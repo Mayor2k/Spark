@@ -1,0 +1,4 @@
+#Sun Feb 25 13:33:06 MSK 2018
+base.0=E\:\\Vault\\Projects\\MusicPlayer\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\65
+path.0=classes.dex
+renamed.0=classes.dex

@@ -1,0 +1,4 @@
+#Thu Mar 01 18:32:55 MSK 2018
+base.0=E\:\\dev\\Projects\\Spark\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\75
+path.0=classes.dex
+renamed.0=classes.dex

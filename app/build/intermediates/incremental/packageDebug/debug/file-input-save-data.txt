@@ -1,0 +1,7 @@
+#Internal package file, do not edit.
+#Thu Mar 01 11:55:08 MSK 2018
+0.baseType=DIRECTORY
+0.base=E\:\\dev\\Projects\\Spark\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\75
+0.path=classes.dex
+0.set=DEX
+count=1

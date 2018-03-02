@@ -1,0 +1,198 @@
+-- Merging decision tree log ---
+manifest
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:1-51:12
+MERGED from [com.android.support:design:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\design-27.0.2.aar\9a908a5fbceb3930b62ba128b5eb3679\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:appcompat-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\appcompat-v7-27.0.2.aar\ce5e5bb800287995f6cd8ba519736537\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:animated-vector-drawable:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-27.0.2.aar\420e4262b787f38adc407e0bbcc84c04\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-vector-drawable:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-27.0.2.aar\e8bcaeb3dac4be191f3922a99f07b4c1\AndroidManifest.xml:17:1-22:12
+MERGED from [com.github.florent37:glidepalette:2.1.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\glidepalette-2.1.2.aar\dd6be76be2a19c4209a2f863176f3134\AndroidManifest.xml:2:1-11:12
+MERGED from [com.android.support:support-v4:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-v4-27.0.2.aar\32f959d46e562e7ec1ae33308d541c7d\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:recyclerview-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\recyclerview-v7-27.0.2.aar\26229f15b947340b6ef8d0018dd46209\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:cardview-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\cardview-v7-27.0.2.aar\45c13876efe1b4518e3a4084f279afd1\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:gridlayout-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\gridlayout-v7-27.0.2.aar\3a3c7a2afd6cc7969696eff15d0b6909\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\59c168b3946de0889dda230c47fe5ad3\AndroidManifest.xml:2:1-11:12
+MERGED from [com.android.support:palette-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\palette-v7-27.0.2.aar\1b15c1ea6572bc5f4449753933aa0e46\AndroidManifest.xml:17:1-22:12
+MERGED from [com.github.bumptech.glide:glide:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\glide-4.6.1.aar\988183896db7d5d5fd4668913ed8f461\AndroidManifest.xml:2:1-13:12
+MERGED from [com.github.liuguangqiang.swipeback:library:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\library-1.0.2.aar\2895daef3395c2a4382a46fb86b2ae9d\AndroidManifest.xml:2:1-11:12
+MERGED from [com.android.support:support-fragment:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-fragment-27.0.2.aar\3149be83390fa87a591f665bc272105f\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-utils:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-core-utils-27.0.2.aar\36ba24d239e0cb6f36af691cf63faa16\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:transition:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\transition-27.0.2.aar\5c20f304cb0fa2b4cb408ac89886ae45\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-media-compat:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-media-compat-27.0.2.aar\223215236f39aab01f8b149f87cb3660\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-ui:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-core-ui-27.0.2.aar\3bd6dbdef4438c4c434f3faa28b10517\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-compat:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-compat-27.0.2.aar\69b43ca69d2ed690e2aa7afc47da9eb1\AndroidManifest.xml:17:1-22:12
+MERGED from [com.github.bumptech.glide:gifdecoder:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\gifdecoder-4.6.1.aar\83496138c884f13adc6f7322ddf0d5b1\AndroidManifest.xml:2:1-11:12
+MERGED from [android.arch.lifecycle:runtime:1.0.3] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\runtime-1.0.3.aar\66338124133eb522b5e9be3f0f55bfd5\AndroidManifest.xml:17:1-24:12
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:1-51:12
+	package
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:3:5-32
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:1-51:12
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+	android:versionCode
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:1-51:12
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:5:5-67
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:5:22-64
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:6:5-80
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:6:22-77
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:7:5-81
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:7:22-78
+uses-permission#android.permission.WAKE_LOCK
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:8:5-68
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:8:22-65
+uses-permission#android.permission.ACTION_HEADSET_PLUG
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:9:5-78
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:9:22-75
+uses-permission#android.permission.MEDIA_CONTENT_CONTROL
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:10:5-80
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:10:22-77
+application
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:12:5-49:19
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\59c168b3946de0889dda230c47fe5ad3\AndroidManifest.xml:9:5-20
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\59c168b3946de0889dda230c47fe5ad3\AndroidManifest.xml:9:5-20
+MERGED from [com.github.bumptech.glide:glide:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\glide-4.6.1.aar\988183896db7d5d5fd4668913ed8f461\AndroidManifest.xml:11:5-20
+MERGED from [com.github.bumptech.glide:glide:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\glide-4.6.1.aar\988183896db7d5d5fd4668913ed8f461\AndroidManifest.xml:11:5-20
+MERGED from [com.github.liuguangqiang.swipeback:library:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\library-1.0.2.aar\2895daef3395c2a4382a46fb86b2ae9d\AndroidManifest.xml:9:5-47
+MERGED from [com.github.liuguangqiang.swipeback:library:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\library-1.0.2.aar\2895daef3395c2a4382a46fb86b2ae9d\AndroidManifest.xml:9:5-47
+MERGED from [com.github.bumptech.glide:gifdecoder:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\gifdecoder-4.6.1.aar\83496138c884f13adc6f7322ddf0d5b1\AndroidManifest.xml:9:5-20
+MERGED from [com.github.bumptech.glide:gifdecoder:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\gifdecoder-4.6.1.aar\83496138c884f13adc6f7322ddf0d5b1\AndroidManifest.xml:9:5-20
+	android:screenOrientation
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:18:9-45
+	android:supportsRtl
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:19:9-35
+	android:label
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:15:9-41
+	android:launchMode
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:16:9-39
+	android:roundIcon
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:17:9-54
+	android:icon
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:14:9-43
+	android:allowBackup
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:13:9-35
+	android:theme
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:20:9-47
+activity#com.mayor2k.spark.UI.Activities.MainActivity
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:21:9-29:20
+	android:label
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:23:13-45
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:22:13-55
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:24:13-28:29
+action#android.intent.action.MAIN
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:25:17-69
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:25:25-66
+category#android.intent.category.LAUNCHER
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:27:17-77
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:27:27-74
+service#com.mayor2k.spark.Services.MusicService
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:31:9-37:19
+	android:exported
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:33:13-37
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:32:13-50
+intent-filter#android.intent.action.MEDIA_BUTTON
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:34:13-36:29
+action#android.intent.action.MEDIA_BUTTON
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:35:17-77
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:35:25-74
+activity#com.mayor2k.spark.UI.Activities.PlayerActivity
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:39:9-41:61
+	android:theme
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:41:13-58
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:40:13-57
+activity#com.mayor2k.spark.UI.Activities.SongTagActivity
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:42:9-45:54
+	android:label
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:44:13-60
+	android:theme
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:45:13-51
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:43:13-58
+activity#com.mayor2k.spark.UI.Activities.AlbumActivity
+ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:46:9-48:61
+	android:theme
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:48:13-58
+	android:name
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml:47:13-56
+uses-sdk
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+MERGED from [com.android.support:design:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\design-27.0.2.aar\9a908a5fbceb3930b62ba128b5eb3679\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:design:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\design-27.0.2.aar\9a908a5fbceb3930b62ba128b5eb3679\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:appcompat-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\appcompat-v7-27.0.2.aar\ce5e5bb800287995f6cd8ba519736537\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:appcompat-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\appcompat-v7-27.0.2.aar\ce5e5bb800287995f6cd8ba519736537\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-27.0.2.aar\420e4262b787f38adc407e0bbcc84c04\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-27.0.2.aar\420e4262b787f38adc407e0bbcc84c04\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-27.0.2.aar\e8bcaeb3dac4be191f3922a99f07b4c1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-27.0.2.aar\e8bcaeb3dac4be191f3922a99f07b4c1\AndroidManifest.xml:20:5-44
+MERGED from [com.github.florent37:glidepalette:2.1.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\glidepalette-2.1.2.aar\dd6be76be2a19c4209a2f863176f3134\AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.florent37:glidepalette:2.1.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\glidepalette-2.1.2.aar\dd6be76be2a19c4209a2f863176f3134\AndroidManifest.xml:7:5-9:41
+MERGED from [com.android.support:support-v4:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-v4-27.0.2.aar\32f959d46e562e7ec1ae33308d541c7d\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-v4:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-v4-27.0.2.aar\32f959d46e562e7ec1ae33308d541c7d\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\recyclerview-v7-27.0.2.aar\26229f15b947340b6ef8d0018dd46209\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\recyclerview-v7-27.0.2.aar\26229f15b947340b6ef8d0018dd46209\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cardview-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\cardview-v7-27.0.2.aar\45c13876efe1b4518e3a4084f279afd1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cardview-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\cardview-v7-27.0.2.aar\45c13876efe1b4518e3a4084f279afd1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:gridlayout-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\gridlayout-v7-27.0.2.aar\3a3c7a2afd6cc7969696eff15d0b6909\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:gridlayout-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\gridlayout-v7-27.0.2.aar\3a3c7a2afd6cc7969696eff15d0b6909\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\59c168b3946de0889dda230c47fe5ad3\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\59c168b3946de0889dda230c47fe5ad3\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support:palette-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\palette-v7-27.0.2.aar\1b15c1ea6572bc5f4449753933aa0e46\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:palette-v7:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\palette-v7-27.0.2.aar\1b15c1ea6572bc5f4449753933aa0e46\AndroidManifest.xml:20:5-44
+MERGED from [com.github.bumptech.glide:glide:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\glide-4.6.1.aar\988183896db7d5d5fd4668913ed8f461\AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.bumptech.glide:glide:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\glide-4.6.1.aar\988183896db7d5d5fd4668913ed8f461\AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.liuguangqiang.swipeback:library:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\library-1.0.2.aar\2895daef3395c2a4382a46fb86b2ae9d\AndroidManifest.xml:5:5-7:41
+MERGED from [com.github.liuguangqiang.swipeback:library:1.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\library-1.0.2.aar\2895daef3395c2a4382a46fb86b2ae9d\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support:support-fragment:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-fragment-27.0.2.aar\3149be83390fa87a591f665bc272105f\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-fragment-27.0.2.aar\3149be83390fa87a591f665bc272105f\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-core-utils-27.0.2.aar\36ba24d239e0cb6f36af691cf63faa16\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-core-utils-27.0.2.aar\36ba24d239e0cb6f36af691cf63faa16\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:transition:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\transition-27.0.2.aar\5c20f304cb0fa2b4cb408ac89886ae45\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:transition:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\transition-27.0.2.aar\5c20f304cb0fa2b4cb408ac89886ae45\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-media-compat:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-media-compat-27.0.2.aar\223215236f39aab01f8b149f87cb3660\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-media-compat:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-media-compat-27.0.2.aar\223215236f39aab01f8b149f87cb3660\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-core-ui-27.0.2.aar\3bd6dbdef4438c4c434f3faa28b10517\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-core-ui-27.0.2.aar\3bd6dbdef4438c4c434f3faa28b10517\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-compat-27.0.2.aar\69b43ca69d2ed690e2aa7afc47da9eb1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:27.0.2] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\support-compat-27.0.2.aar\69b43ca69d2ed690e2aa7afc47da9eb1\AndroidManifest.xml:20:5-44
+MERGED from [com.github.bumptech.glide:gifdecoder:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\gifdecoder-4.6.1.aar\83496138c884f13adc6f7322ddf0d5b1\AndroidManifest.xml:5:5-7:41
+MERGED from [com.github.bumptech.glide:gifdecoder:4.6.1] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\gifdecoder-4.6.1.aar\83496138c884f13adc6f7322ddf0d5b1\AndroidManifest.xml:5:5-7:41
+MERGED from [android.arch.lifecycle:runtime:1.0.3] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\runtime-1.0.3.aar\66338124133eb522b5e9be3f0f55bfd5\AndroidManifest.xml:20:5-22:41
+MERGED from [android.arch.lifecycle:runtime:1.0.3] C:\Users\Maxim\.gradle\caches\transforms-1\files-1.1\runtime-1.0.3.aar\66338124133eb522b5e9be3f0f55bfd5\AndroidManifest.xml:20:5-22:41
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+		ADDED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml
+		INJECTED from E:\dev\Projects\Spark\app\src\main\AndroidManifest.xml

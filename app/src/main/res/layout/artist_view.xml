@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="170dp"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/artistCover"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        app:srcCompat="@drawable/ic_artist_black_24dp" />
+
+    <LinearLayout
+        android:id="@+id/colorArea"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="#beceda"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/artistTitle"
+            android:layout_width="match_parent"
+            android:layout_height="47dp"
+            android:text="Linkin park"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:maxLength="19"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -1,0 +1,100 @@
+package com.mayor2k.spark.UI.Fragments;
+
+import android.content.ContentUris;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.BaseColumns;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.mayor2k.spark.Adapters.SongAdapter;
+import com.mayor2k.spark.Models.Song;
+import com.mayor2k.spark.R;
+import com.mayor2k.spark.UI.Activities.MainActivity;
+
+import java.util.ArrayList;
+
+public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private ListView songView;
+    public static ArrayList<Song> songList;
+    public final static Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+    private SongAdapter songAdt;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_song, container, false);
+        songView = view.findViewById(R.id.song_list);
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        try{
+            songList = new ArrayList<>();
+            songAdt = new SongAdapter(getActivity(), null, songList);
+            songView.setAdapter(songAdt);
+        }catch (IllegalArgumentException e){
+            Toast.makeText(getActivity(),"Nothing found",Toast.LENGTH_LONG).show();
+        }
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    private final String[] COLUMNS = new String[]{
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.ALBUM_ID,
+            MediaStore.Audio.Media.TITLE
+    };
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(), musicUri, COLUMNS, null, null,
+                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data.moveToFirst()) {
+            int titleColumn = data.getColumnIndex(MediaStore.MediaColumns.TITLE);
+            int idColumn = data.getColumnIndex(BaseColumns._ID);
+            int artistColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST);
+            int albumColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM);
+            int column_index = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+            int cover = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID);
+            for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
+                long songId = data.getLong(idColumn);
+                String songTitle = data.getString(titleColumn);
+                String songArtist = data.getString(artistColumn);
+                String songAlbum = data.getString(albumColumn);
+                String pathId = data.getString(column_index);
+                long songCover = data.getLong(cover);
+                Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+                Uri uri = ContentUris.withAppendedId(sArtworkUri, songCover);
+                songList.add(new Song(songId, songTitle, songArtist, songAlbum, pathId, uri));
+            }
+            songAdt.swapCursor(data);
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        songAdt.swapCursor(null);
+        songList.clear();
+    }
+}

@@ -36,7 +36,7 @@ import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
 public class PlayerActivity extends AppCompatActivity {
     public ImageView trackCover;
     public SeekBar seekBar;
-
+//CHECK!
     public ImageButton prev;
     public ImageButton play;
     public ImageButton next;

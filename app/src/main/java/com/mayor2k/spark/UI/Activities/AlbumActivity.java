@@ -92,7 +92,7 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
             String dataAlbum = data.getString(albumColumn);
             Log.i("TAGGING","is "+Objects.equals(dataAlbum, album.getTitle()));
             if (Objects.equals(dataAlbum, album.getTitle()))
-
+                Log.i("make","sth");
         }
         cursorAdapter.swapCursor(data);
     }

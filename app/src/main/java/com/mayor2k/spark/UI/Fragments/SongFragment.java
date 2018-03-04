@@ -54,11 +54,13 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private final String[] COLUMNS = new String[]{
             MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.ALBUM_ID,
-            MediaStore.Audio.Media.TITLE
+            MediaStore.Audio.Media.TRACK,
+            MediaStore.Audio.Media.DURATION
     };
 
     @Override
@@ -75,6 +77,8 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
             int artistColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST);
             int albumColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM);
             int column_index = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+            int trackColumn = data.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK);
+            int durationColumn = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);
             int cover = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID);
             for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
                 long songId = data.getLong(idColumn);
@@ -85,7 +89,10 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                 long songCover = data.getLong(cover);
                 Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                 Uri uri = ContentUris.withAppendedId(sArtworkUri, songCover);
-                songList.add(new Song(songId, songTitle, songArtist, songAlbum, pathId, uri));
+                String songTrack = data.getString(trackColumn);
+                int songDuration = data.getInt(durationColumn);
+                songList.add(new Song(songId, songTitle, songArtist, songAlbum,
+                        pathId, uri, songTrack, songDuration));
             }
             songAdt.swapCursor(data);
         }

@@ -10,15 +10,19 @@ public class Song {
     private String artist;
     private String path;
     private Uri uri;
+    private String track;
+    private int duration;
 
-    public Song(long songID, String songTitle, String songArtist,
-                String songAlbum, String songPath, Uri songUri) {
+    public Song(long songID, String songTitle, String songArtist, String songAlbum,
+                String songPath, Uri songUri, String songTrack, int songDuration) {
         id=songID;
         uri=songUri;
         title=songTitle;
         album=songAlbum;
         artist=songArtist;
         path=songPath;
+        track=songTrack;
+        duration=songDuration;
     }
 
     public long getId() {
@@ -61,5 +65,21 @@ public class Song {
 
     public void setUri(Uri uri) {
         this.uri = uri;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public String getTrack() {
+        return track;
+    }
+
+    public void setTrack(String track) {
+        this.track = track;
     }
 }

@@ -10,7 +10,10 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -22,6 +25,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.github.florent37.glidepalette.GlidePalette;
+import com.mayor2k.spark.Adapters.CustomAdapter;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
@@ -32,23 +36,21 @@ import java.util.Objects;
 import static com.mayor2k.spark.UI.Activities.MainActivity.currentAlbum;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
+import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
 public class AlbumActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     Album album = albumList.get(currentAlbum);
-    private SimpleCursorAdapter cursorAdapter;
     private ArrayList<Song> albumSongs;
+    private CustomAdapter customAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
         ImageView albumCover = findViewById(R.id.albumCover);
-        final TextView albumTitle = findViewById(R.id.albumTitle);
-        LinearLayout titleArea = findViewById(R.id.titleArea);
-        ListView trackList = findViewById(R.id.trackList);
-        albumTitle.setText(album.getTitle());
-        cursorAdapter = new SimpleCursorAdapter(this,R.layout.song_item,null,
-                new String[] { MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.DURATION,MediaStore.Audio.Media.TRACK},
-                new int[] { R.id.songName, R.id.songDuration, R.id.songNumber }, 1);
+        RecyclerView trackList = findViewById(R.id.trackList);
+        customAdapter = new CustomAdapter(this,albumSongs,null);
+        albumSongs = new ArrayList<>();
+
         Glide.with(this)
                 .load(album.getUri())
                 .apply(new RequestOptions()
@@ -56,19 +58,9 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
                         .error(R.drawable.ic_album_black_24dp)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                 )
-                .listener(GlidePalette.with(String.valueOf(album.getUri()))
-                        .use(GlidePalette.Profile.MUTED)
-                        .intoCallBack(
-                                new GlidePalette.CallBack() {
-                                    @Override
-                                    public void onPaletteLoaded(@Nullable Palette palette) {
-                                        albumTitle.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-                                    }
-                                })
-                        .intoBackground(titleArea)
-                )
                 .into(albumCover);
-        trackList.setAdapter(cursorAdapter);
+        //trackList.setLayoutManager(new LinearLayoutManager(this));
+        trackList.setAdapter(customAdapter);
         getSupportLoaderManager().initLoader(1,null,this);
     }
 
@@ -88,17 +80,19 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
+            int i = data.getPosition();
             int albumColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM);
             String dataAlbum = data.getString(albumColumn);
-            Log.i("TAGGING","is "+Objects.equals(dataAlbum, album.getTitle()));
-            if (Objects.equals(dataAlbum, album.getTitle()))
-                Log.i("make","sth");
+            if (Objects.equals(dataAlbum, album.getTitle())){
+                Song song = songList.get(i);
+                albumSongs.add(song);
+            }
+            customAdapter.swapCursor(data);
         }
-        cursorAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        cursorAdapter.swapCursor(null);
+        customAdapter.swapCursor(null);
     }
 }

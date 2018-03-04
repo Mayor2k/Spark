@@ -2,29 +2,20 @@ package com.mayor2k.spark.UI.Activities;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Adapters.CustomAdapter;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Song;
@@ -40,16 +31,16 @@ import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
 public class AlbumActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     Album album = albumList.get(currentAlbum);
-    private ArrayList<Song> albumSongs;
-    private CustomAdapter customAdapter;
+    public ArrayList<Song> albumSongs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
         ImageView albumCover = findViewById(R.id.albumCover);
         RecyclerView trackList = findViewById(R.id.trackList);
-        customAdapter = new CustomAdapter(this,albumSongs,null);
         albumSongs = new ArrayList<>();
+        CustomAdapter customAdapter = new CustomAdapter(albumSongs);
 
         Glide.with(this)
                 .load(album.getUri())
@@ -59,7 +50,7 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                 )
                 .into(albumCover);
-        //trackList.setLayoutManager(new LinearLayoutManager(this));
+        trackList.setLayoutManager(new LinearLayoutManager(this));
         trackList.setAdapter(customAdapter);
         getSupportLoaderManager().initLoader(1,null,this);
     }
@@ -84,15 +75,13 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
             int albumColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM);
             String dataAlbum = data.getString(albumColumn);
             if (Objects.equals(dataAlbum, album.getTitle())){
+                Log.i("tagging","complite!");
                 Song song = songList.get(i);
                 albumSongs.add(song);
             }
-            customAdapter.swapCursor(data);
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        customAdapter.swapCursor(null);
-    }
+    public void onLoaderReset(Loader<Cursor> loader) {}
 }

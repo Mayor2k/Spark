@@ -17,24 +17,10 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
-    private final DataSetObserver mDataSetObserver;
-    private long mRowIdColumn;
-    private Context context;
-    private boolean mDataValid;
     private ArrayList<Song> songs;
-    private Cursor cursor;
 
-
-    public CustomAdapter(Context theContext, ArrayList<Song> theSongs, Cursor theCursor){
-        context=theContext;
+    public CustomAdapter(ArrayList<Song> theSongs){
         songs=theSongs;
-        cursor=theCursor;
-        mDataValid = cursor != null;
-        mRowIdColumn = mDataValid ? cursor.getColumnIndex("_id") : -1;
-        mDataSetObserver = new NotifyingDataSetObserver();
-        if (cursor != null) {
-            cursor.registerDataSetObserver(mDataSetObserver);
-        }
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -72,51 +58,12 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return 0;
+        //return 0;
+        return songs.size();
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-    }
-
-    public Cursor swapCursor(Cursor newCursor) {
-        if (newCursor == cursor) {
-            return null;
-        }
-        final Cursor oldCursor = cursor;
-        if (oldCursor != null && mDataSetObserver != null) {
-            oldCursor.unregisterDataSetObserver(mDataSetObserver);
-        }
-        cursor = newCursor;
-        if (cursor != null) {
-            if (mDataSetObserver != null) {
-                cursor.registerDataSetObserver(mDataSetObserver);
-            }
-            mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
-            mDataValid = true;
-            notifyDataSetChanged();
-        } else {
-            mRowIdColumn = -1;
-            mDataValid = false;
-            notifyDataSetChanged();
-        }
-        return oldCursor;
-    }
-
-    private class NotifyingDataSetObserver extends DataSetObserver {
-        @Override
-        public void onChanged() {
-            super.onChanged();
-            mDataValid = true;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public void onInvalidated() {
-            super.onInvalidated();
-            mDataValid = false;
-            notifyDataSetChanged();
-        }
     }
 }

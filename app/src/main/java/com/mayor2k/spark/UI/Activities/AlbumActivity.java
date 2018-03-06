@@ -75,7 +75,6 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
             int albumColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM);
             String dataAlbum = data.getString(albumColumn);
             if (Objects.equals(dataAlbum, album.getTitle())){
-                Log.i("tagging","complite!");
                 Song song = songList.get(i);
                 albumSongs.add(song);
             }

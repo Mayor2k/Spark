@@ -1,21 +1,26 @@
 package com.mayor2k.spark.UI.Activities;
 
 import android.database.Cursor;
+import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
+import android.support.v7.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Adapters.CustomAdapter;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Song;
@@ -37,6 +42,15 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
+        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.albumCollapsing);
+        collapsingToolbarLayout.setTitle(album.getTitle());
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar()!=null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        }
         ImageView albumCover = findViewById(R.id.albumCover);
         RecyclerView trackList = findViewById(R.id.trackList);
         albumSongs = new ArrayList<>();
@@ -48,6 +62,19 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
                         .override(Target.SIZE_ORIGINAL)
                         .error(R.drawable.ic_album_black_24dp)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
+                )
+                .listener(GlidePalette.with(String.valueOf(album.getUri()))
+                        .use(GlidePalette.Profile.MUTED)
+                        .intoCallBack(
+                                new GlidePalette.CallBack() {
+                                    @Override
+                                    public void onPaletteLoaded(@Nullable Palette palette) {
+                                        int color = palette.getMutedColor(0);
+                                        collapsingToolbarLayout.setContentScrimColor(color);
+                                        collapsingToolbarLayout.setStatusBarScrimColor(color);
+
+                                    }
+                                })
                 )
                 .into(albumCover);
         trackList.setLayoutManager(new LinearLayoutManager(this));
@@ -83,4 +110,10 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
+    }
 }

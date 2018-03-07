@@ -1,6 +1,5 @@
 package com.mayor2k.spark.Services;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,9 +9,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -26,15 +23,11 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RemoteViews;
 
 import com.bumptech.glide.Glide;
@@ -58,7 +51,6 @@ import java.io.InputStream;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.Utils.CoverUtil.drawableToBitmap;
 import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
-import static com.mayor2k.spark.Utils.CoverUtil.getPaletteBitmap;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener {
     public static MediaPlayer player = new MediaPlayer();

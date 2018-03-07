@@ -45,7 +45,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Song song = songs.get(position);
 
-        holder.songNumber.setText(song.getTrack());
+        holder.songNumber.setText(String.valueOf(song.getTrack()));
         holder.songTitle.setText(song.getTitle());
         holder.songDuration.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(song.getDuration()),
                 TimeUnit.MILLISECONDS.toSeconds(song.getDuration()%60000)));
@@ -58,7 +58,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        //return 0;
         return songs.size();
     }
 

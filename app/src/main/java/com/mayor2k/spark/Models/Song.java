@@ -10,11 +10,11 @@ public class Song {
     private String artist;
     private String path;
     private Uri uri;
-    private String track;
+    private int track;
     private int duration;
 
     public Song(long songID, String songTitle, String songArtist, String songAlbum,
-                String songPath, Uri songUri, String songTrack, int songDuration) {
+                String songPath, Uri songUri, int songTrack, int songDuration) {
         id=songID;
         uri=songUri;
         title=songTitle;
@@ -75,11 +75,11 @@ public class Song {
         this.duration = duration;
     }
 
-    public String getTrack() {
+    public int getTrack() {
         return track;
     }
 
-    public void setTrack(String track) {
+    public void setTrack(int track) {
         this.track = track;
     }
 }

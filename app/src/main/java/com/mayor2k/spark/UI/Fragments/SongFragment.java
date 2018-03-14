@@ -24,6 +24,7 @@ import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.MainActivity;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private ListView songView;
@@ -89,7 +90,18 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                 long songCover = data.getLong(cover);
                 Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                 Uri uri = ContentUris.withAppendedId(sArtworkUri, songCover);
-                String songTrack = data.getString(trackColumn);
+
+                String track = data.getString(trackColumn);
+                int songTrack;
+                if (track.length()==4) {
+                    if (!Objects.equals(track.substring(2), "0"))
+                        songTrack = Integer.parseInt(track.substring(2));
+                    else
+                        songTrack = Integer.parseInt(track.substring(3));
+                }
+                else
+                    songTrack = Integer.parseInt(track);
+
                 int songDuration = data.getInt(durationColumn);
                 songList.add(new Song(songId, songTitle, songArtist, songAlbum,
                         pathId, uri, songTrack, songDuration));

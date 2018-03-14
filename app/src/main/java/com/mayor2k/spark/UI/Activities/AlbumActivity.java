@@ -1,6 +1,9 @@
 package com.mayor2k.spark.UI.Activities;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -12,14 +15,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.support.v7.widget.Toolbar;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.elmargomez.typer.Font;
+import com.elmargomez.typer.Typer;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Adapters.CustomAdapter;
 import com.mayor2k.spark.Models.Album;
@@ -38,12 +47,26 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
     Album album = albumList.get(currentAlbum);
     public ArrayList<Song> albumSongs;
 
+    @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
+
+        //getting status bar height
+        Rect rectangle = new Rect();
+        Window window = getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
+        int statusBarHeight = rectangle.top;
+        int contentViewTop =
+                window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
+        int titleBarHeight= contentViewTop - statusBarHeight;
+
         final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.albumCollapsing);
         collapsingToolbarLayout.setTitle(album.getTitle());
+        collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.drawable.gradient);
+        Typeface font = Typer.set(this).getFont(Font.ROBOTO_MEDIUM);
+        collapsingToolbarLayout.setExpandedTitleTypeface(font);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar()!=null){
@@ -51,6 +74,11 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         }
+        View gradientView = findViewById(R.id.gradientView);
+        CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) gradientView.getLayoutParams();
+        params.height = toolbar.getHeight()+titleBarHeight;
+        gradientView.setLayoutParams(params);
+
         ImageView albumCover = findViewById(R.id.albumCover);
         RecyclerView trackList = findViewById(R.id.trackList);
         albumSongs = new ArrayList<>();

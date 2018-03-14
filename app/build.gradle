@@ -38,5 +38,6 @@ dependencies {
     compile 'com.github.florent37:glidepalette:2.1.2'
     compile 'org:jaudiotagger:2.0.3'
     compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
+    compile 'com.elmargomez.typer:typerlib:1.0.0'
     testCompile 'junit:junit:4.12'
 }

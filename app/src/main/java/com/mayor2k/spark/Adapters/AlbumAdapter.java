@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.R;
@@ -68,7 +69,7 @@ public class AlbumAdapter extends CursorAdapter {
         Glide.with(context)
                 .load(album.getUri())
                 .apply(new RequestOptions()
-                        .override(170)
+                        .override(Target.SIZE_ORIGINAL)
                         .error(R.drawable.ic_album_black_24dp)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                 )

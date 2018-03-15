@@ -71,11 +71,14 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), musicUri, COLUMNS, null, null,
-                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data==null){
+            return;
+        }
         ArrayList<String>checking = new ArrayList<>();
         if (data.moveToFirst()) {
             int idColumn = data.getColumnIndex(MediaStore.Audio.Albums._ID);
@@ -103,7 +106,6 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        albumList.clear();
         albumAdapter.swapCursor(null);
     }
 }

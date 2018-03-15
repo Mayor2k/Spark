@@ -142,8 +142,6 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
                                 if (!f.delete()) {
                                     Log.i("TAGGING", "Failed to delete file");
                                 }
-                                songList.clear();
-                                albumList.clear();
                                 getContext().getContentResolver().notifyChange(Uri.parse("content://media"), null);
                                 Log.i(MainActivity.TAG,"CURSOR IS RESTART!"+songList.size());
                                 dismiss();

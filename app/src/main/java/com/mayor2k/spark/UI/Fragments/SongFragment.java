@@ -43,12 +43,12 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        try{
+        try {
             songList = new ArrayList<>();
             songAdt = new SongAdapter(getActivity(), null, songList);
             songView.setAdapter(songAdt);
-        }catch (IllegalArgumentException e){
-            Toast.makeText(getActivity(),"Nothing found",Toast.LENGTH_LONG).show();
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(getActivity(), "Nothing found", Toast.LENGTH_LONG).show();
         }
         getLoaderManager().initLoader(0, null, this);
     }
@@ -72,6 +72,9 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data==null){
+            return;
+        }
         if (data.moveToFirst()) {
             int titleColumn = data.getColumnIndex(MediaStore.MediaColumns.TITLE);
             int idColumn = data.getColumnIndex(BaseColumns._ID);
@@ -93,13 +96,12 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
                 String track = data.getString(trackColumn);
                 int songTrack;
-                if (track.length()==4) {
+                if (track.length() == 4) {
                     if (!Objects.equals(track.substring(2), "0"))
                         songTrack = Integer.parseInt(track.substring(2));
                     else
                         songTrack = Integer.parseInt(track.substring(3));
-                }
-                else
+                } else
                     songTrack = Integer.parseInt(track);
 
                 int songDuration = data.getInt(durationColumn);
@@ -114,6 +116,5 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         songAdt.swapCursor(null);
-        songList.clear();
     }
 }

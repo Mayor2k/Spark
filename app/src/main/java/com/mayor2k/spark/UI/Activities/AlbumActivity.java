@@ -15,13 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.support.v7.widget.Toolbar;
-import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -36,7 +34,6 @@ import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import static com.mayor2k.spark.UI.Activities.MainActivity.currentAlbum;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
@@ -112,27 +109,22 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
 
     private final String[] COLUMNS = new String[]{
             MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.TRACK,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.AudioColumns.ALBUM,
-            MediaStore.Audio.Media.TITLE
+            MediaStore.Audio.Albums.ALBUM,
     };
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, musicUri, COLUMNS, null, null,
-                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        String selection = MediaStore.Audio.Albums.A + "=?";
+        String [] selectionArgs = {album.getTitle()};
+        return new CursorLoader(this, musicUri, COLUMNS, selection,
+                selectionArgs, MediaStore.Audio.Media.ALBUM_KEY);
     }
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
             int i = data.getPosition();
-            int albumColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM);
-            String dataAlbum = data.getString(albumColumn);
-            if (Objects.equals(dataAlbum, album.getTitle())){
-                Song song = songList.get(i);
-                albumSongs.add(song);
-            }
+            Song song = songList.get(i);
+            albumSongs.add(song);
         }
     }
 

@@ -1,10 +1,13 @@
 package com.mayor2k.spark.UI.Activities;
 
 import android.annotation.SuppressLint;
+import android.content.ContentUris;
 import android.database.Cursor;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -35,6 +38,7 @@ import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.mayor2k.spark.UI.Activities.MainActivity.currentAlbum;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
@@ -110,10 +114,13 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
 
     private final String[] COLUMNS = new String[]{
             MediaStore.Audio.Media._ID,
-            MediaStore.Audio.AudioColumns.TRACK,
-            MediaStore.Audio.AudioColumns.ARTIST,
-            MediaStore.MediaColumns.TITLE,
-            MediaStore.Audio.Albums.ALBUM
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.ALBUM_ID,
+            MediaStore.Audio.Media.TRACK,
+            MediaStore.Audio.Media.DURATION
     };
 
     @Override
@@ -123,14 +130,41 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
         String sortOrder = MediaStore.Audio.AudioColumns.ARTIST + " ASC, "
                 + MediaStore.Audio.AudioColumns.TRACK + " ASC";
         return new CursorLoader(AlbumActivity.this, musicUri, COLUMNS, selection,
-                selectionArgs,sortOrder);
+                selectionArgs, sortOrder);
     }
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        int titleColumn = data.getColumnIndex(MediaStore.MediaColumns.TITLE);
+        int idColumn = data.getColumnIndex(BaseColumns._ID);
+        int artistColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST);
+        int albumColumn = data.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM);
+        int column_index = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+        int trackColumn = data.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK);
+        int durationColumn = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);
+        int cover = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID);
         for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
-            int titleColumn = data.getColumnIndex(MediaStore.MediaColumns.TITLE);
-            String title = data.getString(titleColumn);
-            Log.i("tagging","is "+title);
+            long songId = data.getLong(idColumn);
+            String songTitle = data.getString(titleColumn);
+            String songArtist = data.getString(artistColumn);
+            String songAlbum = data.getString(albumColumn);
+            String pathId = data.getString(column_index);
+            long songCover = data.getLong(cover);
+            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+            Uri uri = ContentUris.withAppendedId(sArtworkUri, songCover);
+
+            String track = data.getString(trackColumn);
+            int songTrack;
+            if (track.length() == 4) {
+                if (!Objects.equals(track.substring(2), "0"))
+                    songTrack = Integer.parseInt(track.substring(2));
+                else
+                    songTrack = Integer.parseInt(track.substring(3));
+            } else
+                songTrack = Integer.parseInt(track);
+
+            int songDuration = data.getInt(durationColumn);
+            albumSongs.add(new Song(songId, songTitle, songArtist, songAlbum,
+                    pathId, uri, songTrack, songDuration));
         }
     }
 

@@ -11,6 +11,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,16 +29,15 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private ListView songView;
+    private RecyclerView songView;
     public static ArrayList<Song> songList;
     public final static Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-    private SongAdapter songAdt;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_song, container, false);
-        songView = view.findViewById(R.id.song_list);
+        songView = view.findViewById(R.id.trackList);
         return view;
     }
 
@@ -45,7 +46,8 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onActivityCreated(savedInstanceState);
         try {
             songList = new ArrayList<>();
-            songAdt = new SongAdapter(getActivity(), null, songList);
+            SongAdapter songAdt = new SongAdapter(songList);
+            songView.setLayoutManager(new LinearLayoutManager(getActivity()));
             songView.setAdapter(songAdt);
         } catch (IllegalArgumentException e) {
             Toast.makeText(getActivity(), "Nothing found", Toast.LENGTH_LONG).show();
@@ -108,13 +110,10 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                 songList.add(new Song(songId, songTitle, songArtist, songAlbum,
                         pathId, uri, songTrack, songDuration));
             }
-            songAdt.swapCursor(data);
         }
 
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        songAdt.swapCursor(null);
-    }
+    public void onLoaderReset(Loader<Cursor> loader) {}
 }

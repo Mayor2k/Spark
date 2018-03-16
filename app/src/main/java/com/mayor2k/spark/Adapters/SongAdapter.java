@@ -2,100 +2,103 @@ package com.mayor2k.spark.Adapters;
 
 import java.util.ArrayList;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
+import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 
-import static com.mayor2k.spark.Utils.CoverUtil.drawableToBitmap;
-
-public class SongAdapter extends CursorAdapter {
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     private ArrayList<Song> songs;
-    private LayoutInflater songInf;
 
-    public SongAdapter(Context c,Cursor cursor, ArrayList<Song> theSongs){
-        super(c,cursor,1);
+    public SongAdapter(ArrayList<Song> theSongs){
         songs=theSongs;
-        songInf=LayoutInflater.from(c);
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView coverView;
+        TextView songTitle,songArtist;
+        ViewHolder(View v) {
+            super(v);
+            coverView = v.findViewById(R.id.songCover);
+            songTitle = v.findViewById(R.id.songName);
+            songArtist = v.findViewById(R.id.songArtist);
+        }
+    }
+
+    private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(v.getId()==R.id.songArea){
+                songPosition=(Integer)v.getTag();
+                serviceIntent.setAction(Constants.STARTFOREGROUND_ACTION);
+                startService(serviceIntent);
+            }
+            else if (v.getId()==R.id.songMenu){
+                parentTag = (Integer)((View) v.getParent()).getTag();
+                bottomSheetDialogFragment.show(getSupportFragmentManager(),
+                        bottomSheetDialogFragment.getTag());
+            }
+        }
+    };
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.song_view, parent, false);
+        view.setOnClickListener(mOnClickListener);
+        return new ViewHolder(view);
     }
 
     @Override
-    public int getCount() {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        Song song = songs.get(position);
+
+        holder.songTitle.setText(song.getTitle());
+        holder.songArtist.setText(song.getArtist());
+
+        Glide.with(holder.coverView.getContext())
+                .load(song.getUri())
+                .apply(new RequestOptions()
+                        .override(Target.SIZE_ORIGINAL)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .error(R.drawable.cover)
+                )
+                .into(holder.coverView);
+    }
+
+
+    @Override
+    public long getItemId(int arg0) {
+        return super.getItemId(arg0);
+    }
+
+    @Override
+    public int getItemCount() {
         return songs.size();
     }
 
     @Override
-    public Object getItem(int arg0) {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int arg0) {
-        return 0;
-    }
-
-    @Override
-    public View getView(int position, final View convertView, ViewGroup parent) {
-        @SuppressLint("ViewHolder") LinearLayout songLay = (LinearLayout)songInf.inflate
-                (R.layout.song_view, parent, false);
-
-        TextView titleView = songLay.findViewById(R.id.songName);
-        TextView artistView = songLay.findViewById(R.id.songArtist);
-        final ImageView coverView = songLay.findViewById(R.id.songCover);
-        Song song = songs.get(position);
-
-        titleView.setText(song.getTitle());
-        artistView.setText(song.getArtist());
-
-        Glide.with(coverView.getContext())
-                .asBitmap()
-                .load(song.getUri())
-                .apply(new RequestOptions()
-                        .override(64)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                )
-                .into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        coverView.setImageBitmap(resource);
-                    }
-
-                    @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        coverView.setImageBitmap(BitmapFactory.decodeResource(coverView.getContext().getResources(),
-                                R.drawable.cover_64dp));
-                    }
-                });
-        songLay.setTag(position);
-        return songLay;
-    }
-
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return null;
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
     }
 }

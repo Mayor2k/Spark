@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity{
     public static int songPosition;
     public static int currentAlbum;
     public static int parentTag;
-    private Intent serviceIntent;
+    public static Intent serviceIntent;
 
     public BottomSheetDialogFragment bottomSheetDialogFragment =
             new BottomSheetDialog();

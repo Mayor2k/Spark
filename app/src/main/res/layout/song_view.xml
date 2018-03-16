@@ -4,7 +4,6 @@
     android:id="@+id/songArea"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:onClick="playSong"
     android:orientation="horizontal"
     android:paddingBottom="5dp"
     android:paddingLeft="15dp"
@@ -14,7 +13,6 @@
         android:id="@+id/songCover"
         android:layout_width="54dp"
         android:layout_height="54dp"
-        android:src="@drawable/cover"
         android:layout_gravity="center"
         android:layout_marginRight="15dp" />
 
@@ -49,7 +47,6 @@
     <ImageButton
         android:id="@+id/songMenu"
         android:padding="10dp"
-        android:onClick="playSong"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center"

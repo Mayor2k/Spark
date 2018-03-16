@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -109,22 +110,27 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
 
     private final String[] COLUMNS = new String[]{
             MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Albums.ALBUM,
+            MediaStore.Audio.AudioColumns.TRACK,
+            MediaStore.Audio.AudioColumns.ARTIST,
+            MediaStore.MediaColumns.TITLE,
+            MediaStore.Audio.Albums.ALBUM
     };
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String selection = MediaStore.Audio.Albums.A + "=?";
+        String selection = MediaStore.Audio.Albums.ALBUM + "=?";
         String [] selectionArgs = {album.getTitle()};
-        return new CursorLoader(this, musicUri, COLUMNS, selection,
-                selectionArgs, MediaStore.Audio.Media.ALBUM_KEY);
+        String sortOrder = MediaStore.Audio.AudioColumns.ARTIST + " ASC, "
+                + MediaStore.Audio.AudioColumns.TRACK + " ASC";
+        return new CursorLoader(AlbumActivity.this, musicUri, COLUMNS, selection,
+                selectionArgs,sortOrder);
     }
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
-            int i = data.getPosition();
-            Song song = songList.get(i);
-            albumSongs.add(song);
+            int titleColumn = data.getColumnIndex(MediaStore.MediaColumns.TITLE);
+            String title = data.getString(titleColumn);
+            Log.i("tagging","is "+title);
         }
     }
 

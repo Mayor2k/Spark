@@ -1,7 +1,7 @@
 package com.mayor2k.spark.UI.Activities;
 
 import android.net.Uri;
-import android.os.Bundle;;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,8 +26,10 @@ import org.jaudiotagger.tag.TagException;
 import java.io.File;
 import java.io.IOException;
 
+import static com.mayor2k.spark.Adapters.SongAdapter.parentTag;
+
 public class SongTagActivity extends AppCompatActivity {
-    Song song = SongFragment.songList.get(MainActivity.parentTag);
+    Song song = SongFragment.songList.get(parentTag);
     private EditText songTitle;
     private EditText albumTitle;
     private EditText artistTitle;

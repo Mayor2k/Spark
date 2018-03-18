@@ -47,7 +47,7 @@ import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
 public class AlbumActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     Album album = albumList.get(currentAlbum);
-    public ArrayList<Song> albumSongs;
+    public static ArrayList<Song> albumSongs;
 
     @SuppressLint("ResourceType")
     @Override

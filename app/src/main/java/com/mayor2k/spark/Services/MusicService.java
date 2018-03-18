@@ -41,7 +41,6 @@ import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.PlayerActivity;
-import com.mayor2k.spark.UI.Activities.MainActivity;
 import com.mayor2k.spark.UI.Fragments.SongFragment;
 
 import java.io.FileNotFoundException;
@@ -49,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
+import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.Utils.CoverUtil.drawableToBitmap;
 import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
 
@@ -103,7 +103,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         } else if (intent.getAction().equals(Constants.NEXT_ACTION)) {
             mediaSessionCallback.onSkipToNext();
         } else {
-            songStream(MainActivity.songPosition);
+            songStream(songPosition);
             showNotification(true);
         }
         return START_NOT_STICKY;
@@ -115,8 +115,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }catch (RuntimeException e){
             e.printStackTrace();
         }
-        MainActivity.songPosition = songPos;
-        playSong = SongFragment.songList.get(MainActivity.songPosition);
+        songPosition = songPos;
+        playSong = SongFragment.songList.get(songPosition);
         currSong = playSong.getId();
         Log.i(TAG, "Artist " + playSong.getArtist() + " Song " + playSong.getTitle());
         trackUri = ContentUris.withAppendedId
@@ -126,7 +126,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         } catch (IOException | RuntimeException e) {
             e.printStackTrace();
         }
-
         try{
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
         }catch (RuntimeException e){
@@ -361,7 +360,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         @Override
         public void onSkipToPrevious() {
             if (player.getCurrentPosition() > 3000) {
-                songStream(MainActivity.songPosition);
+                songStream(songPosition);
             } else {
                 try {
                     if (isQueue) {
@@ -369,9 +368,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                         isQueue = false;
                     }
                     else
-                        songStream(MainActivity.songPosition - 1);
+                        songStream(songPosition - 1);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    songStream(SongFragment.songList.size() - 1);
+                    songStream(0);
                 }
             }
             showNotification(true);
@@ -411,9 +410,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     isQueue = false;
                 }
                 else
-                    songStream(MainActivity.songPosition + 1);
+                    songStream(songPosition + 1);
             } catch (IndexOutOfBoundsException e) {
-                songStream(0);
+                songStream(songPosition - 1);
             }
             showNotification(true);
             Log.i(TAG, "Clicked Next");

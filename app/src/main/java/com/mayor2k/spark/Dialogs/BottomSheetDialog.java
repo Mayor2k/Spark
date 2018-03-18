@@ -31,8 +31,7 @@ import java.io.File;
 
 import static com.mayor2k.spark.Services.MusicService.isQueue;
 import static com.mayor2k.spark.Services.MusicService.queuePosition;
-import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
-import static com.mayor2k.spark.UI.Fragments.ArtistFragment.artistList;
+import static com.mayor2k.spark.Adapters.SongAdapter.parentTag;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
 import static com.mayor2k.spark.Utils.CoverUtil.getPaletteBitmap;
@@ -68,7 +67,7 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
     @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(Dialog dialog, int style) {
-        final Song song = songList.get(MainActivity.parentTag);
+        final Song song = songList.get(parentTag);
         View contentView;
         super.setupDialog(dialog, style);
         if (isCover(song,getContext())){
@@ -105,7 +104,7 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
             @Override
             public void onClick(View v) {
                 isQueue = true;
-                queuePosition = MainActivity.parentTag;
+                queuePosition = parentTag;
                 Toast.makeText(getActivity(),"Song added to queue",Toast.LENGTH_SHORT).show();
                 dismiss();
             }
@@ -136,7 +135,7 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
                             public void onClick(DialogInterface dialog, int id) {
                                 ContentResolver contentResolver = getActivity().getContentResolver();
                                 Uri deleteUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                                        songList.get(MainActivity.parentTag).getId());
+                                        songList.get(parentTag).getId());
                                 contentResolver.delete(deleteUri, null, null);
                                 File f = new File(song.getPath());
                                 if (!f.delete()) {

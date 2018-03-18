@@ -17,28 +17,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.R;
-import com.mayor2k.spark.Dialogs.BottomSheetDialog;
-import com.mayor2k.spark.Services.MusicService;
 import com.mayor2k.spark.UI.Fragments.AlbumFragment;
 import com.mayor2k.spark.UI.Fragments.ArtistFragment;
 import com.mayor2k.spark.UI.Fragments.SongFragment;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.UI.Fragments.ViewPagerAdapter;
 
-import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
-
+import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 
 public class MainActivity extends AppCompatActivity{
     public static final String TAG = "TAGGING";
-    public static int songPosition;
     public static int currentAlbum;
-    public static int parentTag;
-    public static Intent serviceIntent;
-
-    public BottomSheetDialogFragment bottomSheetDialogFragment =
-            new BottomSheetDialog();
     public TabLayout tabLayout;
     public ViewPager viewPager;
     public Toolbar toolbar;
@@ -63,7 +53,6 @@ public class MainActivity extends AppCompatActivity{
         setupViewPager(viewPager);
         tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        serviceIntent = new Intent(this, MusicService.class);
         isStoragePermissionGranted();
     }
 
@@ -73,19 +62,6 @@ public class MainActivity extends AppCompatActivity{
         inflater.inflate(R.menu.search, menu);
         inflater.inflate(R.menu.navigation, menu);
         return true;
-    }
-
-    public void playSong(View v){
-        if(v.getId()==R.id.songArea){
-            songPosition=(Integer)v.getTag();
-            serviceIntent.setAction(Constants.STARTFOREGROUND_ACTION);
-            startService(serviceIntent);
-        }
-        else if (v.getId()==R.id.songMenu){
-            parentTag = (Integer)((View) v.getParent()).getTag();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(),
-                    bottomSheetDialogFragment.getTag());
-        }
     }
 
     public void onAlbumClick(View v){

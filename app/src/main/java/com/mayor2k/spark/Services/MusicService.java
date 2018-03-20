@@ -27,6 +27,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.graphics.Palette;
+import android.support.v7.graphics.Target;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -41,22 +42,22 @@ import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.PlayerActivity;
-import com.mayor2k.spark.UI.Fragments.SongFragment;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.mayor2k.spark.UI.Activities.AlbumActivity.albumSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
+import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
+import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 import static com.mayor2k.spark.Utils.CoverUtil.drawableToBitmap;
 import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener {
     public static MediaPlayer player = new MediaPlayer();
     public static Song playSong;
-    public long currSong;
-    public Uri trackUri;
     public static int pausePosition;
     public static boolean isQueue;
     public static int queuePosition;
@@ -102,7 +103,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mediaSessionCallback.onPlay();
         } else if (intent.getAction().equals(Constants.NEXT_ACTION)) {
             mediaSessionCallback.onSkipToNext();
-        } else {
+        } else if (intent.getAction().equals(Constants.STARTFOREGROUND_ACTION)) {
+            playArray=songList;
+            songStream(songPosition);
+            showNotification(true);
+        }else if (intent.getAction().equals(Constants.START_ALBUM_ACTION)) {
+            playArray=albumSongs;
             songStream(songPosition);
             showNotification(true);
         }
@@ -116,10 +122,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             e.printStackTrace();
         }
         songPosition = songPos;
-        playSong = SongFragment.songList.get(songPosition);
-        currSong = playSong.getId();
+        playSong = playArray.get(songPosition);
+        long currSong = playSong.getId();
         Log.i(TAG, "Artist " + playSong.getArtist() + " Song " + playSong.getTitle());
-        trackUri = ContentUris.withAppendedId
+        Uri trackUri = ContentUris.withAppendedId
                 (android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,currSong);
         try {
             player.setDataSource(getApplicationContext(), trackUri);
@@ -252,7 +258,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             Glide.with(getApplicationContext())
                     .load(playSong.getUri())
                     .apply(new RequestOptions()
-                            .override(128)
+                            .override(NotificationTarget.SIZE_ORIGINAL)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                     )
                     .listener(GlidePalette.with(String.valueOf(playSong.getUri()))
@@ -449,7 +455,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 public void onAudioFocusChange(int focusChange) {
                     switch (focusChange) {
                         case AudioManager.AUDIOFOCUS_GAIN:
-                            mediaSessionCallback.onPause();
+                            mediaSessionCallback.onPlay();
                             break;
                         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                             mediaSessionCallback.onPause();

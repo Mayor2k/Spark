@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Fragments.AlbumFragment;
 import com.mayor2k.spark.UI.Fragments.ArtistFragment;
@@ -24,11 +25,14 @@ import com.mayor2k.spark.UI.Fragments.SongFragment;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.UI.Fragments.ViewPagerAdapter;
 
+import java.util.ArrayList;
+
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 
 public class MainActivity extends AppCompatActivity{
     public static final String TAG = "TAGGING";
     public static int currentAlbum;
+    public static ArrayList<Song> playArray;
     public TabLayout tabLayout;
     public ViewPager viewPager;
     public Toolbar toolbar;

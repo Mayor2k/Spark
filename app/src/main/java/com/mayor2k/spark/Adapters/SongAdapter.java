@@ -2,17 +2,10 @@ package com.mayor2k.spark.Adapters;
 
 import java.util.ArrayList;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
@@ -20,28 +13,26 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.request.transition.Transition;
 import com.mayor2k.spark.Dialogs.BottomSheetDialog;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.Services.MusicService;
 
+import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
+
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     private ArrayList<Song> songs;
     public static int songPosition;
     public static Intent serviceIntent;
     public static int parentTag;
-    private BottomSheetDialogFragment bottomSheetDialogFragment =
+    public static BottomSheetDialogFragment bottomSheetDialogFragment =
             new BottomSheetDialog();
-
     public SongAdapter(ArrayList<Song> theSongs){
         songs=theSongs;
     }
@@ -74,6 +65,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     private final View.OnClickListener menuOnClickListener = new View.OnClickListener(){
         @Override
         public void onClick(View v) {
+            playArray=songs;
             parentTag = (Integer)((View) v.getParent()).getTag();
             bottomSheetDialogFragment.show(((FragmentActivity)v.getContext()).getSupportFragmentManager(),
                     bottomSheetDialogFragment.getTag());

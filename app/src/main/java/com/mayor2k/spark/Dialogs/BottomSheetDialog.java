@@ -32,6 +32,7 @@ import java.io.File;
 import static com.mayor2k.spark.Services.MusicService.isQueue;
 import static com.mayor2k.spark.Services.MusicService.queuePosition;
 import static com.mayor2k.spark.Adapters.SongAdapter.parentTag;
+import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
 import static com.mayor2k.spark.Utils.CoverUtil.getPaletteBitmap;
@@ -67,7 +68,7 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
     @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(Dialog dialog, int style) {
-        final Song song = songList.get(parentTag);
+        final Song song = playArray.get(parentTag);
         View contentView;
         super.setupDialog(dialog, style);
         if (isCover(song,getContext())){

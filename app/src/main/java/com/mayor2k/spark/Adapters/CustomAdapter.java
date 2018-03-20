@@ -1,6 +1,7 @@
 package com.mayor2k.spark.Adapters;
 
 import android.annotation.SuppressLint;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +17,11 @@ import com.mayor2k.spark.R;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import static com.mayor2k.spark.Adapters.SongAdapter.bottomSheetDialogFragment;
+import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
+import static com.mayor2k.spark.Adapters.SongAdapter.parentTag;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
     private ArrayList<Song> songs;
@@ -45,7 +49,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         @Override
         public void onClick(View v) {
             songPosition=(Integer)v.getTag();
-            serviceIntent.setAction(Constants.ALBUM_ACTION);
+            serviceIntent.setAction(Constants.START_ALBUM_ACTION);
             v.getContext().startService(serviceIntent);
         }
     };
@@ -53,9 +57,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     private final View.OnClickListener menuOnClickListener = new View.OnClickListener(){
         @Override
         public void onClick(View v) {
-            songPosition=(Integer)v.getTag();
-            serviceIntent.setAction(Constants.ALBUM_ACTION);
-            v.getContext().startService(serviceIntent);
+            parentTag = (Integer)((View) v.getParent()).getTag();
+            playArray=songs;
+            bottomSheetDialogFragment.show(((FragmentActivity)v.getContext()).getSupportFragmentManager(),
+                    bottomSheetDialogFragment.getTag());
         }
     };
 

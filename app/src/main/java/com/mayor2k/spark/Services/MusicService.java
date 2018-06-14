@@ -61,6 +61,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static int pausePosition;
     public static boolean isQueue;
     public static int queuePosition;
+    int audioFocusResult;
     public static NotificationManager mNotifyMgr;
     public MediaSessionCompat mediaSession;
     public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
@@ -154,12 +155,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getCoverBitmap(playSong,getApplicationContext()));
         mediaSession.setMetadata(metadata.build());
 
-        int audioFocusResult = audioManager.requestAudioFocus(
-                audioFocusChangeListener,
-                AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN);
-        if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
-            return;
+        startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
 
         mediaSession.setPlaybackState(
                 stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
@@ -379,6 +375,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     songStream(0);
                 }
             }
+            startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
             showNotification(true);
             Log.i(TAG, "Clicked Previous");
             super.onSkipToPrevious();
@@ -400,6 +397,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         public void onPlay() {
             player.seekTo(pausePosition);
             player.start();
+            startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
             showNotification(false);
             Log.i(TAG, "Clicked play");
             mediaSession.setPlaybackState(
@@ -420,6 +418,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             } catch (IndexOutOfBoundsException e) {
                 songStream(songPosition - 1);
             }
+            startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
             showNotification(true);
             Log.i(TAG, "Clicked Next");
             super.onSkipToNext();
@@ -428,7 +427,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         @Override
         public void onStop() {
             audioManager.abandonAudioFocus(audioFocusChangeListener);
-            unregisterReceiver(myReceiver);
+            //unregisterReceiver(myReceiver);
             if (player.isPlaying())
                 stopForeground(true);
             else
@@ -455,10 +454,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 public void onAudioFocusChange(int focusChange) {
                     switch (focusChange) {
                         case AudioManager.AUDIOFOCUS_GAIN:
-                            mediaSessionCallback.onPlay();
+                            if(player.isPlaying()){
+                                mediaSessionCallback.onPlay();
+                            }
+                            else{
+                                mediaSessionCallback.onStop();
+                            }
                             break;
                         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                            mediaSessionCallback.onPause();
+                            mediaSessionCallback.onPlay();
                             break;
                         default:
                             mediaSessionCallback.onPause();
@@ -466,6 +470,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     }
                 }
             };
+
+    void startAudioFocus(int audioFocus){
+        audioFocusResult = audioManager.requestAudioFocus(
+                audioFocusChangeListener,
+                AudioManager.STREAM_MUSIC,
+                audioFocus);
+        if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+            return;
+    }
 
     public class MusicServiceBinder extends Binder {
         public MediaSessionCompat.Token getMediaSessionToken() {

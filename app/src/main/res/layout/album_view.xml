@@ -30,7 +30,7 @@
             android:ellipsize="end"
             android:textAlignment="center"
             android:maxLines="1"
-            android:textSize="18dp"
+            android:textSize="17sp"
             android:paddingBottom="10dp" />
 
         <TextView

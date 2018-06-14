@@ -18,11 +18,8 @@
         <item name="colorPrimary">@android:color/transparent</item>
     </style>
 
-    <style name="MyMaterialTheme.Player" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
+    <style name="MyMaterialTheme.Player" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 

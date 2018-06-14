@@ -38,7 +38,7 @@
 
         <activity
             android:name=".UI.Activities.PlayerActivity"
-            android:theme="@style/MyMaterialTheme.Player" />
+            android:theme="@style/MyMaterialTheme.Player"/>
         <activity
             android:name=".UI.Activities.SongTagActivity"
             android:label="@string/title_activity_song_tag"

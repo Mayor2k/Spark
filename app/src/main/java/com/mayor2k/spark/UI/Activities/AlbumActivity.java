@@ -2,15 +2,19 @@ package com.mayor2k.spark.UI.Activities;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
+import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
 import android.database.Cursor;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -21,7 +25,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.support.v7.widget.Toolbar;
 
@@ -32,7 +38,9 @@ import com.bumptech.glide.request.target.Target;
 import com.elmargomez.typer.Font;
 import com.elmargomez.typer.Typer;
 import com.github.florent37.glidepalette.GlidePalette;
+import com.jaeger.library.StatusBarUtil;
 import com.mayor2k.spark.Adapters.CustomAdapter;
+import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
@@ -40,10 +48,11 @@ import com.mayor2k.spark.R;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
+import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.UI.Activities.MainActivity.currentAlbum;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
-import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
 public class AlbumActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     Album album = albumList.get(currentAlbum);
@@ -54,33 +63,50 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
+        StatusBarUtil.setTransparent(this);
 
-        //getting status bar height
-        Rect rectangle = new Rect();
-        Window window = getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
-        int statusBarHeight = rectangle.top;
-        int contentViewTop =
-                window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
-        int titleBarHeight= contentViewTop - statusBarHeight;
+        // status bar height
+        int statusBarHeight=0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+        }
+
+        // action bar height
+        int actionBarHeight;
+        final TypedArray styledAttributes = this.getTheme().obtainStyledAttributes(
+                new int[] { android.R.attr.actionBarSize }
+        );
+        actionBarHeight = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+
+        View gradient = findViewById(R.id.gradientView);
+        gradient.setLayoutParams(new CollapsingToolbarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                actionBarHeight+statusBarHeight));
 
         final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.albumCollapsing);
         collapsingToolbarLayout.setTitle(album.getTitle());
-        collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.drawable.gradient);
         Typeface font = Typer.set(this).getFont(Font.ROBOTO_MEDIUM);
+
+        final FloatingActionButton actionButton = findViewById(R.id.action_button);
+
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                songPosition = 0;
+                serviceIntent.setAction(Constants.START_ALBUM_ACTION);
+                v.getContext().startService(serviceIntent);
+            }
+        });
+
         collapsingToolbarLayout.setExpandedTitleTypeface(font);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar()!=null){
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         }
-        View gradientView = findViewById(R.id.gradientView);
-        CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) gradientView.getLayoutParams();
-        params.height = toolbar.getHeight()+titleBarHeight;
-        gradientView.setLayoutParams(params);
-
         ImageView albumCover = findViewById(R.id.albumCover);
         RecyclerView trackList = findViewById(R.id.trackList);
         albumSongs = new ArrayList<>();
@@ -102,7 +128,8 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
                                         int color = palette.getMutedColor(0);
                                         collapsingToolbarLayout.setContentScrimColor(color);
                                         collapsingToolbarLayout.setStatusBarScrimColor(color);
-
+                                        actionButton.setBackgroundTintList(ColorStateList.valueOf(color));
+                                        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
                                     }
                                 })
                 )

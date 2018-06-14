@@ -32,6 +32,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     private RecyclerView songView;
     public static ArrayList<Song> songList;
     public final static Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+    private SongAdapter songAdt;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,7 +47,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onActivityCreated(savedInstanceState);
         try {
             songList = new ArrayList<>();
-            SongAdapter songAdt = new SongAdapter(songList);
+            songAdt = new SongAdapter(songList,getContext());
             songView.setLayoutManager(new LinearLayoutManager(getActivity()));
             songView.setAdapter(songAdt);
         } catch (IllegalArgumentException e) {
@@ -74,6 +75,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.i("TAGGING","that work!!!");
         if (data==null){
             return;
         }
@@ -110,10 +112,14 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                 songList.add(new Song(songId, songTitle, songArtist, songAlbum,
                         pathId, uri, songTrack, songDuration));
             }
+            songAdt.swapCursor(data);
         }
 
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {}
+    public void onLoaderReset(Loader<Cursor> loader) {
+        Log.i("TAGGING","RESTART...");
+        songAdt.swapCursor(null);
+    }
 }

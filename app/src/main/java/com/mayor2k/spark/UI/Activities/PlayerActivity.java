@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 
+import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -12,7 +13,12 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -21,6 +27,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.jaeger.library.StatusBarUtil;
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
 import com.mayor2k.spark.R;
@@ -31,7 +38,6 @@ import java.util.concurrent.TimeUnit;
 import static com.mayor2k.spark.Services.MusicService.pausePosition;
 import static com.mayor2k.spark.Services.MusicService.playSong;
 import static com.mayor2k.spark.Services.MusicService.player;
-import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
 
 public class PlayerActivity extends AppCompatActivity {
     public ImageView trackCover;
@@ -54,8 +60,38 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusBarUtil.setTransparent(this);
         setContentView(R.layout.activity_player);
         //setDragEdge(SwipeBackLayout.DragEdge.TOP);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar()!=null){
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+
+        // status bar height
+        int statusBarHeight=0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+        }
+
+        // action bar height
+        int actionBarHeight;
+        final TypedArray styledAttributes = this.getTheme().obtainStyledAttributes(
+                new int[] { android.R.attr.actionBarSize }
+        );
+        actionBarHeight = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+
+        Log.i("tagging",""+actionBarHeight);
+        View gradient = findViewById(R.id.gradientView);
+        gradient.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                actionBarHeight+statusBarHeight));
+
         prev = findViewById(R.id.playerPrev);
         play = findViewById(R.id.playerPlay);
         next = findViewById(R.id.playerNext);
@@ -64,7 +100,7 @@ public class PlayerActivity extends AppCompatActivity {
         title = findViewById(R.id.playerTitle);
         artist = findViewById(R.id.playerArtist);
         seekBar = findViewById(R.id.seekBar);
-        //seekBar.setProgress(player.getCurrentPosition());
+        seekBar.setProgress(player.getCurrentPosition());
 
         updateView();
         progressListener();
@@ -189,6 +225,12 @@ public class PlayerActivity extends AppCompatActivity {
             e.printStackTrace();
 
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

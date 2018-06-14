@@ -39,5 +39,7 @@ dependencies {
     compile 'org:jaudiotagger:2.0.3'
     compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
     compile 'com.elmargomez.typer:typerlib:1.0.0'
+    compile 'com.jaeger.statusbarutil:library:1.4.0'
+    compile 'com.androidessence:recyclerviewcursoradapter:1.0.0'
     testCompile 'junit:junit:4.12'
 }

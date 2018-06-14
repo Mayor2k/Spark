@@ -42,6 +42,12 @@
                 android:fitsSystemWindows="true"
                 android:layout_gravity="center_horizontal|top"/>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@drawable/bottom_gradient"
+                android:fitsSystemWindows="true"
+                android:layout_gravity="bottom"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -52,7 +58,6 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/trackList"
         android:layout_width="match_parent"
@@ -60,7 +65,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/button"
+        android:id="@+id/action_button"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_margin="@dimen/activity_horizontal_margin"

@@ -7,15 +7,15 @@
     android:layout_width="match_parent"
     tools:context="com.mayor2k.spark.UI.Activities.PlayerActivity"
     android:layout_height="match_parent">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
         android:orientation="vertical">
 
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/player"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -28,7 +28,20 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/cover" />
 
-        </LinearLayout>
+            <View
+                android:id="@+id/gradientView"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="center_horizontal|top"
+                android:background="@drawable/gradient" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="112dp"
+                app:theme="@style/ToolbarStyle"
+                android:fitsSystemWindows="true"/>
+        </FrameLayout>
 
         <SeekBar
             android:layout_marginStart="15dp"

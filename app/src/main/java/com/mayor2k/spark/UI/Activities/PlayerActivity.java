@@ -100,6 +100,7 @@ public class PlayerActivity extends AppCompatActivity {
         title = findViewById(R.id.playerTitle);
         artist = findViewById(R.id.playerArtist);
         seekBar = findViewById(R.id.seekBar);
+        seekBar.setMax(player.getDuration());
         seekBar.setProgress(player.getCurrentPosition());
 
         updateView();

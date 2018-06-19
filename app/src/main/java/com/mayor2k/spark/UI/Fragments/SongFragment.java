@@ -75,7 +75,6 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i("TAGGING","that work!!!");
         if (data==null){
             return;
         }

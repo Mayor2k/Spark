@@ -8,6 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.mayor2k.spark.Adapters.ArtistAdapter;
+import com.mayor2k.spark.Adapters.SongAdapter;
 import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.R;
 
@@ -24,8 +28,7 @@ import java.util.ArrayList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
 
 public class ArtistFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    private GridView artistView;
+    private RecyclerView artistView;
     public static ArrayList<Artist> artistList;
     private ArtistAdapter artistAdapter;
     @Override
@@ -41,7 +44,8 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityCreated(savedInstanceState);
         try{
             artistList = new ArrayList<>();
-            artistAdapter = new ArtistAdapter(getActivity(), null, artistList);
+            artistAdapter = new ArtistAdapter(artistList,getContext());
+            artistView.setLayoutManager(new GridLayoutManager(getActivity(),2));
             artistView.setAdapter(artistAdapter);
         }catch (IllegalArgumentException e){
             Toast.makeText(getActivity(),"Nothing found",Toast.LENGTH_LONG).show();

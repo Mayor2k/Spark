@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.renderscript.Sampler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
@@ -24,9 +25,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Models.Artist;
-import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
-import com.mayor2k.spark.Services.MusicService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,16 +37,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import static com.mayor2k.spark.LastFm.FinalLastFm.last_fm_ending;
 import static com.mayor2k.spark.LastFm.FinalLastFm.last_fm_get_artist_method;
 import static com.mayor2k.spark.LastFm.FinalLastFm.last_fm_ws_address;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
-import static com.mayor2k.spark.Utils.InternetUtil.isConnected;
 
 public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.ViewHolder> {
     private ArrayList<Artist> artists;
-    Context context;
+    private Context context;
 
     public ArtistAdapter(ArrayList<Artist> theArtist, Context theContext){
         super(theContext);
@@ -60,11 +59,12 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     class ViewHolder extends RecyclerViewCursorViewHolder {
         LinearLayout artistArea,colorArea;
         ImageView artistCover;
-        TextView artistTitle;
+        TextView artistTitle,artistInfo;
         ViewHolder(View v) {
             super(v);
             artistCover = v.findViewById(R.id.artistCover);
             artistTitle = v.findViewById(R.id.artistTitle);
+            artistInfo = v.findViewById(R.id.artistInfo);
             colorArea = v.findViewById(R.id.colorArea);
             //getting view for bind tag
             artistArea = v.findViewById(R.id.artistArea);
@@ -95,15 +95,40 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         final Artist artist = artists.get(position);
         holder.artistArea.setTag(position);
         holder.artistTitle.setText(artist.getTitle());
 
-        if(isConnected(holder.colorArea.getContext())){
-            Log.i("tagging","online");
-            new ParseTask(artist,holder,holder.artistCover,holder.colorArea).execute();
+        try {
+            String url = new ParseTask(artist).execute().get();
+            Glide.with(context)
+                    .load(url)
+                    .apply(new RequestOptions()
+                            .override(Target.SIZE_ORIGINAL)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .error(R.drawable.cover)
+                    )
+                    .listener(GlidePalette.with(url)
+                            .use(GlidePalette.Profile.MUTED)
+                            .intoCallBack(
+                                    new GlidePalette.CallBack() {
+                                        @Override
+                                        public void onPaletteLoaded(@Nullable Palette palette) {
+                                            holder.artistTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
+                                            holder.artistInfo.setTextColor(ContextCompat.getColor(context, R.color.white));
+                                        }
+                                    })
+                            .intoBackground(holder.colorArea)
+                    )
+                    .into(holder.artistCover);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
+
+
         mCursorAdapter.getCursor().moveToPosition(position);
         setViewHolder(holder);
         mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
@@ -126,14 +151,17 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     }
 
     @SuppressLint("StaticFieldLeak")
-    class ParseTask extends AsyncTask<Void, Void, String> {
+    static class ParseTask extends AsyncTask<Void, Void, String> {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String resultJson = "";
         String url;
-
         Artist artist;
-        ViewHolder holder;
+
+        ParseTask(Artist theArtist){
+            artist=theArtist;
+        }
+        /*ViewHolder holder;
         ImageView artistCover;
         LinearLayout colorArea;
 
@@ -142,7 +170,7 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
             holder=theViewHolder;
             artistCover=theArtistCover;
             colorArea=theColorArea;
-        }
+        }*/
 
         @Override
         protected String doInBackground(Void... params) {
@@ -177,7 +205,6 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
                 JSONArray jsonArray = arrayJsonObj.getJSONArray("image");
                 JSONObject jsonUrl = jsonArray.getJSONObject(3);
                 url = jsonUrl.getString("#text");
-                Log.d(TAG, url);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -188,19 +215,7 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
         @Override
         protected void onPostExecute(String url) {
             super.onPostExecute(url);
-
-            Glide.with(holder.artistCover.getContext())
-                    .load(url)
-                    .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .error(R.drawable.cover)
-                    )
-                    .listener(GlidePalette.with(url)
-                            .use(GlidePalette.Profile.MUTED)
-                            .intoBackground(holder.colorArea)
-                    )
-                    .into(holder.artistCover);
+            Log.i(TAG,"TASK :"+ url);
         }
     }
 }

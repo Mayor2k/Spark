@@ -3,28 +3,35 @@ package com.mayor2k.spark.UI.Fragments;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import com.mayor2k.spark.Adapters.ArtistAdapter;
-import com.mayor2k.spark.Adapters.SongAdapter;
+import com.mayor2k.spark.Interfaces.ApiService;
+import com.mayor2k.spark.LastFmApi;
 import com.mayor2k.spark.Models.Artist;
+import com.mayor2k.spark.Models.LastFmModels.Image;
+import com.mayor2k.spark.Models.LastFmModels.LastFmModel;
 import com.mayor2k.spark.R;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
 
 public class ArtistFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -32,7 +39,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     public static ArrayList<Artist> artistList;
     private ArtistAdapter artistAdapter;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_artist, container, false);
         artistView = view.findViewById(R.id.artist_grid);
@@ -76,9 +83,25 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
             for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
                 long artistId = data.getLong(idColumn);
                 String artistTitle = data.getString(titleColumn);
+
                 if (!checking.contains(artistTitle)) {
                     checking.add(artistTitle);
-                    artistList.add(new Artist(artistId, artistTitle));
+
+                    String url="";
+                    ApiService api = LastFmApi.getApiService();
+                    Call<LastFmModel> call = api.getArtistImage(artistTitle);
+                    call.enqueue(new Callback<LastFmModel>() {
+                        @Override
+                        public void onResponse(@NonNull Call<LastFmModel> call, @NonNull Response<LastFmModel> response) {
+                            Log.i(TAG,"onResponse: "+response.body().getArtist().getImage().get(2).getText());
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<LastFmModel> call, @NonNull Throwable t) {
+
+                        }
+                    });
+                    artistList.add(new Artist(artistId, artistTitle, url));
                 }
             }
             artistAdapter.swapCursor(data);
@@ -86,7 +109,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         artistAdapter.swapCursor(null);
     }
 }

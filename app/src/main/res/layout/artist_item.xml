@@ -4,6 +4,7 @@
     android:id="@+id/artistArea"
     android:orientation="vertical"
     android:layout_width="170dp"
+    android:padding="5dp"
     android:layout_height="wrap_content">
 
     <ImageView

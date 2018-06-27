@@ -70,7 +70,7 @@ public class AlbumAdapter extends CursorAdapter {
                 .load(album.getUri())
                 .apply(new RequestOptions()
                         .override(Target.SIZE_ORIGINAL)
-                        .error(R.drawable.ic_album_black_24dp)
+                        .error(R.drawable.album)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                 )
                 .listener(GlidePalette.with(String.valueOf(album.getUri()))

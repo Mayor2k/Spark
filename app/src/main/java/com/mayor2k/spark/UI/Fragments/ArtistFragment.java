@@ -22,12 +22,14 @@ import android.widget.Toast;
 import com.mayor2k.spark.Adapters.ArtistAdapter;
 import com.mayor2k.spark.Interfaces.ApiService;
 import com.mayor2k.spark.LastFmApi;
+import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Artist;
-import com.mayor2k.spark.Models.LastFmModels.Image;
 import com.mayor2k.spark.Models.LastFmModels.LastFmModel;
+import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,7 +37,9 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
+import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
+import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
 public class ArtistFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private RecyclerView artistView;
@@ -114,7 +118,23 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
 
                     SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
                     String url = sPref.getString(artistTitle, "DEFAULT");
-                    artistList.add(new Artist(artistId, artistTitle, url));
+
+                    int songInfo=0;
+                    int albumInfo=0;
+                    for(int i = 0; songList.size()>i;i++){
+                        Song song = songList.get(i);
+                        if (Objects.equals(song.getArtist(), artistTitle)){
+                            songInfo++;
+                        }
+                    }
+
+                    for(int i = 0; albumList.size()>i;i++){
+                        Album song = albumList.get(i);
+                        if (Objects.equals(song.getArtist(), artistTitle)){
+                            albumInfo++;
+                        }
+                    }
+                    artistList.add(new Artist(artistId, artistTitle, url, songInfo, albumInfo));
                 }
             }
             artistAdapter.swapCursor(data);

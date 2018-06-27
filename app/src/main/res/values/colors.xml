@@ -15,5 +15,6 @@
     <color name="silver">#DDDDDD</color>
 
     <color name="colorNotification">#ffffffff</color>
+    <color name="item_area">#E5E5E5</color>
 
 </resources>

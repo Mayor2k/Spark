@@ -5,11 +5,15 @@ public class Artist {
     private long id;
     private String title;
     private String url;
+    private int songInfo;
+    private int albumInfo;
 
-    public Artist(long ArtistId, String titleArtist, String theUrl) {
+    public Artist(long ArtistId, String titleArtist, String theUrl, int theSongInfo, int theAlbumInfo) {
         id = ArtistId;
         title= titleArtist;
         url=theUrl;
+        songInfo=theSongInfo;
+        albumInfo=theAlbumInfo;
     }
     public long getId() {
         return id;
@@ -33,5 +37,21 @@ public class Artist {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getSongInfo() {
+        return songInfo;
+    }
+
+    public void setSongInfo(int songInfo) {
+        this.songInfo = songInfo;
+    }
+
+    public int getAlbumInfo() {
+        return albumInfo;
+    }
+
+    public void setAlbumInfo(int albumInfo) {
+        this.albumInfo = albumInfo;
     }
 }

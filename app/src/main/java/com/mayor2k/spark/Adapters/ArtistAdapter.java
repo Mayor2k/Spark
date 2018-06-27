@@ -1,12 +1,13 @@
 package com.mayor2k.spark.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,6 @@ import com.mayor2k.spark.R;
 
 import java.util.ArrayList;
 
-import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 
 public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.ViewHolder> {
     private ArrayList<Artist> artists;
@@ -69,8 +69,9 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     };
 
 
+    @NonNull
     @Override
-    public ArtistAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ArtistAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.artist_item, parent, false);
         view.setOnClickListener(mOnClickListener);
@@ -78,12 +79,15 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
         return new ArtistAdapter.ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         final Artist artist = artists.get(position);
         holder.artistArea.setTag(position);
         holder.artistTitle.setText(artist.getTitle());
-        Log.i(TAG,"image is"+artist.getUrl());
+
+        holder.artistInfo.setText(String.valueOf(artist.getSongInfo())+" song "
+                +String.valueOf(artist.getAlbumInfo())+" album");
 
         Glide.with(context)
                 .load(artist.getUrl())
@@ -124,7 +128,7 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     }
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
 }

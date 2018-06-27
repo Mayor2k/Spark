@@ -11,10 +11,11 @@
         android:id="@+id/albumCover"
         android:layout_width="170dp"
         android:layout_height="170dp"
-        app:srcCompat="@drawable/ic_album_black_24dp" />
+        app:srcCompat="@drawable/album" />
 
     <LinearLayout
         android:id="@+id/colorArea"
+        android:background="@color/item_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"

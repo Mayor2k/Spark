@@ -104,6 +104,7 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
                                     public void onPaletteLoaded(@Nullable Palette palette) {
                                         holder.artistTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
                                         holder.artistInfo.setTextColor(ContextCompat.getColor(context, R.color.white));
+
                                     }
                                 })
                         .intoBackground(holder.colorArea)

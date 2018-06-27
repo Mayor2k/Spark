@@ -83,7 +83,7 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
         final Artist artist = artists.get(position);
         holder.artistArea.setTag(position);
         holder.artistTitle.setText(artist.getTitle());
-        Log.i(TAG,""+artist.getUrl());
+        Log.i(TAG,"image is"+artist.getUrl());
 
         Glide.with(context)
                 .load(artist.getUrl())

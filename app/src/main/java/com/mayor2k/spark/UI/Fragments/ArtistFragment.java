@@ -1,7 +1,9 @@
 package com.mayor2k.spark.UI.Fragments;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,6 +33,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
 
@@ -65,6 +68,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
             MediaStore.Audio.Artists.ARTIST
     };
 
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), musicUri, COLUMNS, null, null,
@@ -72,7 +76,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         if(data==null){
             return;
         }
@@ -82,18 +86,24 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
             int titleColumn = data.getColumnIndex(MediaStore.Audio.Artists.ARTIST);
             for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
                 long artistId = data.getLong(idColumn);
-                String artistTitle = data.getString(titleColumn);
+                final String artistTitle = data.getString(titleColumn);
 
                 if (!checking.contains(artistTitle)) {
                     checking.add(artistTitle);
 
-                    String url="";
                     ApiService api = LastFmApi.getApiService();
                     Call<LastFmModel> call = api.getArtistImage(artistTitle);
                     call.enqueue(new Callback<LastFmModel>() {
                         @Override
                         public void onResponse(@NonNull Call<LastFmModel> call, @NonNull Response<LastFmModel> response) {
-                            Log.i(TAG,"onResponse: "+response.body().getArtist().getImage().get(2).getText());
+                            SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+                            SharedPreferences.Editor ed = sPref.edit();
+                            try{
+                                ed.putString(artistTitle, response.body().getArtist().getImage().get(2).getText());
+                            }catch (NullPointerException e){
+                                Log.i(TAG, "onResponse is null");
+                            }
+                            ed.apply();
                         }
 
                         @Override
@@ -101,6 +111,9 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
 
                         }
                     });
+
+                    SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+                    String url = sPref.getString(artistTitle, "DEFAULT");
                     artistList.add(new Artist(artistId, artistTitle, url));
                 }
             }

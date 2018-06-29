@@ -44,9 +44,9 @@ import com.mayor2k.spark.R;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
-import static com.mayor2k.spark.UI.Activities.MainActivity.currentAlbum;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
 

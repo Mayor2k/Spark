@@ -3,7 +3,6 @@ package com.mayor2k.spark.UI.Fragments;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -102,6 +101,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
                         public void onResponse(@NonNull Call<LastFmModel> call, @NonNull Response<LastFmModel> response) {
                             SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
                             SharedPreferences.Editor ed = sPref.edit();
+                            //fd
                             try{
                                 ed.putString(artistTitle, response.body().getArtist().getImage().get(2).getText());
                             }catch (NullPointerException e){
@@ -139,6 +139,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
             }
             artistAdapter.swapCursor(data);
         }
+        Log.i(TAG,""+artistList.size());
     }
 
     @Override

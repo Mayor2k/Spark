@@ -1,50 +1,43 @@
 package com.mayor2k.spark.UI.Fragments;
 
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import com.mayor2k.spark.Adapters.AlbumAdapter;
 import com.mayor2k.spark.Models.Album;
-import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.R;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 
+import static android.support.constraint.Constraints.TAG;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
 
 public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
-
-    private GridView albumView;
+    private RecyclerView albumView;
     private AlbumAdapter albumAdapter;
     public static ArrayList<Album> albumList;
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_album, container, false);
-        albumView = view.findViewById(R.id.album_grid);
+        albumView = view.findViewById(R.id.albumRecyclerView);
         return view;
     }
 
@@ -53,7 +46,8 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onActivityCreated(savedInstanceState);
         try{
             albumList = new ArrayList<>();
-            albumAdapter = new AlbumAdapter(getActivity(),null,albumList);
+            albumAdapter = new AlbumAdapter(albumList, getContext());
+            albumView.setLayoutManager(new GridLayoutManager(getActivity(),2));
             albumView.setAdapter(albumAdapter);
         }catch (IllegalArgumentException e){
             Toast.makeText(getActivity(),"Nothing found",Toast.LENGTH_LONG).show();
@@ -68,6 +62,7 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
             MediaStore.Audio.Albums.ALBUM_ID,
     };
 
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), musicUri, COLUMNS, null, null,
@@ -75,7 +70,7 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         if (data==null){
             return;
         }
@@ -102,10 +97,14 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
             }
             albumAdapter.swapCursor(data);
         }
+        for (int i=0;albumList.size()>i;i++){
+            Album a = albumList.get(i);
+            Log.i("tagging",i+a.getTitle());
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         albumAdapter.swapCursor(null);
     }
 }

@@ -2,17 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.mayor2k.spark.UI.Fragments.AlbumFragment">
 
-    <GridView
-        android:id="@+id/album_grid"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/albumRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginLeft="5dp"
-        android:gravity="center"
-        android:scrollbarStyle="outsideOverlay"
-        android:numColumns="auto_fit"/>
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
 
 </FrameLayout>

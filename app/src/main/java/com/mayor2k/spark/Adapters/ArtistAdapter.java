@@ -37,7 +37,7 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
         artists=theArtist;
         context=theContext;
 
-        setupCursorAdapter(null, 0, R.layout.artist_item, false);
+        setupCursorAdapter(null, 0, R.layout.grid_item, false);
     }
 
     class ViewHolder extends RecyclerViewCursorViewHolder {
@@ -46,12 +46,12 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
         TextView artistTitle,artistInfo;
         ViewHolder(View v) {
             super(v);
-            artistCover = v.findViewById(R.id.artistCover);
-            artistTitle = v.findViewById(R.id.artistTitle);
-            artistInfo = v.findViewById(R.id.artistInfo);
-            colorArea = v.findViewById(R.id.colorArea);
+            artistCover = v.findViewById(R.id.gridImageView);
+            artistTitle = v.findViewById(R.id.gridTopTextView);
+            artistInfo = v.findViewById(R.id.gridBottomTextView);
+            colorArea = v.findViewById(R.id.gridColorArea);
             //getting view for bind tag
-            artistArea = v.findViewById(R.id.artistArea);
+            artistArea = v.findViewById(R.id.gridArea);
 
         }
 
@@ -73,7 +73,7 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     @Override
     public ArtistAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext)
-                .inflate(R.layout.artist_item, parent, false);
+                .inflate(R.layout.grid_item, parent, false);
         view.setOnClickListener(mOnClickListener);
 
         return new ArtistAdapter.ViewHolder(view);

@@ -38,7 +38,7 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
         albums=theAlbum;
         context=theContext;
 
-        setupCursorAdapter(null, 0, R.layout.album_view, false);
+        setupCursorAdapter(null, 0, R.layout.grid_item, false);
     }
 
     class ViewHolder extends RecyclerViewCursorViewHolder {
@@ -48,12 +48,12 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
 
         ViewHolder(View v){
             super(v);
-            albumTitle = v.findViewById(R.id.albumName);
-            artistName = v.findViewById(R.id.albumArtist);
-            imageView = v.findViewById(R.id.albumCover);
-            colorArea = v.findViewById(R.id.colorArea);
+            albumTitle = v.findViewById(R.id.gridTopTextView);
+            artistName = v.findViewById(R.id.gridBottomTextView);
+            imageView = v.findViewById(R.id.gridImageView);
+            colorArea = v.findViewById(R.id.gridColorArea);
             //getting view for bind tag
-            album = v.findViewById(R.id.album);
+            album = v.findViewById(R.id.gridArea);
         }
 
         @Override
@@ -66,7 +66,7 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext)
-                .inflate(R.layout.album_view, parent, false);
+                .inflate(R.layout.grid_item, parent, false);
         view.setOnClickListener(onClickListener);
         return new ViewHolder(view);
     }

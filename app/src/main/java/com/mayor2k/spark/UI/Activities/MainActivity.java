@@ -1,6 +1,7 @@
 package com.mayor2k.spark.UI.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -32,7 +33,8 @@ public class MainActivity extends AppCompatActivity{
     public static ArrayList<Song> playArray;
     public TabLayout tabLayout;
     public ViewPager viewPager;
-    public Toolbar toolbar;
+    @SuppressLint("StaticFieldLeak")
+    public static Toolbar toolbar;
 
 
     private void setupViewPager(ViewPager viewPager) {

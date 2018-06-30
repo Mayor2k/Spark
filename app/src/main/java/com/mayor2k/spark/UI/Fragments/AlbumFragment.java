@@ -15,6 +15,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -22,10 +24,12 @@ import android.widget.Toast;
 import com.mayor2k.spark.Adapters.AlbumAdapter;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.R;
+import com.mayor2k.spark.UI.Activities.MainActivity;
 
 import java.util.ArrayList;
 
 import static android.support.constraint.Constraints.TAG;
+import static com.mayor2k.spark.UI.Activities.MainActivity.toolbar;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
 
 public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -42,8 +46,16 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.add("rer");
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
         try{
             albumList = new ArrayList<>();
             albumAdapter = new AlbumAdapter(albumList, getContext());
@@ -96,10 +108,6 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
                 }
             }
             albumAdapter.swapCursor(data);
-        }
-        for (int i=0;albumList.size()>i;i++){
-            Album a = albumList.get(i);
-            Log.i("tagging",i+a.getTitle());
         }
     }
 

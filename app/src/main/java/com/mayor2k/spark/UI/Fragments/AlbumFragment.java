@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -48,14 +49,12 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        menu.add("rer");
+        menu.add(Menu.NONE, 1, Menu.NONE, "Item name");
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
-        setHasOptionsMenu(true);
         try{
             albumList = new ArrayList<>();
             albumAdapter = new AlbumAdapter(albumList, getContext());

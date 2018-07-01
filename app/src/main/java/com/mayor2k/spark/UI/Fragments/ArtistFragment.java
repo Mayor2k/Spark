@@ -93,30 +93,29 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
 
                 if (!checking.contains(artistTitle)) {
                     checking.add(artistTitle);
-
-                    ApiService api = LastFmApi.getApiService();
-                    Call<LastFmModel> call = api.getArtistImage(artistTitle);
-                    call.enqueue(new Callback<LastFmModel>() {
-                        @Override
-                        public void onResponse(@NonNull Call<LastFmModel> call, @NonNull Response<LastFmModel> response) {
-                            SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
-                            SharedPreferences.Editor ed = sPref.edit();
-                            //fd
-                            try{
-                                ed.putString(artistTitle, response.body().getArtist().getImage().get(2).getText());
-                            }catch (NullPointerException e){
-                                Log.i(TAG, "onResponse is null");
-                            }
-                            ed.apply();
-                        }
-
-                        @Override
-                        public void onFailure(@NonNull Call<LastFmModel> call, @NonNull Throwable t) {
-
-                        }
-                    });
-
                     SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+                    if (!sPref.contains(artistTitle)){
+                        ApiService api = LastFmApi.getApiService();
+                        Call<LastFmModel> call = api.getArtistImage(artistTitle);
+                        call.enqueue(new Callback<LastFmModel>() {
+                            @Override
+                            public void onResponse(@NonNull Call<LastFmModel> call, @NonNull Response<LastFmModel> response) {
+                                SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+                                SharedPreferences.Editor ed = sPref.edit();
+                                try{
+                                    ed.putString(artistTitle, response.body().getArtist().getImage().get(2).getText());
+                                }catch (NullPointerException e){
+                                    Log.i(TAG, "onResponse is null");
+                                }
+                                ed.apply();
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<LastFmModel> call, @NonNull Throwable t) {
+
+                            }
+                        });
+                    }
                     String url = sPref.getString(artistTitle, "DEFAULT");
 
                     int songInfo=0;

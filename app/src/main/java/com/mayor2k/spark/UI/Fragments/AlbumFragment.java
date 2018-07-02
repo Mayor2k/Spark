@@ -65,11 +65,11 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
         SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
         @SuppressLint("CommitPrefEdits") SharedPreferences.Editor ed = sPref.edit();
         switch (item.getItemId()){
-            /*case 1:
+            case 1:
                 ed.putInt("AlbumSpanCount",1);
                 ed.apply();
                 albumView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                return true;*/
+                return true;
             case 2:
                 ed.putInt("AlbumSpanCount",2);
                 ed.apply();
@@ -96,10 +96,19 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
         setHasOptionsMenu(true);
         try{
             albumList = new ArrayList<>();
-            albumAdapter = new AlbumAdapter(albumList, getContext());
+            albumAdapter = new AlbumAdapter(albumList, getContext(),getActivity());
+
+            int spanCount;
             SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
-            int spanCount = sPref.getInt("AlbumSpanCount", -1);
-            albumView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+            if (!sPref.contains("AlbumSpanCount"))
+                spanCount = 2;
+            else
+                spanCount = sPref.getInt("AlbumSpanCount", -1);
+
+            if (spanCount==1)
+                albumView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            else
+                albumView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
             albumView.setAdapter(albumAdapter);
         }catch (IllegalArgumentException e){
             Toast.makeText(getActivity(),"Nothing found",Toast.LENGTH_LONG).show();

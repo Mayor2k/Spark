@@ -2,9 +2,11 @@ package com.mayor2k.spark.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
@@ -25,20 +27,29 @@ import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.AlbumActivity;
+import com.mayor2k.spark.UI.Activities.MainActivity;
+import com.mayor2k.spark.UI.Fragments.AlbumFragment;
 
 import java.util.ArrayList;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHolder> {
     private ArrayList<Album> albums;
     private Context context;
+    private FragmentActivity fragmentActivity;
     public static int currentAlbum;
 
-    public AlbumAdapter(ArrayList<Album> theAlbum, Context theContext){
+    public AlbumAdapter(ArrayList<Album> theAlbum, Context theContext, FragmentActivity theFragmentActivity){
         super(theContext);
         albums=theAlbum;
         context=theContext;
+        fragmentActivity=theFragmentActivity;
 
-        setupCursorAdapter(null, 0, R.layout.grid_item, false);
+        if (checkLayout())
+            setupCursorAdapter(null, 0, R.layout.grid_item, false);
+        else
+            setupCursorAdapter(null, 0, R.layout.linear_item, false);
     }
 
     class ViewHolder extends RecyclerViewCursorViewHolder {
@@ -51,7 +62,8 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
             albumTitle = v.findViewById(R.id.itemTopTextView);
             artistName = v.findViewById(R.id.itemBottomTextView);
             imageView = v.findViewById(R.id.itemImageView);
-            colorArea = v.findViewById(R.id.gridColorArea);
+            if (checkLayout())
+                colorArea = v.findViewById(R.id.gridColorArea);
             //getting view for bind tag
             album = v.findViewById(R.id.itemArea);
         }
@@ -65,8 +77,13 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext)
+        View view;
+        if (checkLayout())
+            view = LayoutInflater.from(mContext)
                 .inflate(R.layout.grid_item, parent, false);
+        else
+            view = LayoutInflater.from(mContext)
+                    .inflate(R.layout.linear_item, parent, false);
         view.setOnClickListener(onClickListener);
         return new ViewHolder(view);
     }
@@ -87,7 +104,8 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
         holder.albumTitle.setText(album.getTitle());
         holder.artistName.setText(album.getArtist());
 
-        Glide.with(context)
+        if (checkLayout())
+            Glide.with(context)
                 .load(album.getUri())
                 .apply(new RequestOptions()
                         .override(Target.SIZE_ORIGINAL)
@@ -107,6 +125,15 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
                         .intoBackground(holder.colorArea)
                 )
                 .into(holder.imageView);
+        else
+            Glide.with(context)
+                    .load(album.getUri())
+                    .apply(new RequestOptions()
+                            .override(Target.SIZE_ORIGINAL)
+                            .error(R.drawable.album)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    )
+                    .into(holder.imageView);
 
         mCursorAdapter.getCursor().moveToPosition(position);
         setViewHolder(holder);
@@ -126,5 +153,10 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    private boolean checkLayout(){
+        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
+        return sPref.getInt("AlbumSpanCount", -1) != 1;
     }
 }

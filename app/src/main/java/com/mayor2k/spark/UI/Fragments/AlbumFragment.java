@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,12 +50,30 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        menu.add(Menu.NONE, 1, Menu.NONE, "Item name");
+        SubMenu subMenu = menu.addSubMenu(Menu.NONE, 0, Menu.NONE, "Grid size");
+        subMenu.add(Menu.NONE,1,Menu.NONE,"1");
+        subMenu.add(Menu.NONE,2,Menu.NONE,"2");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()){
+            case 1:
+                Toast.makeText(getContext(),"asd",Toast.LENGTH_SHORT).show();
+                return true;
+            case 2:
+                Log.i("TAGGING","2 IN CLICK");
+                return true;
+            default:
+                return super .onOptionsItemSelected(item);
+        }
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
         try{
             albumList = new ArrayList<>();
             albumAdapter = new AlbumAdapter(albumList, getContext());

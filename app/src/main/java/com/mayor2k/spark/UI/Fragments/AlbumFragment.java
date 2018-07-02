@@ -2,7 +2,6 @@ package com.mayor2k.spark.UI.Fragments;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,7 +16,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -68,22 +66,22 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
             case 1:
                 ed.putInt("AlbumSpanCount",1);
                 ed.apply();
-                albumView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                onActivityCreated(null);
                 return true;
             case 2:
                 ed.putInt("AlbumSpanCount",2);
                 ed.apply();
-                albumView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+                onActivityCreated(null);
                 return true;
             case 3:
                 ed.putInt("AlbumSpanCount",3);
                 ed.apply();
-                albumView.setLayoutManager(new GridLayoutManager(getActivity(),3));
+                onActivityCreated(null);
                 return true;
             case 4:
                 ed.putInt("AlbumSpanCount",4);
                 ed.apply();
-                albumView.setLayoutManager(new GridLayoutManager(getActivity(),4));
+                onActivityCreated(null);
                 return true;
             default:
                 return super .onOptionsItemSelected(item);

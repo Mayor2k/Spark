@@ -1,6 +1,9 @@
 package com.mayor2k.spark.UI.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,12 +30,10 @@ import android.widget.Toast;
 import com.mayor2k.spark.Adapters.AlbumAdapter;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.R;
-import com.mayor2k.spark.UI.Activities.MainActivity;
 
 import java.util.ArrayList;
 
-import static android.support.constraint.Constraints.TAG;
-import static com.mayor2k.spark.UI.Activities.MainActivity.toolbar;
+import static android.content.Context.MODE_PRIVATE;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
 
 public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -53,17 +55,35 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
         SubMenu subMenu = menu.addSubMenu(Menu.NONE, 0, Menu.NONE, "Grid size");
         subMenu.add(Menu.NONE,1,Menu.NONE,"1");
         subMenu.add(Menu.NONE,2,Menu.NONE,"2");
+        subMenu.add(Menu.NONE,3,Menu.NONE,"3");
+        subMenu.add(Menu.NONE,4,Menu.NONE,"4");
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        super.onOptionsItemSelected(item);
+        SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor ed = sPref.edit();
         switch (item.getItemId()){
-            case 1:
-                Toast.makeText(getContext(),"asd",Toast.LENGTH_SHORT).show();
-                return true;
+            /*case 1:
+                ed.putInt("AlbumSpanCount",1);
+                ed.apply();
+                albumView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                return true;*/
             case 2:
-                Log.i("TAGGING","2 IN CLICK");
+                ed.putInt("AlbumSpanCount",2);
+                ed.apply();
+                albumView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+                return true;
+            case 3:
+                ed.putInt("AlbumSpanCount",3);
+                ed.apply();
+                albumView.setLayoutManager(new GridLayoutManager(getActivity(),3));
+                return true;
+            case 4:
+                ed.putInt("AlbumSpanCount",4);
+                ed.apply();
+                albumView.setLayoutManager(new GridLayoutManager(getActivity(),4));
                 return true;
             default:
                 return super .onOptionsItemSelected(item);
@@ -77,7 +97,9 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
         try{
             albumList = new ArrayList<>();
             albumAdapter = new AlbumAdapter(albumList, getContext());
-            albumView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+            SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+            int spanCount = sPref.getInt("AlbumSpanCount", -1);
+            albumView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
             albumView.setAdapter(albumAdapter);
         }catch (IllegalArgumentException e){
             Toast.makeText(getActivity(),"Nothing found",Toast.LENGTH_LONG).show();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/songArea"
+    android:id="@+id/itemArea"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -10,7 +10,7 @@
     android:paddingTop="5dp">
 
     <ImageView
-        android:id="@+id/songCover"
+        android:id="@+id/itemImageView"
         android:layout_width="54dp"
         android:layout_height="54dp"
         android:layout_gravity="center"
@@ -24,7 +24,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/songName"
+            android:id="@+id/itemTopTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Talking to Myself"
@@ -34,7 +34,7 @@
             android:textSize="18dp" />
 
         <TextView
-            android:id="@+id/songArtist"
+            android:id="@+id/itemBottomTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
@@ -45,7 +45,7 @@
     </LinearLayout>
 
     <ImageButton
-        android:id="@+id/songMenu"
+        android:id="@+id/linearMenu"
         android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -44,7 +44,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         context = theContext;
         songs=theSongs;
 
-        setupCursorAdapter(null, 0, R.layout.song_item, false);
+        setupCursorAdapter(null, 0, R.layout.linear_item, false);
     }
 
     class ViewHolder extends RecyclerViewCursorViewHolder {
@@ -54,12 +54,12 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         ImageButton songMenu;
         ViewHolder(View v) {
             super(v);
-            coverView = v.findViewById(R.id.songCover);
-            songTitle = v.findViewById(R.id.songName);
-            songArtist = v.findViewById(R.id.songArtist);
+            coverView = v.findViewById(R.id.itemImageView);
+            songTitle = v.findViewById(R.id.itemTopTextView);
+            songArtist = v.findViewById(R.id.itemBottomTextView);
             //getting view for bind tag
-            songArea = v.findViewById(R.id.songArea);
-            songMenu = v.findViewById(R.id.songMenu);
+            songArea = v.findViewById(R.id.itemArea);
+            songMenu = v.findViewById(R.id.linearMenu);
         }
 
         @Override
@@ -90,9 +90,9 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext)
-                .inflate(R.layout.song_view, parent, false);
+                .inflate(R.layout.linear_item, parent, false);
         view.setOnClickListener(mOnClickListener);
-        View menu = view.findViewById(R.id.songMenu);
+        View menu = view.findViewById(R.id.linearMenu);
         menu.setOnClickListener(menuOnClickListener);
         serviceIntent = new Intent(view.getContext(), MusicService.class);
 

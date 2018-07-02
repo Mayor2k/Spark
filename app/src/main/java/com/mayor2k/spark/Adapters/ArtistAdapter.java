@@ -46,12 +46,12 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
         TextView artistTitle,artistInfo;
         ViewHolder(View v) {
             super(v);
-            artistCover = v.findViewById(R.id.gridImageView);
-            artistTitle = v.findViewById(R.id.gridTopTextView);
-            artistInfo = v.findViewById(R.id.gridBottomTextView);
+            artistCover = v.findViewById(R.id.itemImageView);
+            artistTitle = v.findViewById(R.id.itemTopTextView);
+            artistInfo = v.findViewById(R.id.itemBottomTextView);
             colorArea = v.findViewById(R.id.gridColorArea);
             //getting view for bind tag
-            artistArea = v.findViewById(R.id.gridArea);
+            artistArea = v.findViewById(R.id.itemArea);
 
         }
 

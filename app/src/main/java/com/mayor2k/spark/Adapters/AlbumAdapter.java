@@ -48,12 +48,12 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
 
         ViewHolder(View v){
             super(v);
-            albumTitle = v.findViewById(R.id.gridTopTextView);
-            artistName = v.findViewById(R.id.gridBottomTextView);
-            imageView = v.findViewById(R.id.gridImageView);
+            albumTitle = v.findViewById(R.id.itemTopTextView);
+            artistName = v.findViewById(R.id.itemBottomTextView);
+            imageView = v.findViewById(R.id.itemImageView);
             colorArea = v.findViewById(R.id.gridColorArea);
             //getting view for bind tag
-            album = v.findViewById(R.id.gridArea);
+            album = v.findViewById(R.id.itemArea);
         }
 
         @Override

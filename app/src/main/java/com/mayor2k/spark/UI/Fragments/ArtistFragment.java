@@ -138,7 +138,6 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
             }
             artistAdapter.swapCursor(data);
         }
-        Log.i(TAG,""+artistList.size());
     }
 
     @Override

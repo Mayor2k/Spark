@@ -4,9 +4,14 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +27,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Dialogs.BottomSheetDialog;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.Services.MusicService;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
 public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolder> {
@@ -38,19 +45,24 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     public static BottomSheetDialogFragment bottomSheetDialogFragment =
             new BottomSheetDialog();
     private Context context;
+    private FragmentActivity fragmentActivity;
 
-    public SongAdapter(ArrayList<Song> theSongs,Context theContext){
+    public SongAdapter(ArrayList<Song> theSongs,Context theContext,FragmentActivity theFragmentActivity){
         super(theContext);
         context = theContext;
         songs=theSongs;
+        fragmentActivity=theFragmentActivity;
 
-        setupCursorAdapter(null, 0, R.layout.linear_item, false);
+        if (checkLayout())
+            setupCursorAdapter(null, 0, R.layout.grid_item, false);
+        else
+            setupCursorAdapter(null, 0, R.layout.linear_item, false);
     }
 
     class ViewHolder extends RecyclerViewCursorViewHolder {
         ImageView coverView;
         TextView songTitle,songArtist;
-        LinearLayout songArea;
+        LinearLayout songArea,colorArea;
         ImageButton songMenu;
         ViewHolder(View v) {
             super(v);
@@ -59,7 +71,10 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
             songArtist = v.findViewById(R.id.itemBottomTextView);
             //getting view for bind tag
             songArea = v.findViewById(R.id.itemArea);
-            songMenu = v.findViewById(R.id.linearMenu);
+            if (checkLayout())
+                colorArea = v.findViewById(R.id.gridColorArea);
+            else
+                songMenu = v.findViewById(R.id.linearMenu);
         }
 
         @Override
@@ -87,36 +102,71 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         }
     };
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext)
-                .inflate(R.layout.linear_item, parent, false);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view;
+        if (checkLayout())
+            view = LayoutInflater.from(mContext)
+                    .inflate(R.layout.grid_item, parent, false);
+        else
+            view = LayoutInflater.from(mContext)
+                    .inflate(R.layout.linear_item, parent, false);
         view.setOnClickListener(mOnClickListener);
-        View menu = view.findViewById(R.id.linearMenu);
-        menu.setOnClickListener(menuOnClickListener);
+
+        if (!checkLayout()){
+            View menu = view.findViewById(R.id.linearMenu);
+            menu.setOnClickListener(menuOnClickListener);
+        }
         serviceIntent = new Intent(view.getContext(), MusicService.class);
 
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Song song = songs.get(position);
 
         holder.songArea.setTag(position);
-        holder.songMenu.setTag(position);
+        if (!checkLayout())
+            holder.songMenu.setTag(position);
 
         holder.songTitle.setText(song.getTitle());
         holder.songArtist.setText(song.getArtist());
 
-        Glide.with(holder.coverView.getContext())
-                .load(song.getUri())
-                .apply(new RequestOptions()
-                        .override(Target.SIZE_ORIGINAL)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .error(R.drawable.cover)
-                )
-                .into(holder.coverView);
+        if(checkLayout()){
+            Glide.with(context)
+                    .load(song.getUri())
+                    .apply(new RequestOptions()
+                            .override(Target.SIZE_ORIGINAL)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .error(R.drawable.cover)
+                    )
+                    .listener(GlidePalette.with(String.valueOf(song.getUri()))
+                            .use(GlidePalette.Profile.MUTED)
+                            .intoCallBack(
+                                    new GlidePalette.CallBack() {
+                                        @Override
+                                        public void onPaletteLoaded(@Nullable Palette palette) {
+                                            holder.songTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
+                                            holder.songArtist.setTextColor(ContextCompat.getColor(context, R.color.white));
+
+                                        }
+                                    })
+                            .intoBackground(holder.colorArea)
+                    )
+                    .into(holder.coverView);
+        }else{
+            Glide.with(holder.coverView.getContext())
+                    .load(song.getUri())
+                    .apply(new RequestOptions()
+                            .override(Target.SIZE_ORIGINAL)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .error(R.drawable.cover)
+                    )
+                    .into(holder.coverView);
+        }
+
         mCursorAdapter.getCursor().moveToPosition(position);
         setViewHolder(holder);
         mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
@@ -134,7 +184,12 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     }
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    private boolean checkLayout(){
+        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
+        return sPref.getInt("SongSpanCount", -1) != 1;
     }
 }

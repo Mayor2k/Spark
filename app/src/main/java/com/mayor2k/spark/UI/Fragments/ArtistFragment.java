@@ -1,5 +1,6 @@
 package com.mayor2k.spark.UI.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,9 +12,14 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -53,12 +59,66 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        SubMenu subMenu = menu.addSubMenu(Menu.NONE, 0, Menu.NONE, "Grid size");
+        subMenu.add(Menu.NONE,1,Menu.NONE,"1");
+        subMenu.add(Menu.NONE,2,Menu.NONE,"2");
+        subMenu.add(Menu.NONE,3,Menu.NONE,"3");
+        subMenu.add(Menu.NONE,4,Menu.NONE,"4");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor ed = sPref.edit();
+        switch (item.getItemId()){
+            case 1:
+                ed.putInt("ArtistSpanCount",1);
+                ed.apply();
+                onActivityCreated(null);
+                return true;
+            case 2:
+                ed.putInt("ArtistSpanCount",2);
+                ed.apply();
+                onActivityCreated(null);
+                return true;
+            case 3:
+                ed.putInt("ArtistSpanCount",3);
+                ed.apply();
+                onActivityCreated(null);
+                return true;
+            case 4:
+                ed.putInt("ArtistSpanCount",4);
+                ed.apply();
+                onActivityCreated(null);
+                return true;
+            default:
+                return super .onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
         try{
             artistList = new ArrayList<>();
-            artistAdapter = new ArtistAdapter(artistList,getContext());
-            artistView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+            artistAdapter = new ArtistAdapter(artistList,getContext(),getActivity());
+
+            int spanCount;
+            SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+            if (!sPref.contains("ArtistSpanCount"))
+                spanCount = 2;
+            else
+                spanCount = sPref.getInt("ArtistSpanCount", -1);
+
+            if (spanCount==1)
+                artistView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            else
+                artistView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+
             artistView.setAdapter(artistAdapter);
         }catch (IllegalArgumentException e){
             Toast.makeText(getActivity(),"Nothing found",Toast.LENGTH_LONG).show();

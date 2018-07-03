@@ -1,32 +1,40 @@
 package com.mayor2k.spark.UI.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.mayor2k.spark.Adapters.SongAdapter;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
-import com.mayor2k.spark.UI.Activities.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Objects;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private RecyclerView songView;
@@ -35,7 +43,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     private SongAdapter songAdt;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_song, container, false);
         songView = view.findViewById(R.id.trackList);
@@ -43,12 +51,66 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        SubMenu subMenu = menu.addSubMenu(Menu.NONE, 0, Menu.NONE, "Grid size");
+        subMenu.add(Menu.NONE,1,Menu.NONE,"1");
+        subMenu.add(Menu.NONE,2,Menu.NONE,"2");
+        subMenu.add(Menu.NONE,3,Menu.NONE,"3");
+        subMenu.add(Menu.NONE,4,Menu.NONE,"4");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor ed = sPref.edit();
+        switch (item.getItemId()){
+            case 1:
+                ed.putInt("SongSpanCount",1);
+                ed.apply();
+                onActivityCreated(null);
+                return true;
+            case 2:
+                ed.putInt("SongSpanCount",2);
+                ed.apply();
+                onActivityCreated(null);
+                return true;
+            case 3:
+                ed.putInt("SongSpanCount",3);
+                ed.apply();
+                onActivityCreated(null);
+                return true;
+            case 4:
+                ed.putInt("SongSpanCount",4);
+                ed.apply();
+                onActivityCreated(null);
+                return true;
+            default:
+                return super .onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
         try {
             songList = new ArrayList<>();
-            songAdt = new SongAdapter(songList,getContext());
-            songView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            songAdt = new SongAdapter(songList,getContext(),getActivity());
+
+            int spanCount;
+            SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+            if (!sPref.contains("SongSpanCount"))
+                spanCount = 1;
+            else
+                spanCount = sPref.getInt("SongSpanCount", -1);
+
+            if (spanCount==1)
+                songView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            else
+                songView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+
             songView.setAdapter(songAdt);
         } catch (IllegalArgumentException e) {
             Toast.makeText(getActivity(), "Nothing found", Toast.LENGTH_LONG).show();
@@ -67,6 +129,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
             MediaStore.Audio.Media.DURATION
     };
 
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), musicUri, COLUMNS, null, null,
@@ -74,7 +137,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         if (data==null){
             return;
         }
@@ -117,7 +180,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         Log.i("TAGGING","RESTART...");
         songAdt.swapCursor(null);
     }

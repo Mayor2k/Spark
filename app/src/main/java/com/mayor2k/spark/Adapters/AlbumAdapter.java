@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,8 @@ import com.mayor2k.spark.UI.Fragments.AlbumFragment;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
+import static com.mayor2k.spark.UI.Activities.MainActivity.getScreenWidth;
 
 public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHolder> {
     private ArrayList<Album> albums;
@@ -99,32 +102,50 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
+        int spanCount;
+        if (!sPref.contains("AlbumSpanCount"))
+            spanCount = 2;
+        else
+            spanCount = sPref.getInt("AlbumSpanCount", -1);
+
         Album album = albums.get(position);
         holder.album.setTag(position);
         holder.albumTitle.setText(album.getTitle());
         holder.artistName.setText(album.getArtist());
 
-        if (checkLayout())
+        float itemSize = (getScreenWidth(holder.albumTitle.getContext())-5*spanCount*2)/spanCount;
+        Log.i(TAG,"itemSize is "+itemSize);
+
+        if (checkLayout()) {
+            holder.imageView.getLayoutParams().width = (int) itemSize;
+            holder.imageView.getLayoutParams().height = (int) itemSize;
+            holder.imageView.requestLayout();
+            Log.i(TAG,"imageView size is "+holder.imageView.getWidth());
+            holder.album.getLayoutParams().width = (int) itemSize;
+            holder.album.requestLayout();
+
             Glide.with(context)
-                .load(album.getUri())
-                .apply(new RequestOptions()
-                        .override(Target.SIZE_ORIGINAL)
-                        .error(R.drawable.album)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                )
-                .listener(GlidePalette.with(String.valueOf(album.getUri()))
-                        .use(GlidePalette.Profile.MUTED)
-                        .intoCallBack(
-                                new GlidePalette.CallBack() {
-                                    @Override
-                                    public void onPaletteLoaded(@Nullable Palette palette) {
-                                        holder.albumTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
-                                        holder.artistName.setTextColor(ContextCompat.getColor(context, R.color.white));
-                                    }
-                                })
-                        .intoBackground(holder.colorArea)
-                )
-                .into(holder.imageView);
+                    .load(album.getUri())
+                    .apply(new RequestOptions()
+                            .override(Target.SIZE_ORIGINAL)
+                            .error(R.drawable.album)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    )
+                    .listener(GlidePalette.with(String.valueOf(album.getUri()))
+                            .use(GlidePalette.Profile.MUTED)
+                            .intoCallBack(
+                                    new GlidePalette.CallBack() {
+                                        @Override
+                                        public void onPaletteLoaded(@Nullable Palette palette) {
+                                            holder.albumTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
+                                            holder.artistName.setTextColor(ContextCompat.getColor(context, R.color.white));
+                                        }
+                                    })
+                            .intoBackground(holder.colorArea)
+                    )
+                    .into(holder.imageView);
+        }
         else
             Glide.with(context)
                     .load(album.getUri())

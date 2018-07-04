@@ -2,6 +2,7 @@ package com.mayor2k.spark.UI.Activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -94,5 +96,10 @@ public class MainActivity extends AppCompatActivity{
     public void startAnotherActivity(MenuItem item) {
         Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
         startActivity(intent);
+    }
+
+    public static float getScreenWidth(Context context){
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        return displayMetrics.widthPixels / displayMetrics.density;
     }
 }

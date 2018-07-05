@@ -114,15 +114,13 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
         holder.albumTitle.setText(album.getTitle());
         holder.artistName.setText(album.getArtist());
 
-        float itemSize = (getScreenWidth(holder.albumTitle.getContext())-5*spanCount*2)/spanCount;
-        Log.i(TAG,"itemSize is "+itemSize);
-
         if (checkLayout()) {
-            holder.imageView.getLayoutParams().width = (int) itemSize;
-            holder.imageView.getLayoutParams().height = (int) itemSize;
+            float itemSize = (getScreenWidth(holder.albumTitle.getContext())-5*spanCount*2)/spanCount;
+            float factor = holder.itemView.getContext().getResources().getDisplayMetrics().density;
+            holder.imageView.getLayoutParams().width = (int) (itemSize*factor);
+            holder.imageView.getLayoutParams().height = (int) (itemSize*factor);
             holder.imageView.requestLayout();
-            Log.i(TAG,"imageView size is "+holder.imageView.getWidth());
-            holder.album.getLayoutParams().width = (int) itemSize;
+            holder.album.getLayoutParams().width = (int) (itemSize*factor);
             holder.album.requestLayout();
 
             Glide.with(context)

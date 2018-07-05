@@ -30,6 +30,7 @@ import com.mayor2k.spark.R;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.mayor2k.spark.UI.Activities.MainActivity.getScreenWidth;
 
 
 public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.ViewHolder> {
@@ -97,6 +98,13 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
+        int spanCount;
+        if (!sPref.contains("ArtistSpanCount"))
+            spanCount = 2;
+        else
+            spanCount = sPref.getInt("ArtistSpanCount", -1);
+
         final Artist artist = artists.get(position);
         holder.artistArea.setTag(position);
         holder.artistTitle.setText(artist.getTitle());
@@ -104,7 +112,17 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
         holder.artistInfo.setText(String.valueOf(artist.getSongInfo())+" song "
                 +String.valueOf(artist.getAlbumInfo())+" album");
 
-        if (checkLayout())
+        if (checkLayout()){
+            float itemSize = (getScreenWidth(holder.artistCover.getContext())-5*spanCount*2)/spanCount;
+            float factor = holder.artistCover.getContext().getResources().getDisplayMetrics().density;
+
+            holder.artistCover.getLayoutParams().width = (int) (itemSize*factor);
+            holder.artistCover.getLayoutParams().height = (int) (itemSize*factor);
+            holder.artistCover.requestLayout();
+            holder.artistArea.getLayoutParams().width = (int) (itemSize*factor);
+            holder.artistArea.requestLayout();
+
+
             Glide.with(context)
                     .load(artist.getUrl())
                     .apply(new RequestOptions()
@@ -126,6 +144,7 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
                             .intoBackground(holder.colorArea)
                     )
                     .into(holder.artistCover);
+    }
         else
             Glide.with(context)
                     .load(artist.getUrl())

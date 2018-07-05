@@ -35,6 +35,7 @@ import com.mayor2k.spark.R;
 import com.mayor2k.spark.Services.MusicService;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.mayor2k.spark.UI.Activities.MainActivity.getScreenWidth;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
 public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolder> {
@@ -125,8 +126,14 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        Song song = songs.get(position);
+        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
+        int spanCount;
+        if (!sPref.contains("SongSpanCount"))
+            spanCount = 2;
+        else
+            spanCount = sPref.getInt("SongSpanCount", -1);
 
+        Song song = songs.get(position);
         holder.songArea.setTag(position);
         if (!checkLayout())
             holder.songMenu.setTag(position);
@@ -134,7 +141,16 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         holder.songTitle.setText(song.getTitle());
         holder.songArtist.setText(song.getArtist());
 
-        if(checkLayout()){
+        if(checkLayout()) {
+            float itemSize = (getScreenWidth(holder.coverView.getContext())-5*spanCount*2)/spanCount;
+            float factor = holder.coverView.getContext().getResources().getDisplayMetrics().density;
+
+            holder.coverView.getLayoutParams().width = (int) (itemSize*factor);
+            holder.coverView.getLayoutParams().height = (int) (itemSize*factor);
+            holder.coverView.requestLayout();
+            holder.songArea.getLayoutParams().width = (int) (itemSize*factor);
+            holder.songArea.requestLayout();
+
             Glide.with(context)
                     .load(song.getUri())
                     .apply(new RequestOptions()
@@ -156,7 +172,8 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
                             .intoBackground(holder.colorArea)
                     )
                     .into(holder.coverView);
-        }else{
+        }
+        else{
             Glide.with(holder.coverView.getContext())
                     .load(song.getUri())
                     .apply(new RequestOptions()

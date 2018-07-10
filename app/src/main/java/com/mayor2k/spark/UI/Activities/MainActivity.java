@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search, menu);
         inflater.inflate(R.menu.navigation, menu);
@@ -94,8 +93,13 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void startAnotherActivity(MenuItem item) {
-        Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
-        startActivity(intent);
+        if (item.getItemId()==R.id.searchToolBar){
+            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+            startActivity(intent);
+        }else{
+            Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+            startActivity(intent);
+        }
     }
 
     public static float getScreenWidth(Context context){

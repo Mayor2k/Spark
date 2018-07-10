@@ -39,14 +39,17 @@
 
         <activity
             android:name=".UI.Activities.PlayerActivity"
-            android:theme="@style/MyMaterialTheme.Player"/>
+            android:theme="@style/MyMaterialTheme.Player" />
         <activity
             android:name=".UI.Activities.SongTagActivity"
             android:label="@string/title_activity_song_tag"
             android:theme="@style/MyMaterialTheme" />
         <activity
             android:name=".UI.Activities.AlbumActivity"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".UI.Activities.SearchActivity">
+            android:theme="@style/MyMaterialTheme" />
+        </activity>
     </application>
 
 </manifest>

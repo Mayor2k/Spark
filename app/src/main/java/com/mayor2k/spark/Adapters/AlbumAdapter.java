@@ -99,7 +99,6 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
             v.getContext().startActivity(intent);
         }
     };
-
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
@@ -115,7 +114,7 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
         holder.artistName.setText(album.getArtist());
 
         if (checkLayout()) {
-            float itemSize = (getScreenWidth(holder.albumTitle.getContext())-5*spanCount*2)/spanCount;
+            float itemSize = (getScreenWidth(holder.albumTitle.getContext())-5*spanCount)/spanCount;
             float factor = holder.itemView.getContext().getResources().getDisplayMetrics().density;
             holder.imageView.getLayoutParams().width = (int) (itemSize*factor);
             holder.imageView.getLayoutParams().height = (int) (itemSize*factor);

@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.mayor2k.spark.R;
 
@@ -32,10 +33,24 @@ public class SearchActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search_icon, menu);
 
-        final MenuItem searchItem = menu.findItem(R.id.searchIconToolBar);
+        MenuItem searchItem = menu.findItem(R.id.searchIconToolBar);
         searchView = (SearchView)MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Search music");
         searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Toast.makeText(SearchActivity.this,"submit",Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Toast.makeText(SearchActivity.this,newText,Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
         return true;
     }
 

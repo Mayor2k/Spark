@@ -45,13 +45,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         }
     }
 
-    private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            songPosition=(Integer)v.getTag();
-            serviceIntent.setAction(Constants.START_ALBUM_ACTION);
-            v.getContext().startService(serviceIntent);
-        }
+    private final View.OnClickListener mOnClickListener = v -> {
+        songPosition=(Integer)v.getTag();
+        serviceIntent.setAction(Constants.START_ALBUM_ACTION);
+        v.getContext().startService(serviceIntent);
     };
 
     private final View.OnClickListener menuOnClickListener = new View.OnClickListener(){

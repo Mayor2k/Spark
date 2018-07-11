@@ -86,13 +86,10 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
 
         final FloatingActionButton actionButton = findViewById(R.id.action_button);
 
-        actionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                songPosition = 0;
-                serviceIntent.setAction(Constants.START_ALBUM_ACTION);
-                v.getContext().startService(serviceIntent);
-            }
+        actionButton.setOnClickListener(v -> {
+            songPosition = 0;
+            serviceIntent.setAction(Constants.START_ALBUM_ACTION);
+            v.getContext().startService(serviceIntent);
         });
 
         collapsingToolbarLayout.setExpandedTitleTypeface(font);

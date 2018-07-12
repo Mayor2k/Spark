@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,21 +116,19 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
                 .listener(GlidePalette.with(String.valueOf(album.getUri()))
                         .use(GlidePalette.Profile.MUTED)
                         .intoCallBack(
-                                new GlidePalette.CallBack() {
-                                    @Override
-                                    public void onPaletteLoaded(@Nullable Palette palette) {
-                                        int color = palette.getMutedColor(0);
-                                        collapsingToolbarLayout.setContentScrimColor(color);
-                                        collapsingToolbarLayout.setStatusBarScrimColor(color);
-                                        actionButton.setBackgroundTintList(ColorStateList.valueOf(color));
-                                        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
-                                    }
+                                palette -> {
+                                    int color = palette.getMutedColor(0);
+                                    collapsingToolbarLayout.setContentScrimColor(color);
+                                    collapsingToolbarLayout.setStatusBarScrimColor(color);
+                                    actionButton.setBackgroundTintList(ColorStateList.valueOf(color));
+                                    getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
                                 })
                 )
                 .into(albumCover);
         trackList.setLayoutManager(new LinearLayoutManager(this));
         trackList.setAdapter(customAdapter);
         getSupportLoaderManager().initLoader(1,null,this);
+        Log.i(MainActivity.TAG,""+albumSongs.size());
     }
 
     private final String[] COLUMNS = new String[]{

@@ -58,6 +58,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     public void onBindViewHolder(@NonNull SearchAdapter.ViewHolder holder, int position) {
         holder.itemArea.setTag(position);
         holder.itemMenu.setTag(position);
+
         if (objects.get(position) instanceof Song){
             Song song = (Song) objects.get(position);
             holder.itemTitle.setText(song.getTitle());

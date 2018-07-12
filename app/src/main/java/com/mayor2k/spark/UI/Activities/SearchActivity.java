@@ -27,7 +27,8 @@ import java.util.ArrayList;
 
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
-public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,LoaderManager.LoaderCallbacks<ArrayList<Object>> {
+public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
+        LoaderManager.LoaderCallbacks<ArrayList<Object>> {
 
     public String query = "QUERY";
     private SearchView searchView;
@@ -100,11 +101,11 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public void onLoadFinished(@NonNull Loader<ArrayList<Object>> loader, ArrayList<Object> data) {
         searchAdapter.notifyDataSetChanged();
+
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<ArrayList<Object>> loader) {
-
     }
 
     private static class AsyncSearchResultLoader extends WrappedAsyncTaskLoader<ArrayList<Object>>{
@@ -117,10 +118,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         @Override
         public ArrayList<Object> loadInBackground() {
+            searchList.clear();
             for (int i=0;songList.size()>i;i++){
                 Song song = songList.get(i);
                 if (song.getTitle().contains(query)){
-                    Log.i(MainActivity.TAG,"YES");
                     searchList.add(song);
                 }
             }

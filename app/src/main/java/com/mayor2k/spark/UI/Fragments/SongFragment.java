@@ -38,7 +38,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private RecyclerView songView;
-    public static ArrayList<Song> songList;
+    public static ArrayList<Song> songList = new ArrayList<>();
     public final static Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
     private SongAdapter songAdt;
 
@@ -96,7 +96,6 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
         try {
-            songList = new ArrayList<>();
             songAdt = new SongAdapter(songList,getContext(),getActivity());
 
             int spanCount;
@@ -138,9 +137,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        if (data==null){
-            return;
-        }
+        songList.clear();
         if (data.moveToFirst()) {
             int titleColumn = data.getColumnIndex(MediaStore.MediaColumns.TITLE);
             int idColumn = data.getColumnIndex(BaseColumns._ID);
@@ -171,17 +168,18 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                     songTrack = Integer.parseInt(track);
 
                 int songDuration = data.getInt(durationColumn);
-                songList.add(new Song(songId, songTitle, songArtist, songAlbum,
-                        pathId, uri, songTrack, songDuration));
+                Song song = new Song(songId, songTitle, songArtist, songAlbum,
+                        pathId, uri, songTrack, songDuration);
+                songList.add(song);
             }
+            songAdt.notifyDataSetChanged();
             songAdt.swapCursor(data);
         }
-
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        Log.i("TAGGING","RESTART...");
+        Log.i("tagging","reset!");
         songAdt.swapCursor(null);
     }
 }

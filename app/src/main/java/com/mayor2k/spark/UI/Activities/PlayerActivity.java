@@ -202,12 +202,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         play.setImageResource(!player.isPlaying()?R.drawable.ic_play_24dp:R.drawable.ic_pause_24dp);
 
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                progressListener();
-            }
-        };
+        runnable = this::progressListener;
         handler.postDelayed(runnable,1000);
     }
 

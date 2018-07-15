@@ -48,7 +48,7 @@ import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
 public class ArtistFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private RecyclerView artistView;
-    public static ArrayList<Artist> artistList;
+    public static ArrayList<Artist> artistList = new ArrayList<>();
     private ArtistAdapter artistAdapter;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -104,7 +104,6 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
         try{
-            artistList = new ArrayList<>();
             artistAdapter = new ArtistAdapter(artistList,getContext(),getActivity());
 
             int spanCount;
@@ -140,10 +139,8 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        if(data==null){
-            return;
-        }
         ArrayList<String>checking = new ArrayList<>();
+        artistList.clear();
         if (data.moveToFirst()) {
             int idColumn = data.getColumnIndex(MediaStore.Audio.Artists._ID);
             int titleColumn = data.getColumnIndex(MediaStore.Audio.Artists.ARTIST);

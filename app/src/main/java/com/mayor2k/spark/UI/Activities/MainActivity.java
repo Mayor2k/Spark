@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 
 public class MainActivity extends AppCompatActivity{
+
     public static final String TAG = "TAGGING";
     public static ArrayList<Song> playArray;
     public TabLayout tabLayout;

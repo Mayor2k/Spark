@@ -38,7 +38,7 @@ import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
 public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     private RecyclerView albumView;
     private AlbumAdapter albumAdapter;
-    public static ArrayList<Album> albumList;
+    public static ArrayList<Album> albumList = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -94,7 +94,6 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
         try{
-            albumList = new ArrayList<>();
             albumAdapter = new AlbumAdapter(albumList, getContext(),getActivity());
 
             int spanCount;
@@ -131,10 +130,8 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        if (data==null){
-            return;
-        }
         ArrayList<String>checking = new ArrayList<>();
+        albumList.clear();
         if (data.moveToFirst()) {
             int idColumn = data.getColumnIndex(MediaStore.Audio.Albums._ID);
             int titleColumn = data.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
@@ -142,7 +139,6 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
             int cover = data.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID);
             for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
                 long albumId = data.getLong(idColumn);
-
                 long songCover = data.getLong(cover);
                 Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                 Uri uri = ContentUris.withAppendedId(sArtworkUri, songCover);
@@ -155,6 +151,7 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
                     albumList.add(new Album(albumId ,albumTitle,artistTitle, uri));
                 }
             }
+            albumAdapter.notifyDataSetChanged();
             albumAdapter.swapCursor(data);
         }
     }

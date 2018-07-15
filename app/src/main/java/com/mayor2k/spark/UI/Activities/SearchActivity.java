@@ -60,12 +60,11 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         final MenuItem searchItem = menu.findItem(R.id.searchIconToolBar);
         searchView = (SearchView)MenuItemCompat.getActionView(searchItem);
+        searchView.setIconifiedByDefault(false);
         searchView.setQueryHint("Search music");
         searchView.setMaxWidth(Integer.MAX_VALUE);
 
-        searchView.setQuery(query,false);
         searchView.post(() -> searchView.setOnQueryTextListener(SearchActivity.this));
-
         return true;
     }
 

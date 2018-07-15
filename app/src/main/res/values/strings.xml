@@ -15,5 +15,6 @@
     <string name="title_activity_song_tag">SongTagActivity</string>
 
     <string name="tag_editor">Tag Editor</string>
+    <string name="no_results">No results</string>
 
 </resources>

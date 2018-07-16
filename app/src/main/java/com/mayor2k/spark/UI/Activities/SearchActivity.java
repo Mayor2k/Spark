@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mayor2k.spark.Adapters.SearchAdapter;
@@ -24,6 +26,7 @@ import com.mayor2k.spark.R;
 import com.mayor2k.spark.Utils.WrappedAsyncTaskLoader;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
@@ -34,6 +37,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private SearchView searchView;
     public static ArrayList<Object> searchList;
     SearchAdapter searchAdapter;
+    private TextView noResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +45,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         setContentView(R.layout.activity_search);
         Toolbar toolbar = findViewById(R.id.searchActivityToolBar);
         RecyclerView searchRecyclerView = findViewById(R.id.searchableList);
+        noResults = findViewById(R.id.emptyTextView);
         setSupportActionBar(toolbar);
         if (getSupportActionBar()!=null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -99,8 +104,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     @Override
     public void onLoadFinished(@NonNull Loader<ArrayList<Object>> loader, ArrayList<Object> data) {
+        noResults.setVisibility(searchList.size()==0 ? View.VISIBLE : View.INVISIBLE);
         searchAdapter.notifyDataSetChanged();
-
     }
 
     @Override
@@ -117,14 +122,33 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         @Override
         public ArrayList<Object> loadInBackground() {
+            if (Objects.equals(query, "")){
+                searchList.clear();
+                return searchList;
+            }
             searchList.clear();
+
             for (int i=0;songList.size()>i;i++){
                 Song song = songList.get(i);
-                if (song.getTitle().contains(query)){
+                if (containsIgnoreCase(song.getTitle(),query)){
                     searchList.add(song);
                 }
             }
             return searchList;
+        }
+
+        boolean containsIgnoreCase(String str, String searchStr)     {
+            if(str == null || searchStr == null) return false;
+
+            final int length = searchStr.length();
+            if (length == 0)
+                return true;
+
+            for (int i = str.length() - length; i >= 0; i--) {
+                if (str.regionMatches(true, i, searchStr, 0, length))
+                    return true;
+            }
+            return false;
         }
     }
 }

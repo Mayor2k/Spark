@@ -3,6 +3,7 @@ package com.mayor2k.spark.Adapters;
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +23,15 @@ import com.mayor2k.spark.R;
 
 import java.util.ArrayList;
 
+import static com.mayor2k.spark.UI.Activities.SearchActivity.searchList;
+
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder>{
     private ArrayList<Object> objects;
+
+    final private int SONG_HEADER = 0;
+    final private int ALBUM_HEADER = 1;
+    final private int ARTIST_HEADER = 2;
+    final private int NORMAL_ITEM = 3;
 
     public SearchAdapter(ArrayList<Object> theObjects){
         objects=theObjects;
@@ -31,7 +39,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     class ViewHolder extends RecyclerView.ViewHolder {
         ImageView itemImage;
-        TextView itemTitle,itemDescription;
+        TextView itemTitle,itemDescription,headerText;
         LinearLayout itemArea;
         ImageButton itemMenu;
         ViewHolder(View v) {
@@ -39,6 +47,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             itemImage = v.findViewById(R.id.itemImageView);
             itemTitle = v.findViewById(R.id.itemTopTextView);
             itemDescription = v.findViewById(R.id.itemBottomTextView);
+            //headerTextView
+            headerText = v.findViewById(R.id.headerTextView);
 
             itemArea = v.findViewById(R.id.itemArea);
             itemMenu = v.findViewById(R.id.linearMenu);
@@ -48,49 +58,116 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     @NonNull
     @Override
     public SearchAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.linear_item, parent, false);
+        View view;
+        if (viewType==NORMAL_ITEM)
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.linear_item, parent, false);
+        else
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.header_item, parent, false);
         return new SearchAdapter.ViewHolder(view);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull SearchAdapter.ViewHolder holder, int position) {
-        holder.itemArea.setTag(position);
-        holder.itemMenu.setTag(position);
+        if (getItemViewType(position)==SONG_HEADER)
+            holder.headerText.setText("Song");
+        else if (getItemViewType(position)==ALBUM_HEADER)
+            holder.headerText.setText("Album");
+        else if (getItemViewType(position)==ARTIST_HEADER)
+            holder.headerText.setText("Artist");
 
-        if (objects.get(position) instanceof Song){
-            Song song = (Song) objects.get(position);
-            holder.itemTitle.setText(song.getTitle());
-            holder.itemDescription.setText(song.getArtist());
+        else {
+            holder.itemArea.setTag(position);
+            holder.itemMenu.setTag(position);
 
-            Glide.with(holder.itemImage.getContext())
-                    .load(song.getUri())
-                    .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .error(R.drawable.album)
-                    )
-                    .into(holder.itemImage);
+            if (objects.get(position) instanceof Song){
+                Song song = (Song) objects.get(position);
+                holder.itemTitle.setText(song.getTitle());
+                holder.itemDescription.setText(song.getArtist());
 
-        }else if (objects.get(position) instanceof Album){
-            Album album = (Album) objects.get(position);
-            holder.itemTitle.setText(album.getTitle());
-            holder.itemDescription.setText(album.getArtist());
+                Glide.with(holder.itemImage.getContext())
+                        .load(song.getUri())
+                        .apply(new RequestOptions()
+                                .override(Target.SIZE_ORIGINAL)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .error(R.drawable.album)
+                        )
+                        .into(holder.itemImage);
 
-            Glide.with(holder.itemImage.getContext())
-                    .load(album.getUri())
-                    .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .error(R.drawable.album)
-                    )
-                    .into(holder.itemImage);
-        }else if (objects.get(position) instanceof Artist){
-            Artist artist = (Artist) objects.get(position);
-            holder.itemTitle.setText(artist.getTitle());
-            holder.itemDescription.setText(String.valueOf(artist.getSongInfo())+" song "
-                    +String.valueOf(artist.getAlbumInfo())+" album");
+            }else if (objects.get(position) instanceof Album){
+                Album album = (Album) objects.get(position);
+                holder.itemTitle.setText(album.getTitle());
+                holder.itemDescription.setText(album.getArtist());
+
+                Glide.with(holder.itemImage.getContext())
+                        .load(album.getUri())
+                        .apply(new RequestOptions()
+                                .override(Target.SIZE_ORIGINAL)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .error(R.drawable.album)
+                        )
+                        .into(holder.itemImage);
+            }else if (objects.get(position) instanceof Artist){
+                Artist artist = (Artist) objects.get(position);
+                holder.itemTitle.setText(artist.getTitle());
+                holder.itemDescription.setText(String.valueOf(artist.getSongInfo())+" song "
+                        +String.valueOf(artist.getAlbumInfo())+" album");
+
+                Glide.with(holder.itemImage.getContext())
+                        .load(artist.getUrl())
+                        .apply(new RequestOptions()
+                                .override(Target.SIZE_ORIGINAL)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .error(R.drawable.album)
+                        )
+                        .into(holder.itemImage);
+            }        holder.itemArea.setTag(position);
+            holder.itemMenu.setTag(position);
+
+            if (objects.get(position) instanceof Song){
+                Song song = (Song) objects.get(position);
+                holder.itemTitle.setText(song.getTitle());
+                holder.itemDescription.setText(song.getArtist());
+
+                Glide.with(holder.itemImage.getContext())
+                        .load(song.getUri())
+                        .apply(new RequestOptions()
+                                .override(Target.SIZE_ORIGINAL)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .error(R.drawable.album)
+                        )
+                        .into(holder.itemImage);
+
+            }else if (objects.get(position) instanceof Album){
+                Album album = (Album) objects.get(position);
+                holder.itemTitle.setText(album.getTitle());
+                holder.itemDescription.setText(album.getArtist());
+
+                Glide.with(holder.itemImage.getContext())
+                        .load(album.getUri())
+                        .apply(new RequestOptions()
+                                .override(Target.SIZE_ORIGINAL)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .error(R.drawable.album)
+                        )
+                        .into(holder.itemImage);
+            }else if (objects.get(position) instanceof Artist){
+                Artist artist = (Artist) objects.get(position);
+                holder.itemTitle.setText(artist.getTitle());
+                holder.itemDescription.setText(String.valueOf(artist.getSongInfo())+" song "
+                        +String.valueOf(artist.getAlbumInfo())+" album");
+
+                Glide.with(holder.itemImage.getContext())
+                        .load(artist.getUrl())
+                        .apply(new RequestOptions()
+                                .override(Target.SIZE_ORIGINAL)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .error(R.drawable.album)
+                        )
+                        .into(holder.itemImage);
+            }
         }
     }
 
@@ -107,5 +184,35 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        int[] list = new int[3];
+        for (int i = 0; searchList.size()>i; i++) {
+            if (searchList.get(i) instanceof Song)
+                list[0] += 1;
+            else if (searchList.get(i) instanceof Album)
+                list[1]+=1;
+            else if (searchList.get(i) instanceof Artist)
+                list[2]+=1;
+        }
+
+        try{
+            if (searchList.get(position - 1).getClass() != searchList.get(position + 1).getClass())
+                return SONG_HEADER;
+            else
+                return NORMAL_ITEM;
+        } catch (ArrayIndexOutOfBoundsException e){
+            if (searchList.get(0) instanceof Song)
+                return SONG_HEADER;
+            else if (searchList.get(0) instanceof Album)
+                return ALBUM_HEADER;
+            else if (searchList.get(0) instanceof Artist)
+                return ARTIST_HEADER;
+        }catch (IndexOutOfBoundsException e){
+            return NORMAL_ITEM;
+        }
+        return NORMAL_ITEM;
     }
 }

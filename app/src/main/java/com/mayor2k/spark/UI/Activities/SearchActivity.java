@@ -1,5 +1,6 @@
 package com.mayor2k.spark.UI.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,13 +22,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mayor2k.spark.Adapters.SearchAdapter;
+import com.mayor2k.spark.Models.Album;
+import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.Utils.WrappedAsyncTaskLoader;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
+import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
+import static com.mayor2k.spark.UI.Fragments.ArtistFragment.artistList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
@@ -36,7 +42,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     public String query = "QUERY";
     private SearchView searchView;
     public static ArrayList<Object> searchList;
-    SearchAdapter searchAdapter;
+    public SearchAdapter searchAdapter;
     private TextView noResults;
 
     @Override
@@ -105,6 +111,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public void onLoadFinished(@NonNull Loader<ArrayList<Object>> loader, ArrayList<Object> data) {
         noResults.setVisibility(searchList.size()==0 ? View.VISIBLE : View.INVISIBLE);
+
         searchAdapter.notifyDataSetChanged();
     }
 
@@ -120,6 +127,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             this.query = query;
         }
 
+        @SuppressLint("ResourceType")
         @Override
         public ArrayList<Object> loadInBackground() {
             if (Objects.equals(query, "")){
@@ -130,10 +138,22 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
             for (int i=0;songList.size()>i;i++){
                 Song song = songList.get(i);
-                if (containsIgnoreCase(song.getTitle(),query)){
+                if (containsIgnoreCase(song.getTitle(),query))
                     searchList.add(song);
-                }
             }
+
+            for (int i=0;albumList.size()>i;i++){
+                Album album = albumList.get(i);
+                if (containsIgnoreCase(album.getTitle(),query))
+                    searchList.add(album);
+            }
+
+            for (int i=0;artistList.size()>i;i++){
+                Artist artist = artistList.get(i);
+                if (containsIgnoreCase(artist.getTitle(),query))
+                    searchList.add(artist);
+            }
+
             return searchList;
         }
 

@@ -152,6 +152,7 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
         return new CursorLoader(AlbumActivity.this, musicUri, COLUMNS, selection,
                 selectionArgs, sortOrder);
     }
+    @SuppressLint("NewApi")
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         int titleColumn = data.getColumnIndex(MediaStore.MediaColumns.TITLE);

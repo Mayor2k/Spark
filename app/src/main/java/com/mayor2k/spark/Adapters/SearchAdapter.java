@@ -3,7 +3,6 @@ package com.mayor2k.spark.Adapters;
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +77,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         else if (getItemViewType(position)==ARTIST_HEADER)
             holder.headerText.setText("Artist");
 
-        else {
+        else{
             holder.itemArea.setTag(position);
             holder.itemMenu.setTag(position);
 
@@ -188,31 +187,13 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        int[] list = new int[3];
-        for (int i = 0; searchList.size()>i; i++) {
-            if (searchList.get(i) instanceof Song)
-                list[0] += 1;
-            else if (searchList.get(i) instanceof Album)
-                list[1]+=1;
-            else if (searchList.get(i) instanceof Artist)
-                list[2]+=1;
-        }
-
-        try{
-            if (searchList.get(position - 1).getClass() != searchList.get(position + 1).getClass())
-                return SONG_HEADER;
-            else
-                return NORMAL_ITEM;
-        } catch (ArrayIndexOutOfBoundsException e){
-            if (searchList.get(0) instanceof Song)
-                return SONG_HEADER;
-            else if (searchList.get(0) instanceof Album)
-                return ALBUM_HEADER;
-            else if (searchList.get(0) instanceof Artist)
-                return ARTIST_HEADER;
-        }catch (IndexOutOfBoundsException e){
+        if (searchList.get(position)=="SONG_HEADER")
+            return SONG_HEADER;
+        else if (searchList.get(position)=="ALBUM_HEADER")
+            return ALBUM_HEADER;
+        else if (searchList.get(position)=="ARTIST_HEADER")
+            return ARTIST_HEADER;
+        else
             return NORMAL_ITEM;
-        }
-        return NORMAL_ITEM;
     }
 }

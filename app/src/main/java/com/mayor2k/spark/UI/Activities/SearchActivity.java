@@ -28,6 +28,7 @@ import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.Utils.WrappedAsyncTaskLoader;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -111,7 +112,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public void onLoadFinished(@NonNull Loader<ArrayList<Object>> loader, ArrayList<Object> data) {
         noResults.setVisibility(searchList.size()==0 ? View.VISIBLE : View.INVISIBLE);
-
         searchAdapter.notifyDataSetChanged();
     }
 
@@ -134,28 +134,60 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 searchList.clear();
                 return searchList;
             }
+            ArrayList<Object> songs = new ArrayList<>();
+            ArrayList<Object> albums = new ArrayList<>();
+            ArrayList<Object> artists = new ArrayList<>();
+
+            songs.clear();
+            albums.clear();
+            artists.clear();
             searchList.clear();
+
+            /*int[] list = new int[3];
+            for (int i = 0; searchList.size()>i; i++) {
+                if (searchList.get(i) instanceof Song)
+                    list[0] += 1;
+                else if (searchList.get(i) instanceof Album)
+                    list[1]+=1;
+                else if (searchList.get(i) instanceof Artist)
+                    list[2]+=1;
+            }*/
 
             for (int i=0;songList.size()>i;i++){
                 Song song = songList.get(i);
                 if (containsIgnoreCase(song.getTitle(),query))
-                    searchList.add(song);
+                    songs.add(song);
+            }
+            if (songs.size()!=0){
+                songs.add(0,"SONG_HEADER");
+                searchList.addAll(songs);
             }
 
             for (int i=0;albumList.size()>i;i++){
                 Album album = albumList.get(i);
                 if (containsIgnoreCase(album.getTitle(),query))
-                    searchList.add(album);
+                    albums.add(album);
+            }
+            if (albums.size()!=0){
+                albums.add(0,"ALBUM_HEADER");
+                searchList.addAll(albums);
             }
 
             for (int i=0;artistList.size()>i;i++){
                 Artist artist = artistList.get(i);
                 if (containsIgnoreCase(artist.getTitle(),query))
-                    searchList.add(artist);
+                    artists.add(artist);
             }
+            if (artists.size()!=0){
+                artists.add(0,"ARTIST_HEADER");
+                searchList.addAll(artists);
+            }
+
+            Log.i("TAGGING",""+searchList);
 
             return searchList;
         }
+
 
         boolean containsIgnoreCase(String str, String searchStr)     {
             if(str == null || searchStr == null) return false;

@@ -9,7 +9,9 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -252,30 +254,20 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         if (isUpdate){
             Glide.with(getApplicationContext())
+                    .asBitmap()
                     .load(playSong.getUri())
                     .apply(new RequestOptions()
                             .override(NotificationTarget.SIZE_ORIGINAL)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                     )
-                    .listener(GlidePalette.with(String.valueOf(playSong.getUri()))
-                            .use(GlidePalette.Profile.MUTED)
-                            .intoCallBack(
-                                    new GlidePalette.CallBack() {
-                                        @Override
-                                        public void onPaletteLoaded(Palette palette) {
-                                            if (isCover()){
-                                                final int color = palette.getMutedColor(1);
-                                                Log.i(TAG,"COLOR IS "+color);
-                                                views.setInt(R.id.root,"setBackgroundColor", color);
-                                                viewsBig.setInt(R.id.root,"setBackgroundColor", color);
-                                            }
-                                        }
-                                    })
-                            .skipPaletteCache(false)
-                    )
-                    .into(new SimpleTarget<Drawable>() {
+                    .into(new SimpleTarget<Bitmap>(com.bumptech.glide.request.target.Target.SIZE_ORIGINAL, com.bumptech.glide.request.target.Target.SIZE_ORIGINAL) {
                         @Override
-                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            Palette p = Palette.from(resource).generate();
+                            int color = p.getMutedColor(p.getVibrantColor(p.getDominantColor(-111)));
+                            views.setInt(R.id.root,"setBackgroundColor", color);
+                            viewsBig.setInt(R.id.root,"setBackgroundColor",color);
+
                             viewsBig.setTextColor(R.id.status_bar_track_name,
                                     ContextCompat.getColor(getApplicationContext(), R.color.white));
                             viewsBig.setTextColor(R.id.status_bar_album_name,
@@ -288,8 +280,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                             views.setTextColor(R.id.status_bar_artist_name,
                                     ContextCompat.getColor(getApplicationContext(), R.color.white));
 
-                            viewsTarget.onResourceReady(drawableToBitmap(resource),null);
-                            viewsBigTarget.onResourceReady(drawableToBitmap(resource),null);
+                            viewsTarget.onResourceReady(resource,null);
+                            viewsBigTarget.onResourceReady(resource,null);
                         }
 
                         @Override
@@ -397,6 +389,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         public void onPlay() {
             player.seekTo(pausePosition);
             player.start();
+            int audioFocusResult = audioManager.requestAudioFocus(
+                    audioFocusChangeListener,
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.AUDIOFOCUS_GAIN);
+            if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+                return;
+            mediaSession.setActive(true);
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
             showNotification(false);
             Log.i(TAG, "Clicked play");
@@ -449,25 +448,17 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener =
-            new AudioManager.OnAudioFocusChangeListener() {
-                @Override
-                public void onAudioFocusChange(int focusChange) {
-                    switch (focusChange) {
-                        case AudioManager.AUDIOFOCUS_GAIN:
-                            if(player.isPlaying()){
-                                mediaSessionCallback.onPlay();
-                            }
-                            else{
-                                mediaSessionCallback.onStop();
-                            }
-                            break;
-                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                            mediaSessionCallback.onPlay();
-                            break;
-                        default:
-                            mediaSessionCallback.onPause();
-                            break;
-                    }
+            focusChange -> {
+                switch (focusChange) {
+                    case AudioManager.AUDIOFOCUS_GAIN:
+                        mediaSessionCallback.onPlay();
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                        mediaSessionCallback.onPause();
+                        break;
+                    default:
+                        mediaSessionCallback.onPause();
+                        break;
                 }
             };
 

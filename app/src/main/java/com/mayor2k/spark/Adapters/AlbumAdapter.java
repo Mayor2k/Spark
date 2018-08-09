@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -23,7 +25,9 @@ import com.androidessence.recyclerviewcursoradapter.RecyclerViewCursorViewHolder
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.R;
@@ -42,12 +46,19 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
     private Context context;
     private FragmentActivity fragmentActivity;
     public static int currentAlbum;
+    private int spanCount;
 
     public AlbumAdapter(ArrayList<Album> theAlbum, Context theContext, FragmentActivity theFragmentActivity){
         super(theContext);
         albums=theAlbum;
         context=theContext;
         fragmentActivity=theFragmentActivity;
+
+        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
+        if (!sPref.contains("AlbumSpanCount"))
+            spanCount = 2;
+        else
+            spanCount = sPref.getInt("AlbumSpanCount", -1);
 
         if (checkLayout())
             setupCursorAdapter(null, 0, R.layout.grid_item, false);
@@ -101,13 +112,6 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
     };
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
-        int spanCount;
-        if (!sPref.contains("AlbumSpanCount"))
-            spanCount = 2;
-        else
-            spanCount = sPref.getInt("AlbumSpanCount", -1);
-
         Album album = albums.get(position);
         holder.album.setTag(position);
         holder.albumTitle.setText(album.getTitle());
@@ -123,25 +127,29 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
             holder.album.requestLayout();
 
             Glide.with(context)
+                    .asBitmap()
                     .load(album.getUri())
                     .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
-                            .error(R.drawable.album)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                     )
-                    .listener(GlidePalette.with(String.valueOf(album.getUri()))
-                            .use(GlidePalette.Profile.MUTED)
-                            .intoCallBack(
-                                    new GlidePalette.CallBack() {
-                                        @Override
-                                        public void onPaletteLoaded(@Nullable Palette palette) {
-                                            holder.albumTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
-                                            holder.artistName.setTextColor(ContextCompat.getColor(context, R.color.white));
-                                        }
-                                    })
-                            .intoBackground(holder.colorArea)
-                    )
-                    .into(holder.imageView);
+                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL,Target.SIZE_ORIGINAL) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            holder.imageView.setImageBitmap(resource);
+                            holder.albumTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
+                            holder.artistName.setTextColor(ContextCompat.getColor(context, R.color.white));
+                            Palette.from(resource).generate(p -> holder.colorArea.setBackgroundColor(p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)))));
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            holder.imageView.setImageResource(R.drawable.album);
+                            holder.colorArea.setBackgroundColor(ContextCompat.getColor(context, R.color.item_area));
+                            holder.albumTitle.setTextColor(ContextCompat.getColor(context, R.color.black));
+                            holder.artistName.setTextColor(ContextCompat.getColor(context, R.color.black_p50));
+                        }
+                    });
         }
         else
             Glide.with(context)
@@ -166,6 +174,11 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
     @Override
     public int getItemCount() {
         return albums.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     @Override

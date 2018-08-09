@@ -2,10 +2,14 @@ package com.mayor2k.spark.Adapters;
 
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -26,8 +30,9 @@ import com.androidessence.recyclerviewcursoradapter.RecyclerViewCursorViewHolder
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
-import com.github.florent37.glidepalette.GlidePalette;
+import com.bumptech.glide.request.transition.Transition;
 import com.mayor2k.spark.Dialogs.BottomSheetDialog;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
@@ -43,16 +48,24 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     public static int songPosition;
     public static Intent serviceIntent;
     public static int parentTag;
-    public static BottomSheetDialogFragment bottomSheetDialogFragment =
+    static BottomSheetDialogFragment bottomSheetDialogFragment =
             new BottomSheetDialog();
     private Context context;
     private FragmentActivity fragmentActivity;
+    private int spanCount;
 
     public SongAdapter(ArrayList<Song> theSongs,Context theContext,FragmentActivity theFragmentActivity){
         super(theContext);
         context = theContext;
         songs=theSongs;
         fragmentActivity=theFragmentActivity;
+
+        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
+        if (!sPref.contains("SongSpanCount"))
+            spanCount = 1;
+        else
+            spanCount = sPref.getInt("SongSpanCount", -1);
+
 
         if (checkLayout())
             setupCursorAdapter(null, 0, R.layout.grid_item, false);
@@ -124,24 +137,17 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         return new ViewHolder(view);
     }
 
+    @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
-        int spanCount;
-        if (!sPref.contains("SongSpanCount"))
-            spanCount = 2;
-        else
-            spanCount = sPref.getInt("SongSpanCount", -1);
-
         Song song = songs.get(position);
-        holder.songArea.setTag(position);
-        if (!checkLayout())
-            holder.songMenu.setTag(position);
 
+        holder.songArea.setTag(position);
         holder.songTitle.setText(song.getTitle());
         holder.songArtist.setText(song.getArtist());
 
         if(checkLayout()) {
+
             float itemSize = (getScreenWidth(holder.coverView.getContext())-5*spanCount*2)/spanCount;
             float factor = holder.coverView.getContext().getResources().getDisplayMetrics().density;
 
@@ -152,41 +158,57 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
             holder.songArea.requestLayout();
 
             Glide.with(context)
+                    .asBitmap()
                     .load(song.getUri())
                     .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .error(R.drawable.cover)
                     )
-                    .listener(GlidePalette.with(String.valueOf(song.getUri()))
-                            .use(GlidePalette.Profile.MUTED)
-                            .intoCallBack(
-                                    new GlidePalette.CallBack() {
-                                        @Override
-                                        public void onPaletteLoaded(@Nullable Palette palette) {
-                                            holder.songTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
-                                            holder.songArtist.setTextColor(ContextCompat.getColor(context, R.color.white));
+                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL,Target.SIZE_ORIGINAL) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            holder.coverView.setImageBitmap(resource);
+                            Palette.from(resource).generate(p -> {
+                                holder.colorArea.setBackgroundColor(p.getMutedColor(p.getVibrantColor(p.getDominantColor(0))));
+                            });
+                            holder.songTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
+                            holder.songArtist.setTextColor(ContextCompat.getColor(context, R.color.white));
+                        }
 
-                                        }
-                                    })
-                            .intoBackground(holder.colorArea)
-                    )
-                    .into(holder.coverView);
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            holder.coverView.setImageResource(R.drawable.album);
+                            holder.colorArea.setBackgroundColor(ContextCompat.getColor(context, R.color.item_area));
+                            holder.songTitle.setTextColor(ContextCompat.getColor(context, R.color.black));
+                            holder.songArtist.setTextColor(ContextCompat.getColor(context, R.color.black_p50));
+                        }
+                    });
         }
         else{
             Glide.with(holder.coverView.getContext())
+                    .asBitmap()
                     .load(song.getUri())
                     .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .error(R.drawable.cover)
                     )
-                    .into(holder.coverView);
+                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            holder.coverView.setImageBitmap(resource);
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            holder.coverView.setImageResource(R.drawable.album);
+                        }
+                    });
         }
 
         mCursorAdapter.getCursor().moveToPosition(position);
         setViewHolder(holder);
-        mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
+        mCursorAdapter.bindView(
+                null, mContext, mCursorAdapter.getCursor());
     }
 
 
@@ -203,6 +225,11 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     private boolean checkLayout(){

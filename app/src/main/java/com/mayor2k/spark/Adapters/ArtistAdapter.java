@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -22,7 +24,9 @@ import com.androidessence.recyclerviewcursoradapter.RecyclerViewCursorViewHolder
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.R;
@@ -37,12 +41,19 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     private ArrayList<Artist> artists;
     private Context context;
     private FragmentActivity fragmentActivity;
+    private int spanCount;
 
     public ArtistAdapter(ArrayList<Artist> theArtist, Context theContext, FragmentActivity theFragmentActivity){
         super(theContext);
         artists=theArtist;
         context=theContext;
         fragmentActivity=theFragmentActivity;
+        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
+
+        if (!sPref.contains("ArtistSpanCount"))
+            spanCount = 2;
+        else
+            spanCount = sPref.getInt("ArtistSpanCount", -1);
 
         if (checkLayout())
             setupCursorAdapter(null, 0, R.layout.grid_item, false);
@@ -98,12 +109,6 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
-        int spanCount;
-        if (!sPref.contains("ArtistSpanCount"))
-            spanCount = 2;
-        else
-            spanCount = sPref.getInt("ArtistSpanCount", -1);
 
         final Artist artist = artists.get(position);
         holder.artistArea.setTag(position);
@@ -122,28 +127,30 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
             holder.artistArea.getLayoutParams().width = (int) (itemSize*factor);
             holder.artistArea.requestLayout();
 
-
             Glide.with(context)
+                    .asBitmap()
                     .load(artist.getUrl())
                     .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .error(R.drawable.cover)
                     )
-                    .listener(GlidePalette.with(artist.getUrl())
-                            .use(GlidePalette.Profile.MUTED)
-                            .intoCallBack(
-                                    new GlidePalette.CallBack() {
-                                        @Override
-                                        public void onPaletteLoaded(@Nullable Palette palette) {
-                                            holder.artistTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
-                                            holder.artistInfo.setTextColor(ContextCompat.getColor(context, R.color.white));
+                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL,Target.SIZE_ORIGINAL) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            holder.artistCover.setImageBitmap(resource);
+                            holder.artistTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
+                            holder.artistInfo.setTextColor(ContextCompat.getColor(context, R.color.white));
+                            Palette.from(resource).generate(p -> holder.colorArea.setBackgroundColor(p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)))));
+                        }
 
-                                        }
-                                    })
-                            .intoBackground(holder.colorArea)
-                    )
-                    .into(holder.artistCover);
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            holder.artistCover.setImageResource(R.drawable.album);
+                            holder.colorArea.setBackgroundColor(ContextCompat.getColor(context, R.color.item_area));
+                            holder.artistTitle.setTextColor(ContextCompat.getColor(context, R.color.black));
+                            holder.artistInfo.setTextColor(ContextCompat.getColor(context, R.color.black_p50));
+                        }
+                    });
     }
         else
             Glide.with(context)
@@ -169,6 +176,11 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     @Override
     public int getItemCount() {
         return artists.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     @Override

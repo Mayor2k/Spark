@@ -5,7 +5,10 @@ import android.content.ContentUris;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -31,7 +34,9 @@ import android.support.v7.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.elmargomez.typer.Font;
 import com.elmargomez.typer.Typer;
 import com.github.florent37.glidepalette.GlidePalette;
@@ -107,24 +112,33 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
         CustomAdapter customAdapter = new CustomAdapter(albumSongs);
 
         Glide.with(this)
+                .asBitmap()
                 .load(album.getUri())
                 .apply(new RequestOptions()
-                        .override(Target.SIZE_ORIGINAL)
-                        .error(R.drawable.ic_album_black_24dp)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                 )
-                .listener(GlidePalette.with(String.valueOf(album.getUri()))
-                        .use(GlidePalette.Profile.MUTED)
-                        .intoCallBack(
-                                palette -> {
-                                    int color = palette.getMutedColor(0);
-                                    collapsingToolbarLayout.setContentScrimColor(color);
-                                    collapsingToolbarLayout.setStatusBarScrimColor(color);
-                                    actionButton.setBackgroundTintList(ColorStateList.valueOf(color));
-                                    getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
-                                })
-                )
-                .into(albumCover);
+                .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        albumCover.setImageBitmap(resource);
+                        Palette p = Palette.from(resource).generate();
+                        int color = p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)));
+                        collapsingToolbarLayout.setContentScrimColor(color);
+                        collapsingToolbarLayout.setStatusBarScrimColor(color);
+                        actionButton.setBackgroundTintList(ColorStateList.valueOf(color));
+                        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
+                    }
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        super.onLoadFailed(errorDrawable);
+                        albumCover.setImageResource(R.drawable.album);
+                        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
+                        collapsingToolbarLayout.setContentScrimColor(Color.parseColor("#cccccc"));
+                        collapsingToolbarLayout.setStatusBarScrimColor(Color.parseColor("#cccccc"));
+
+                    }
+                });
         trackList.setLayoutManager(new LinearLayoutManager(this));
         trackList.setAdapter(customAdapter);
         getSupportLoaderManager().initLoader(1,null,this);

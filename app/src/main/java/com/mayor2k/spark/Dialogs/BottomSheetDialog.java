@@ -88,11 +88,7 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
 
         if (isCover(song,getContext())){
             cover.setImageBitmap(getCoverBitmap(song,getContext()));
-            Palette.from(getPaletteBitmap(song)).generate(new Palette.PaletteAsyncListener() {
-                public void onGenerated(Palette p) {
-                    root.setBackgroundColor(p.getMutedColor(0));
-                }
-            });
+            Palette.from(getPaletteBitmap(song)).generate(p -> root.setBackgroundColor(p.getMutedColor(0)));
         }
 
         title.setText(song.getTitle());

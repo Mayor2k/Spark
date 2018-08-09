@@ -9,10 +9,12 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -75,8 +77,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
     public AudioManager audioManager;
 
-    public MusicIntentReceiver myReceiver = new MusicIntentReceiver();
-
     @Override
     public void onCreate() {
         mediaSession = new MediaSessionCompat(this, TAG);
@@ -85,12 +85,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                         | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         mediaSession.setCallback(mediaSessionCallback);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "MyWakelockTag");
-        wakeLock.acquire();
-        //IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
-        //registerReceiver(myReceiver, filter);
         mediaSession.setActive(true);
         super.onCreate();
     }
@@ -140,18 +134,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }catch (RuntimeException e){
             e.printStackTrace();
         }
-
         try {
             player.prepare();
         } catch (IOException | RuntimeException e) {
             e.printStackTrace();
         }
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mediaSessionCallback.onSkipToNext();
-            }
-        });
+        player.setOnCompletionListener(mp -> mediaSessionCallback.onSkipToNext());
 
         MediaMetadataCompat.Builder metadata = metadataBuilder
                 .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getCoverBitmap(playSong,getApplicationContext()));
@@ -163,6 +151,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                         PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
 
+        registerReceiver(
+                becomingNoisyReceiver,
+                new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
         mediaSession.setActive(true);
         player.start();
     }
@@ -346,7 +337,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public void onDestroy() {
-        player.stop();
+        mediaSessionCallback.onStop();
+        player.release();
+        mediaSession.release();
         super.onDestroy();
     }
 
@@ -377,6 +370,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         public void onPause() {
             player.pause();
             pausePosition = player.getCurrentPosition();
+            try {
+                unregisterReceiver(becomingNoisyReceiver);
+            }catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }
             showNotification(false);
             Log.i(TAG, "Clicked pause Current position is" + pausePosition);
             mediaSession.setPlaybackState(
@@ -395,13 +393,17 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     AudioManager.AUDIOFOCUS_GAIN);
             if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
                 return;
-            mediaSession.setActive(true);
+
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
+            registerReceiver(
+                    becomingNoisyReceiver,
+                    new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
             showNotification(false);
             Log.i(TAG, "Clicked play");
             mediaSession.setPlaybackState(
                     stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                             PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
+            mediaSession.setActive(true);
             super.onPlay();
         }
 
@@ -425,13 +427,17 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         @Override
         public void onStop() {
+            player.stop();
             audioManager.abandonAudioFocus(audioFocusChangeListener);
-            //unregisterReceiver(myReceiver);
+            try{
+                unregisterReceiver(becomingNoisyReceiver);
+            }catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }
             if (player.isPlaying())
                 stopForeground(true);
             else
                 mNotifyMgr.cancelAll();
-            player.stop();
         }
     };
 
@@ -451,10 +457,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             focusChange -> {
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_GAIN:
+                        if (!player.isPlaying())
+                            mediaSessionCallback.onPause();
+                        else
+                            mediaSessionCallback.onPlay();
+                        break;
+                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
                         mediaSessionCallback.onPlay();
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                        mediaSessionCallback.onPause();
+                        mediaSessionCallback.onPlay();
                         break;
                     default:
                         mediaSessionCallback.onPause();
@@ -477,23 +489,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
-    public class MusicIntentReceiver extends BroadcastReceiver {
-        @Override public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
-                int state = intent.getIntExtra("state", 1);
-                switch (state) {
-                    case 0:
-                        if(player.isPlaying())
-                            mediaSessionCallback.onPause();
-                        Log.d(TAG, "Headphones is unplugged");
-                        break;
-                    case 1:
-                        Log.d(TAG, "Headphones is plugged");
-                        break;
-                    default:
-                        Log.d(TAG, "???");
-                }
+    final BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                mediaSessionCallback.onPause();
             }
         }
-    }
+    };
+
 }

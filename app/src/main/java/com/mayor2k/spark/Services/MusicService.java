@@ -12,16 +12,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -31,7 +28,6 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.graphics.Palette;
-import android.support.v7.graphics.Target;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -41,7 +37,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.NotificationTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
@@ -50,13 +45,14 @@ import com.mayor2k.spark.UI.Activities.PlayerActivity;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import static com.mayor2k.spark.UI.Activities.AlbumActivity.albumSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
+import static com.mayor2k.spark.UI.Activities.SearchActivity.searchList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
-import static com.mayor2k.spark.Utils.CoverUtil.drawableToBitmap;
 import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener {
@@ -65,6 +61,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static int pausePosition;
     public static boolean isQueue;
     public static int queuePosition;
+    public static boolean isAudiofocusLoss;
     int audioFocusResult;
     public static NotificationManager mNotifyMgr;
     public MediaSessionCompat mediaSession;
@@ -108,6 +105,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             playArray=albumSongs;
             songStream(songPosition);
             showNotification(true);
+        }else if (intent.getAction().equals(Constants.START_SEARCH_ACTION)){
+            /*ArrayList<Song> searchSong = new ArrayList<>();
+            for (int i=1;searchList.size()>i;i++){
+                if (searchList.get(i) instanceof Song)
+                    searchSong.add((Song) searchList.get(i));
+            }*/
+            playArray=searchList;
+            songStream(songPosition);
+            showNotification(true);
         }
         return START_NOT_STICKY;
     }
@@ -119,7 +125,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             e.printStackTrace();
         }
         songPosition = songPos;
-        playSong = playArray.get(songPosition);
+        playSong = (Song) playArray.get(songPosition);
         long currSong = playSong.getId();
         Log.i(TAG, "Artist " + playSong.getArtist() + " Song " + playSong.getTitle());
         Uri trackUri = ContentUris.withAppendedId
@@ -358,7 +364,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                         songStream(songPosition - 1);
                 } catch (ArrayIndexOutOfBoundsException e) {
                     songStream(0);
+                }catch (ClassCastException e){
+                    songStream(1);
                 }
+
             }
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
             showNotification(true);
@@ -416,7 +425,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 }
                 else
                     songStream(songPosition + 1);
-            } catch (IndexOutOfBoundsException e) {
+            } catch (IndexOutOfBoundsException|ClassCastException e) {
                 songStream(songPosition - 1);
             }
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
@@ -457,16 +466,28 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             focusChange -> {
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_GAIN:
-                        if (!player.isPlaying())
-                            mediaSessionCallback.onPause();
-                        else
+                        Log.i("TAGGING","AUDIOFOCUS_GAIN");
+                        if (!isAudiofocusLoss && !player.isPlaying())
                             mediaSessionCallback.onPlay();
                         break;
                     case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
-                        mediaSessionCallback.onPlay();
+                        Log.i("TAGGING","AUDIOFOCUS_GAIN_TRANSIENT");
+                        if (player.isPlaying()){
+                            pausePosition=player.getCurrentPosition();
+                            mediaSessionCallback.onPlay();
+                        }
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                        mediaSessionCallback.onPlay();
+                        Log.i("TAGGING","AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
+                        /*if (player.isPlaying()){
+                            pausePosition=player.getCurrentPosition();
+                            mediaSessionCallback.onPlay();
+                        }*/
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS:
+                        Log.i("TAGGING","AUDIOFOCUS_LOSS");
+                        isAudiofocusLoss = true;
+                        mediaSessionCallback.onPause();
                         break;
                     default:
                         mediaSessionCallback.onPause();

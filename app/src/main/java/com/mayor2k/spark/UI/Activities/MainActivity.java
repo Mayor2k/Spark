@@ -33,7 +33,7 @@ import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 public class MainActivity extends AppCompatActivity{
 
     public static final String TAG = "TAGGING";
-    public static ArrayList<Song> playArray;
+    public static ArrayList playArray;
     public TabLayout tabLayout;
     public ViewPager viewPager;
     @SuppressLint("StaticFieldLeak")
@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity{
         adapter.addFragment(new ArtistFragment(), "Artists");
         viewPager.setAdapter(adapter);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

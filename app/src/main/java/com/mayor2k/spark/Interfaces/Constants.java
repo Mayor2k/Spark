@@ -9,4 +9,5 @@ public interface Constants {
     String STARTFOREGROUND_ACTION = "com.mayor2k.spark.action.startforeground";
     String STOPFOREGROUND_ACTION = "com.mayor2k.spark.action.stopforeground";
     String START_ALBUM_ACTION = "com.mayor2k.spark.action.start_album";
+    String START_SEARCH_ACTION = "com.mayor2k.spark.action.start_search";
 }

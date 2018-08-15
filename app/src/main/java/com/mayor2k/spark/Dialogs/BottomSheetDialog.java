@@ -68,7 +68,7 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
     @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(Dialog dialog, int style) {
-        final Song song = playArray.get(parentTag);
+        final Song song =(Song) playArray.get(parentTag);
         View contentView;
         super.setupDialog(dialog, style);
         if (isCover(song,getContext())){

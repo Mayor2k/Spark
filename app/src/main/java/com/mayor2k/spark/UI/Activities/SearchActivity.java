@@ -138,9 +138,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             ArrayList<Object> albums = new ArrayList<>();
             ArrayList<Object> artists = new ArrayList<>();
 
-            songs.clear();
-            albums.clear();
-            artists.clear();
             searchList.clear();
 
             /*int[] list = new int[3];

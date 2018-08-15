@@ -1,8 +1,13 @@
 package com.mayor2k.spark.Adapters;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,19 +15,28 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
+import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
+import com.mayor2k.spark.UI.Activities.AlbumActivity;
 
 import java.util.ArrayList;
 
+import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
+import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.UI.Activities.SearchActivity.searchList;
+import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
+import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder>{
     private ArrayList<Object> objects;
@@ -54,16 +68,41 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         }
     }
 
+    private final View.OnClickListener onClickListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View v) {
+            int position = (Integer)v.getTag();
+            Object object = objects.get(position);
+            if (object instanceof Song){
+                songPosition = position;
+                serviceIntent.setAction(Constants.START_SEARCH_ACTION);
+                v.getContext().startService(serviceIntent);
+            }else if(object instanceof Album){
+                currentAlbum = albumList.indexOf(object);
+                Intent intent = new Intent(v.getContext(), AlbumActivity.class);
+                v.getContext().startActivity(intent);
+            }else if(object instanceof Artist){
+                Toast.makeText(v.getContext(),"Not ready right now!",Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
     @NonNull
     @Override
     public SearchAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
-        if (viewType==NORMAL_ITEM)
+        if (viewType==NORMAL_ITEM){
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.linear_item, parent, false);
-        else
+            View item_area = view.findViewById(R.id.itemArea);
+            item_area.getTag();
+            item_area.setOnClickListener(onClickListener);
+        }
+        else{
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.header_item, parent, false);
+        }
+
         return new SearchAdapter.ViewHolder(view);
     }
 
@@ -80,20 +119,29 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         else{
             holder.itemArea.setTag(position);
             holder.itemMenu.setTag(position);
-
             if (objects.get(position) instanceof Song){
                 Song song = (Song) objects.get(position);
                 holder.itemTitle.setText(song.getTitle());
                 holder.itemDescription.setText(song.getArtist());
 
                 Glide.with(holder.itemImage.getContext())
+                        .asBitmap()
                         .load(song.getUri())
                         .apply(new RequestOptions()
-                                .override(Target.SIZE_ORIGINAL)
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .error(R.drawable.album)
                         )
-                        .into(holder.itemImage);
+                        .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                holder.itemImage.setImageBitmap(resource);
+                            }
+
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                super.onLoadFailed(errorDrawable);
+                                holder.itemImage.setImageResource(R.drawable.album);
+                            }
+                        });
 
             }else if (objects.get(position) instanceof Album){
                 Album album = (Album) objects.get(position);
@@ -101,13 +149,23 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 holder.itemDescription.setText(album.getArtist());
 
                 Glide.with(holder.itemImage.getContext())
+                        .asBitmap()
                         .load(album.getUri())
                         .apply(new RequestOptions()
-                                .override(Target.SIZE_ORIGINAL)
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .error(R.drawable.album)
                         )
-                        .into(holder.itemImage);
+                        .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                holder.itemImage.setImageBitmap(resource);
+                            }
+
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                super.onLoadFailed(errorDrawable);
+                                holder.itemImage.setImageResource(R.drawable.album);
+                            }
+                        });
             }else if (objects.get(position) instanceof Artist){
                 Artist artist = (Artist) objects.get(position);
                 holder.itemTitle.setText(artist.getTitle());
@@ -115,57 +173,23 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                         +String.valueOf(artist.getAlbumInfo())+" album");
 
                 Glide.with(holder.itemImage.getContext())
+                        .asBitmap()
                         .load(artist.getUrl())
                         .apply(new RequestOptions()
-                                .override(Target.SIZE_ORIGINAL)
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .error(R.drawable.album)
                         )
-                        .into(holder.itemImage);
-            }        holder.itemArea.setTag(position);
-            holder.itemMenu.setTag(position);
+                        .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                holder.itemImage.setImageBitmap(resource);
+                            }
 
-            if (objects.get(position) instanceof Song){
-                Song song = (Song) objects.get(position);
-                holder.itemTitle.setText(song.getTitle());
-                holder.itemDescription.setText(song.getArtist());
-
-                Glide.with(holder.itemImage.getContext())
-                        .load(song.getUri())
-                        .apply(new RequestOptions()
-                                .override(Target.SIZE_ORIGINAL)
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .error(R.drawable.album)
-                        )
-                        .into(holder.itemImage);
-
-            }else if (objects.get(position) instanceof Album){
-                Album album = (Album) objects.get(position);
-                holder.itemTitle.setText(album.getTitle());
-                holder.itemDescription.setText(album.getArtist());
-
-                Glide.with(holder.itemImage.getContext())
-                        .load(album.getUri())
-                        .apply(new RequestOptions()
-                                .override(Target.SIZE_ORIGINAL)
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .error(R.drawable.album)
-                        )
-                        .into(holder.itemImage);
-            }else if (objects.get(position) instanceof Artist){
-                Artist artist = (Artist) objects.get(position);
-                holder.itemTitle.setText(artist.getTitle());
-                holder.itemDescription.setText(String.valueOf(artist.getSongInfo())+" song "
-                        +String.valueOf(artist.getAlbumInfo())+" album");
-
-                Glide.with(holder.itemImage.getContext())
-                        .load(artist.getUrl())
-                        .apply(new RequestOptions()
-                                .override(Target.SIZE_ORIGINAL)
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .error(R.drawable.album)
-                        )
-                        .into(holder.itemImage);
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                super.onLoadFailed(errorDrawable);
+                                holder.itemImage.setImageResource(R.drawable.album);
+                            }
+                        });
             }
         }
     }

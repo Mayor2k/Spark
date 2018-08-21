@@ -5,14 +5,21 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -21,12 +28,14 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.jaeger.library.StatusBarUtil;
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
@@ -42,15 +51,9 @@ import static com.mayor2k.spark.Services.MusicService.player;
 public class PlayerActivity extends AppCompatActivity {
     public ImageView trackCover;
     public SeekBar seekBar;
-
-    public ImageButton prev;
-    public ImageButton play;
-    public ImageButton next;
-
-    public TextView title;
-    public TextView artist;
-    public TextView timeStart;
-    public TextView timeEnd;
+    public ImageButton prev,play,next;
+    public TextView title,artist,timeStart,timeEnd;
+    private LinearLayout playerArea;
 
     public MusicService.MusicServiceBinder musicServiceBinder;
     public MediaControllerCompat mediaController;
@@ -96,13 +99,16 @@ public class PlayerActivity extends AppCompatActivity {
         play = findViewById(R.id.playerPlay);
         next = findViewById(R.id.playerNext);
 
+        timeStart = findViewById(R.id.seekBarTimeStart);
+        timeEnd = findViewById(R.id.seekBarTimeEnd);
+
         trackCover = findViewById(R.id.trackCover);
         title = findViewById(R.id.playerTitle);
         artist = findViewById(R.id.playerArtist);
+        playerArea = findViewById(R.id.playerArea);
         seekBar = findViewById(R.id.seekBar);
         seekBar.setMax(player.getDuration());
         seekBar.setProgress(player.getCurrentPosition());
-
         updateView();
         progressListener();
 
@@ -142,33 +148,16 @@ public class PlayerActivity extends AppCompatActivity {
             }
         }, BIND_AUTO_CREATE);
 
+        prev.setOnClickListener(v -> mediaController.getTransportControls().skipToPrevious());
 
-
-        prev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mediaController.getTransportControls().skipToPrevious();
-            }
+        play.setOnClickListener(v -> {
+            if(player.isPlaying())
+                mediaController.getTransportControls().pause();
+            else
+                mediaController.getTransportControls().play();
         });
 
-        play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(player.isPlaying())
-                    mediaController.getTransportControls().pause();
-                else
-                    mediaController.getTransportControls().play();
-            }
-        });
-
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mediaController.getTransportControls().skipToNext();
-            }
-        });
-
-
+        next.setOnClickListener(v -> mediaController.getTransportControls().skipToNext());
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -192,29 +181,58 @@ public class PlayerActivity extends AppCompatActivity {
         seekBar.setProgress(player.getCurrentPosition());
         seekBar.setMax(player.getDuration());
 
-        timeStart = findViewById(R.id.seekBarTimeStart);
         timeStart.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(player.getCurrentPosition()),
                 TimeUnit.MILLISECONDS.toSeconds(player.getCurrentPosition()%60000)));
 
-        timeEnd = findViewById(R.id.seekBarTimeEnd);
         timeEnd.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(player.getDuration()),
                 TimeUnit.MILLISECONDS.toSeconds(player.getDuration()%60000)));
 
         play.setImageResource(!player.isPlaying()?R.drawable.ic_play_24dp:R.drawable.ic_pause_24dp);
 
         runnable = this::progressListener;
-        handler.postDelayed(runnable,1000);
+        handler.postDelayed(runnable,100);
     }
 
     private void updateView(){
         try{
             Glide.with(trackCover.getContext())
+                    .asBitmap()
                     .load(playSong.getUri())
-                    .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
-                            .error(R.drawable.cover)
-                    )
-                    .into(trackCover);
+                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            trackCover.setImageBitmap(resource);
+                            Palette p = Palette.from(resource).generate();
+                            int colorPrimary = p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)));
+                            playerArea.setBackgroundColor(colorPrimary);
+                            int colorAccent = p.getLightMutedColor(p.getLightVibrantColor(p.getDominantColor(0)));
+                            seekBar.getProgressDrawable().setColorFilter(colorAccent, PorterDuff.Mode.SRC_IN);
+                            seekBar.getThumb().setColorFilter(colorAccent, PorterDuff.Mode.SRC_IN);
+                            timeStart.setTextColor(getResources().getColor(R.color.white));
+                            timeEnd.setTextColor(getResources().getColor(R.color.white));
+                            title.setTextColor(getResources().getColor(R.color.white));
+                            artist.setTextColor(getResources().getColor(R.color.white));
+                            prev.setColorFilter(getResources().getColor(R.color.white));
+                            play.setColorFilter(getResources().getColor(R.color.white));
+                            next.setColorFilter(getResources().getColor(R.color.white));
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            trackCover.setImageResource(R.drawable.cover);
+                            seekBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.silver), PorterDuff.Mode.SRC_IN);
+                            seekBar.getThumb().setColorFilter(getResources().getColor(R.color.silver), PorterDuff.Mode.SRC_IN);
+                            playerArea.setBackgroundColor(getResources().getColor(R.color.white));
+                            timeStart.setTextColor(getResources().getColor(R.color.black_p50));
+                            timeEnd.setTextColor(getResources().getColor(R.color.black_p50));
+                            title.setTextColor(getResources().getColor(R.color.black));
+                            artist.setTextColor(getResources().getColor(R.color.black_p50));
+                            prev.setColorFilter(getResources().getColor(R.color.black));
+                            play.setColorFilter(getResources().getColor(R.color.black));
+                            next.setColorFilter(getResources().getColor(R.color.black));
+                        }
+                    });
             title.setText(playSong.getTitle());
             artist.setText(playSong.getArtist());
         }catch (IllegalArgumentException e){

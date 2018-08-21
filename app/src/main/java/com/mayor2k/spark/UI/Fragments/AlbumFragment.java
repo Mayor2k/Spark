@@ -156,7 +156,5 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        albumAdapter.swapCursor(null);
-    }
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {}
 }

@@ -45,7 +45,6 @@ import com.mayor2k.spark.UI.Activities.PlayerActivity;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import static com.mayor2k.spark.UI.Activities.AlbumActivity.albumSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
@@ -106,11 +105,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             songStream(songPosition);
             showNotification(true);
         }else if (intent.getAction().equals(Constants.START_SEARCH_ACTION)){
-            /*ArrayList<Song> searchSong = new ArrayList<>();
-            for (int i=1;searchList.size()>i;i++){
-                if (searchList.get(i) instanceof Song)
-                    searchSong.add((Song) searchList.get(i));
-            }*/
             playArray=searchList;
             songStream(songPosition);
             showNotification(true);
@@ -261,7 +255,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             Palette p = Palette.from(resource).generate();
-                            int color = p.getMutedColor(p.getVibrantColor(p.getDominantColor(-111)));
+                            int color = p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)));
                             views.setInt(R.id.root,"setBackgroundColor", color);
                             viewsBig.setInt(R.id.root,"setBackgroundColor",color);
 

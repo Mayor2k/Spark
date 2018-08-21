@@ -179,8 +179,5 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        Log.i("tagging","reset!");
-        songAdt.swapCursor(null);
-    }
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {}
 }

@@ -10,6 +10,7 @@
 
 
     <LinearLayout
+        android:id="@+id/playerArea"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
@@ -18,7 +19,8 @@
         <FrameLayout
             android:id="@+id/player"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_weight="40">
 
             <ImageView
                 android:id="@+id/trackCover"
@@ -26,7 +28,8 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/cover" />
+                android:src="@drawable/cover"
+                tools:ignore="ContentDescription" />
 
             <View
                 android:id="@+id/gradientView"
@@ -39,122 +42,144 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="112dp"
-                app:theme="@style/ToolbarStyle"
-                android:fitsSystemWindows="true"/>
+                android:fitsSystemWindows="true"
+                app:theme="@style/ToolbarStyle" />
+
         </FrameLayout>
 
-        <SeekBar
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="5dp"
-            android:id="@+id/seekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100"
-            android:progress="00"/>
-
-        <RelativeLayout
-            android:id="@+id/seekBar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/seekBarTimeStart"
-                android:layout_width="match_parent"
-                android:layout_marginStart="15dp"
-                android:gravity="start"
-                android:text="0.00"
-                android:layout_alignStart="@+id/seekBarTimeEnd"
-                android:textColor="@color/black_p50"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:id="@+id/seekBarTimeEnd"
-                android:layout_width="match_parent"
-                android:layout_marginEnd="15dp"
-                android:gravity="end"
-                android:text="3.48"
-                android:textColor="@color/black_p50"
-                android:layout_height="wrap_content"/>
-
-
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/playerTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="15dp"
-            android:text="Talking to Myself"
-            android:maxLines="1"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="24dp" />
-
-        <TextView
-            android:id="@+id/playerArtist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="15dp"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:text="Linkin Park"
-            android:textAllCaps="false"
-            android:textColor="@color/black_p50"
-            android:textSize="18dp" />
-
         <LinearLayout
-            android:id="@+id/media_actions"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_gravity="bottom"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:layout_weight="60"
+            android:orientation="vertical">
 
-            <ImageButton
-                android:id="@+id/playerPrev"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="48dp"
-                android:layout_height="match_parent"
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="15dp"
+                android:max="100"
+                android:progress="00" />
+
+            <RelativeLayout
+                android:id="@+id/seekBar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/seekBarTimeStart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/seekBarTimeEnd"
+                    android:layout_marginStart="15dp"
+                    android:gravity="start"
+                    android:text="0.00"
+                    android:textColor="@color/black_p50"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/seekBarTimeEnd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:gravity="end"
+                    android:text="3.48"
+                    android:textColor="@color/black_p50"
+                    tools:ignore="HardcodedText" />
+
+
+            </RelativeLayout>
+
+            <LinearLayout
                 android:layout_weight="1"
-                android:gravity="center"
-                android:padding="8dp"
-                android:tint="@color/black"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_previous_24dp"
-                tools:ignore="ContentDescription" />
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                tools:ignore="NestedWeights">
+                <TextView
+                    android:id="@+id/playerTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginStart="15dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="Talking to Myself"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    tools:ignore="HardcodedText" />
 
-            <ImageButton
-                android:id="@+id/playerPlay"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="48dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
-                android:gravity="center"
-                android:tint="@color/black"
-                android:padding="8dp"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_pause_24dp"
-                tools:ignore="ContentDescription" />
+                <TextView
+                    android:id="@+id/playerArtist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginStart="15dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:text="Linkin Park"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black_p50"
+                    android:textSize="18sp"
+                    tools:ignore="HardcodedText" />
 
-            <ImageButton
-                android:id="@+id/playerNext"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="48dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:tint="@color/black"
-                android:gravity="center"
-                android:padding="8dp"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_next_24dp"
-                tools:ignore="ContentDescription" />
+                <LinearLayout
+                    android:id="@+id/media_actions"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_gravity="bottom"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/playerPrev"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="48dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:scaleType="fitCenter"
+                        android:tint="@color/black"
+                        app:srcCompat="@drawable/ic_previous_24dp"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageButton
+                        android:id="@+id/playerPlay"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="48dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:scaleType="fitCenter"
+                        android:tint="@color/black"
+                        app:srcCompat="@drawable/ic_pause_24dp"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageButton
+                        android:id="@+id/playerNext"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="48dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:scaleType="fitCenter"
+                        android:tint="@color/black"
+                        app:srcCompat="@drawable/ic_next_24dp"
+                        tools:ignore="ContentDescription" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 

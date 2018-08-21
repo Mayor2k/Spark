@@ -200,7 +200,5 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        artistAdapter.swapCursor(null);
-    }
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {}
 }

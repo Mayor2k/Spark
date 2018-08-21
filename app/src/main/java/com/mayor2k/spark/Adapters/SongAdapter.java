@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +16,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
@@ -147,15 +147,20 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         holder.songArtist.setText(song.getArtist());
 
         if(checkLayout()) {
-
-            float itemSize = (getScreenWidth(holder.coverView.getContext())-5*spanCount*2)/spanCount;
-            float factor = holder.coverView.getContext().getResources().getDisplayMetrics().density;
+            float itemSize = getScreenWidth(context)/spanCount;
+            int padding = (int) ((int)itemSize*0.03f);
+            float factor = context.getResources().getDisplayMetrics().density;
 
             holder.coverView.getLayoutParams().width = (int) (itemSize*factor);
             holder.coverView.getLayoutParams().height = (int) (itemSize*factor);
             holder.coverView.requestLayout();
             holder.songArea.getLayoutParams().width = (int) (itemSize*factor);
             holder.songArea.requestLayout();
+
+            //set left padding only for first layout on row
+            //set bottom padding only for last row
+            holder.songArea.setPadding(position%spanCount==0?padding:0,padding,
+                    padding,position==getItemCount()-1?padding:0);
 
             Glide.with(context)
                     .asBitmap()

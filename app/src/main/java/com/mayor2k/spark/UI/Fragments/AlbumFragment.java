@@ -26,7 +26,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.mayor2k.spark.Adapters.AlbumAdapter;
-import com.mayor2k.spark.Adapters.SpacesItemDecoration;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.R;
 

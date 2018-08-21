@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -118,14 +119,20 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
                 +String.valueOf(artist.getAlbumInfo())+" album");
 
         if (checkLayout()){
-            float itemSize = (getScreenWidth(holder.artistCover.getContext())-5*spanCount*2)/spanCount;
-            float factor = holder.artistCover.getContext().getResources().getDisplayMetrics().density;
+            float itemSize = getScreenWidth(context)/spanCount;
+            int padding = (int) ((int)itemSize*0.03f);
+            float factor = context.getResources().getDisplayMetrics().density;
 
             holder.artistCover.getLayoutParams().width = (int) (itemSize*factor);
             holder.artistCover.getLayoutParams().height = (int) (itemSize*factor);
             holder.artistCover.requestLayout();
             holder.artistArea.getLayoutParams().width = (int) (itemSize*factor);
             holder.artistArea.requestLayout();
+
+            //set left padding only for first layout on row
+            //set bottom padding only for last row
+            holder.artistArea.setPadding(position%spanCount==0?padding:0,padding,
+                    padding,position==getItemCount()-1?padding:0);
 
             Glide.with(context)
                     .asBitmap()

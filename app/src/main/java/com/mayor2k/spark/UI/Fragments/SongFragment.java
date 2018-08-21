@@ -107,10 +107,11 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
             if (spanCount==1)
                 songView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            else
+            else {
                 songView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
-
+            }
             songView.setAdapter(songAdt);
+
         } catch (IllegalArgumentException e) {
             Toast.makeText(getActivity(), "Nothing found", Toast.LENGTH_LONG).show();
         }

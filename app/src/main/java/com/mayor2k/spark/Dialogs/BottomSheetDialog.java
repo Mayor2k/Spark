@@ -6,9 +6,11 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
@@ -22,6 +24,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.MainActivity;
@@ -87,8 +94,19 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
         delete = contentView.findViewById(R.id.delete);
 
         if (isCover(song,getContext())){
-            cover.setImageBitmap(getCoverBitmap(song,getContext()));
-            Palette.from(getPaletteBitmap(song)).generate(p -> root.setBackgroundColor(p.getMutedColor(0)));
+            Glide.with(getContext())
+                    .asBitmap()
+                    .load(song.getUri())
+                    .apply(new RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    )
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            cover.setImageBitmap(resource);
+                            Palette.from(resource).generate(p -> root.setBackgroundColor(p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)))));
+                        }
+                    });
         }
 
         title.setText(song.getTitle());
@@ -97,14 +115,11 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
         dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         dialog.setContentView(contentView);
 
-        queue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isQueue = true;
-                queuePosition = parentTag;
-                Toast.makeText(getActivity(),"Song added to queue",Toast.LENGTH_SHORT).show();
-                dismiss();
-            }
+        queue.setOnClickListener(v -> {
+            isQueue = true;
+            queuePosition = parentTag;
+            Toast.makeText(getActivity(),"Song added to queue",Toast.LENGTH_SHORT).show();
+            dismiss();
         });
 
         playlist.setOnClickListener(new View.OnClickListener() {

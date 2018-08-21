@@ -3,9 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/itemArea"
     android:orientation="vertical"
-    android:layout_marginTop="5dp"
-    android:layout_marginRight="5dp"
-    android:layout_marginLeft="5dp"
     android:layout_width="170dp"
     android:layout_height="wrap_content">
 

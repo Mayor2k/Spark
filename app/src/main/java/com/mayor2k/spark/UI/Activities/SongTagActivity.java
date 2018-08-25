@@ -47,15 +47,12 @@ public class SongTagActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.tag_editor);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    saveStrings();
-                } catch (TagException | CannotWriteException | ReadOnlyFileException
-                        | InvalidAudioFrameException | CannotReadException | IOException e) {
-                    finish();
-                }
+        fab.setOnClickListener(view -> {
+            try {
+                saveStrings();
+            } catch (TagException | CannotWriteException | ReadOnlyFileException
+                    | InvalidAudioFrameException | CannotReadException | IOException e) {
+                finish();
             }
         });
 

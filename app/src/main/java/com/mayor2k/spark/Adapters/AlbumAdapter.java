@@ -70,7 +70,6 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
         TextView artistName,albumTitle;
         ImageView imageView;
         LinearLayout colorArea,album;
-
         ViewHolder(View v){
             super(v);
             albumTitle = v.findViewById(R.id.itemTopTextView);

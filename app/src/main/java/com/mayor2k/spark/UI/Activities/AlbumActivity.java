@@ -142,7 +142,6 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
         trackList.setLayoutManager(new LinearLayoutManager(this));
         trackList.setAdapter(customAdapter);
         getSupportLoaderManager().initLoader(1,null,this);
-        Log.i(MainActivity.TAG,""+albumSongs.size());
     }
 
     private final String[] COLUMNS = new String[]{

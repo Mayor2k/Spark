@@ -8,49 +8,36 @@
     tools:context="com.mayor2k.spark.UI.Activities.PlayerActivity"
     android:layout_height="match_parent">
 
-
-    <LinearLayout
-        android:id="@+id/playerArea"
+    <FrameLayout
+        android:id="@+id/player"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <FrameLayout
-            android:id="@+id/player"
+        <ImageView
+            android:id="@+id/trackCover"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cover"
+            tools:ignore="ContentDescription" />
+
+        <View
+            android:id="@+id/halfBlackBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="40">
+            android:background="@color/transparent_black" />
 
-            <ImageView
-                android:id="@+id/trackCover"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/cover"
-                tools:ignore="ContentDescription" />
-
-            <View
-                android:id="@+id/gradientView"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_gravity="center_horizontal|top"
-                android:background="@drawable/gradient" />
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="112dp"
-                android:fitsSystemWindows="true"
-                app:theme="@style/ToolbarStyle" />
-
-        </FrameLayout>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="112dp"
+            android:fitsSystemWindows="true"
+            app:theme="@style/ToolbarStyle" />
 
         <LinearLayout
+            android:layout_gravity="bottom"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="60"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <SeekBar
@@ -77,7 +64,7 @@
                     android:layout_marginStart="15dp"
                     android:gravity="start"
                     android:text="0.00"
-                    android:textColor="@color/black_p50"
+                    android:textColor="@color/white"
                     tools:ignore="HardcodedText" />
 
                 <TextView
@@ -87,16 +74,15 @@
                     android:layout_marginEnd="15dp"
                     android:gravity="end"
                     android:text="3.48"
-                    android:textColor="@color/black_p50"
+                    android:textColor="@color/white"
                     tools:ignore="HardcodedText" />
 
 
             </RelativeLayout>
 
             <LinearLayout
-                android:layout_weight="1"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
                 tools:ignore="NestedWeights">
@@ -112,7 +98,7 @@
                     android:maxLines="1"
                     android:text="Talking to Myself"
                     android:textAllCaps="false"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="24sp"
                     tools:ignore="HardcodedText" />
 
@@ -127,7 +113,7 @@
                     android:gravity="center"
                     android:text="Linkin Park"
                     android:textAllCaps="false"
-                    android:textColor="@color/black_p50"
+                    android:textColor="@color/white"
                     android:textSize="18sp"
                     tools:ignore="HardcodedText" />
 
@@ -135,7 +121,7 @@
                     android:id="@+id/media_actions"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:layout_gravity="bottom"
+
                     android:orientation="horizontal">
 
                     <ImageButton
@@ -147,20 +133,19 @@
                         android:gravity="center"
                         android:padding="8dp"
                         android:scaleType="fitCenter"
-                        android:tint="@color/black"
+                        android:tint="@color/white"
                         app:srcCompat="@drawable/ic_previous_24dp"
                         tools:ignore="ContentDescription" />
 
-                    <ImageButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/playerPlay"
-                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="48dp"
                         android:layout_height="match_parent"
                         android:layout_weight="0"
                         android:gravity="center"
                         android:padding="8dp"
                         android:scaleType="fitCenter"
-                        android:tint="@color/black"
+                        android:tint="@color/white"
                         app:srcCompat="@drawable/ic_pause_24dp"
                         tools:ignore="ContentDescription" />
 
@@ -173,7 +158,7 @@
                         android:gravity="center"
                         android:padding="8dp"
                         android:scaleType="fitCenter"
-                        android:tint="@color/black"
+                        android:tint="@color/white"
                         app:srcCompat="@drawable/ic_next_24dp"
                         tools:ignore="ContentDescription" />
 
@@ -183,6 +168,7 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+    </FrameLayout>
+
 
 </com.liuguangqiang.swipeback.SwipeBackLayout>

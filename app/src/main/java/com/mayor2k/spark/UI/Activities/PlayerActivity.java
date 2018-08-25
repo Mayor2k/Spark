@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.os.Bundle;
@@ -51,7 +52,8 @@ import static com.mayor2k.spark.Services.MusicService.player;
 public class PlayerActivity extends AppCompatActivity {
     public ImageView trackCover;
     public SeekBar seekBar;
-    public ImageButton prev,play,next;
+    public ImageButton prev,next;
+    private FloatingActionButton play;
     public TextView title,artist,timeStart,timeEnd;
     private LinearLayout playerArea;
 
@@ -91,9 +93,8 @@ public class PlayerActivity extends AppCompatActivity {
         styledAttributes.recycle();
 
         Log.i("tagging",""+actionBarHeight);
-        View gradient = findViewById(R.id.gradientView);
-        gradient.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                actionBarHeight+statusBarHeight));
+        //View gradient = findViewById(R.id.gradientView);
+        //gradient.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,actionBarHeight+statusBarHeight));
 
         prev = findViewById(R.id.playerPrev);
         play = findViewById(R.id.playerPlay);
@@ -105,7 +106,6 @@ public class PlayerActivity extends AppCompatActivity {
         trackCover = findViewById(R.id.trackCover);
         title = findViewById(R.id.playerTitle);
         artist = findViewById(R.id.playerArtist);
-        playerArea = findViewById(R.id.playerArea);
         seekBar = findViewById(R.id.seekBar);
         seekBar.setMax(player.getDuration());
         seekBar.setProgress(player.getCurrentPosition());
@@ -203,18 +203,10 @@ public class PlayerActivity extends AppCompatActivity {
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             trackCover.setImageBitmap(resource);
                             Palette p = Palette.from(resource).generate();
-                            int colorPrimary = p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)));
-                            playerArea.setBackgroundColor(colorPrimary);
-                            int colorAccent = p.getLightMutedColor(p.getLightVibrantColor(p.getDominantColor(0)));
-                            seekBar.getProgressDrawable().setColorFilter(colorAccent, PorterDuff.Mode.SRC_IN);
-                            seekBar.getThumb().setColorFilter(colorAccent, PorterDuff.Mode.SRC_IN);
-                            timeStart.setTextColor(getResources().getColor(R.color.white));
-                            timeEnd.setTextColor(getResources().getColor(R.color.white));
-                            title.setTextColor(getResources().getColor(R.color.white));
-                            artist.setTextColor(getResources().getColor(R.color.white));
-                            prev.setColorFilter(getResources().getColor(R.color.white));
-                            play.setColorFilter(getResources().getColor(R.color.white));
-                            next.setColorFilter(getResources().getColor(R.color.white));
+                            int color = p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)));
+                            play.setBackgroundTintList(ColorStateList.valueOf(color));
+                            seekBar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+                            seekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_IN);
                         }
 
                         @Override
@@ -223,14 +215,7 @@ public class PlayerActivity extends AppCompatActivity {
                             trackCover.setImageResource(R.drawable.cover);
                             seekBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.silver), PorterDuff.Mode.SRC_IN);
                             seekBar.getThumb().setColorFilter(getResources().getColor(R.color.silver), PorterDuff.Mode.SRC_IN);
-                            playerArea.setBackgroundColor(getResources().getColor(R.color.white));
-                            timeStart.setTextColor(getResources().getColor(R.color.black_p50));
-                            timeEnd.setTextColor(getResources().getColor(R.color.black_p50));
-                            title.setTextColor(getResources().getColor(R.color.black));
-                            artist.setTextColor(getResources().getColor(R.color.black_p50));
-                            prev.setColorFilter(getResources().getColor(R.color.black));
-                            play.setColorFilter(getResources().getColor(R.color.black));
-                            next.setColorFilter(getResources().getColor(R.color.black));
+                            play.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.silver)));
                         }
                     });
             title.setText(playSong.getTitle());

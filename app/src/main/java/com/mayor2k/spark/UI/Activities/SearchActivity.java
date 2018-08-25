@@ -28,9 +28,7 @@ import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.Utils.WrappedAsyncTaskLoader;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;

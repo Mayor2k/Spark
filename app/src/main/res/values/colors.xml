@@ -4,7 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="transparent_black">#aa000000</color>
     <color name="selected_tabtext">#bb000000</color>
     <color name="unselected_tabtext">#77000000</color>
     <color name="shuffle_grey">#ffdedede</color>
@@ -16,5 +15,6 @@
 
     <color name="colorNotification">#ffffffff</color>
     <color name="item_area">#E5E5E5</color>
+    <color name="transparent_black">#80000000</color>
 
 </resources>

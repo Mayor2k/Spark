@@ -20,6 +20,7 @@
     <style name="MyMaterialTheme.Player" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="actionMenuTextColor">@color/black</item>
     </style>
 
     <style name="MyMaterialTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -35,6 +36,7 @@
 
     <style name="ToolbarStyle" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <item name="colorControlNormal">@color/white</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
 </resources>

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 
 import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -22,14 +21,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -38,24 +34,26 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.jaeger.library.StatusBarUtil;
-import com.liuguangqiang.swipeback.SwipeBackActivity;
-import com.liuguangqiang.swipeback.SwipeBackLayout;
+import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.Services.MusicService;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import static com.mayor2k.spark.Services.MusicService.isShuffle;
 import static com.mayor2k.spark.Services.MusicService.pausePosition;
 import static com.mayor2k.spark.Services.MusicService.playSong;
 import static com.mayor2k.spark.Services.MusicService.player;
+import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
 public class PlayerActivity extends AppCompatActivity {
     public ImageView trackCover;
     public SeekBar seekBar;
-    public ImageButton prev,next;
+    public ImageButton prev,next,shuffle;
     private FloatingActionButton play;
     public TextView title,artist,timeStart,timeEnd;
-    private LinearLayout playerArea;
 
     public MusicService.MusicServiceBinder musicServiceBinder;
     public MediaControllerCompat mediaController;
@@ -77,28 +75,14 @@ public class PlayerActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
-        // status bar height
-        int statusBarHeight=0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-        }
-
-        // action bar height
-        int actionBarHeight;
-        final TypedArray styledAttributes = this.getTheme().obtainStyledAttributes(
-                new int[] { android.R.attr.actionBarSize }
-        );
-        actionBarHeight = (int) styledAttributes.getDimension(0, 0);
-        styledAttributes.recycle();
-
-        Log.i("tagging",""+actionBarHeight);
-        //View gradient = findViewById(R.id.gradientView);
-        //gradient.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,actionBarHeight+statusBarHeight));
-
         prev = findViewById(R.id.playerPrev);
         play = findViewById(R.id.playerPlay);
         next = findViewById(R.id.playerNext);
+        shuffle = findViewById(R.id.playerShuffle);
+        if(!isShuffle)
+            shuffle.setColorFilter(getResources().getColor(R.color.black_p50));
+        else
+            shuffle.setColorFilter(getResources().getColor(R.color.white));
 
         timeStart = findViewById(R.id.seekBarTimeStart);
         timeEnd = findViewById(R.id.seekBarTimeEnd);
@@ -159,6 +143,17 @@ public class PlayerActivity extends AppCompatActivity {
 
         next.setOnClickListener(v -> mediaController.getTransportControls().skipToNext());
 
+        shuffle.setOnClickListener(v -> {
+            if(!isShuffle){
+                isShuffle = true;
+                Collections.shuffle(playArray);
+                shuffle.setColorFilter(getResources().getColor(R.color.white));
+            }else{
+                isShuffle = false;
+                shuffle.setColorFilter(getResources().getColor(R.color.black_p50));
+            }
+        });
+
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
@@ -175,6 +170,12 @@ public class PlayerActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.player_navigation, menu);
+        return true;
+    }
 
     @SuppressLint("DefaultLocale")
     public void progressListener(){

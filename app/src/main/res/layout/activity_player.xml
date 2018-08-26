@@ -120,18 +120,31 @@
                 <LinearLayout
                     android:id="@+id/media_actions"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingBottom="15sp">
 
-                    android:orientation="horizontal">
+                    <ImageButton
+                        android:id="@+id/playerRepeat"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_gravity="center_vertical"
+                        android:scaleType="fitCenter"
+                        android:tint="@color/black_p50"
+                        app:srcCompat="@drawable/ic_repeat_24dp"
+                        tools:ignore="ContentDescription"  />
 
                     <ImageButton
                         android:id="@+id/playerPrev"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="48dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="48dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:padding="8dp"
+                        android:layout_gravity="center_vertical"
                         android:scaleType="fitCenter"
                         android:tint="@color/white"
                         app:srcCompat="@drawable/ic_previous_24dp"
@@ -139,11 +152,11 @@
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/playerPlay"
-                        android:layout_width="48dp"
-                        android:layout_height="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fabCustomSize="64dp"
                         android:layout_weight="0"
                         android:gravity="center"
-                        android:padding="8dp"
                         android:scaleType="fitCenter"
                         android:tint="@color/white"
                         app:srcCompat="@drawable/ic_pause_24dp"
@@ -153,13 +166,27 @@
                         android:id="@+id/playerNext"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="48dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="48dp"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:layout_gravity="center_vertical"
                         android:padding="8dp"
                         android:scaleType="fitCenter"
                         android:tint="@color/white"
                         app:srcCompat="@drawable/ic_next_24dp"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageButton
+                        android:id="@+id/playerShuffle"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_gravity="center_vertical"
+                        android:scaleType="fitCenter"
+                        android:tint="@color/black_p50"
+                        app:srcCompat="@drawable/ic_shuffle_24dp"
                         tools:ignore="ContentDescription" />
 
                 </LinearLayout>
@@ -169,6 +196,5 @@
         </LinearLayout>
 
     </FrameLayout>
-
 
 </com.liuguangqiang.swipeback.SwipeBackLayout>

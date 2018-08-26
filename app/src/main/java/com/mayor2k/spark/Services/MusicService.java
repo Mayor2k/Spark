@@ -58,6 +58,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static MediaPlayer player = new MediaPlayer();
     public static Song playSong;
     public static int pausePosition;
+    public static boolean isShuffle = false;
     public static boolean isQueue;
     public static int queuePosition;
     public static boolean isAudiofocusLoss;

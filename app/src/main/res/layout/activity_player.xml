@@ -77,7 +77,6 @@
                     android:textColor="@color/white"
                     tools:ignore="HardcodedText" />
 
-
             </RelativeLayout>
 
             <LinearLayout

@@ -7,4 +7,9 @@
         android:onClick="startAnotherActivity"
         android:title="Player" />
 
+    <item
+        android:id="@+id/navigation_setting"
+        android:onClick="startAnotherActivity"
+        android:title="Setting" />
+
 </menu>

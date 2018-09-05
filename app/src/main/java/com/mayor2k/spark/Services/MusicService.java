@@ -1,6 +1,8 @@
 package com.mayor2k.spark.Services;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -15,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -45,6 +48,7 @@ import com.mayor2k.spark.UI.Activities.PlayerActivity;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
 
 import static com.mayor2k.spark.UI.Activities.AlbumActivity.albumSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
@@ -64,6 +68,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static boolean isAudiofocusLoss;
     int audioFocusResult;
     public static NotificationManager mNotifyMgr;
+    //public NotificationManager mNotifyMgr24;
     public MediaSessionCompat mediaSession;
     public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
     final PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
@@ -100,15 +105,27 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         } else if (intent.getAction().equals(Constants.STARTFOREGROUND_ACTION)) {
             playArray=songList;
             songStream(songPosition);
-            showNotification(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                showNotification24();
+            }else{
+                showNotification(true);
+            }
         }else if (intent.getAction().equals(Constants.START_ALBUM_ACTION)) {
             playArray=albumSongs;
             songStream(songPosition);
-            showNotification(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                showNotification24();
+            }else{
+                showNotification(true);
+            }
         }else if (intent.getAction().equals(Constants.START_SEARCH_ACTION)){
             playArray=searchList;
             songStream(songPosition);
-            showNotification(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                showNotification24();
+            }else{
+                showNotification(true);
+            }
         }
         return START_NOT_STICKY;
     }
@@ -175,7 +192,84 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mp.start();
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void showNotification24(){
+        Intent notificationIntent = new Intent(getApplicationContext(), PlayerActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        notificationIntent.setAction(Constants.MAIN_ACTION);
+
+        PendingIntent notification = PendingIntent.getActivity(this, 0,
+                notificationIntent, 0);
+
+        Intent prevIntent = new Intent(getApplicationContext(), MusicService.class);
+        prevIntent.setAction(Constants.PREV_ACTION);
+        PendingIntent prev = PendingIntent.getService(getApplicationContext(), 1, prevIntent, 0);
+        NotificationCompat.Action prevAction = new NotificationCompat.Action(R.drawable.ic_previous_24dp_black,
+                "prev", prev);
+
+        Intent pauseIntent = new Intent(getApplicationContext(), MusicService.class);
+        pauseIntent.setAction(Constants.PAUSE_ACTION);
+        PendingIntent pause = PendingIntent.getService(getApplicationContext(), 1, pauseIntent, 0);
+        NotificationCompat.Action pauseAction = new NotificationCompat.Action(R.drawable.ic_pause_24dp_black,
+                "pause", pause);
+
+        Intent playIntent = new Intent(getApplicationContext(), MusicService.class);
+        playIntent.setAction(Constants.PLAY_ACTION);
+        PendingIntent play = PendingIntent.getService(getApplicationContext(), 1, playIntent, 0);
+        NotificationCompat.Action playAction = new NotificationCompat.Action(R.drawable.ic_play_24dp_black,
+                "play", play);
+
+        Intent nextIntent = new Intent(getApplicationContext(), MusicService.class);
+        nextIntent.setAction(Constants.NEXT_ACTION);
+        PendingIntent next = PendingIntent.getService(getApplicationContext(), 1, nextIntent, 0);
+        NotificationCompat.Action nextAction = new NotificationCompat.Action(R.drawable.ic_next_24dp_black,
+                "next", next);
+
+        String CHANNEL_ID = "CHANNEL_02";
+        CharSequence name = "NAME_1";
+        int importance = NotificationManager.IMPORTANCE_LOW;
+        Bitmap bitmap = getCoverBitmap(playSong,getApplicationContext());
+        if (bitmap==null)
+            bitmap = BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.album);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setLargeIcon(bitmap)
+                .setSmallIcon(R.drawable.ic_play_24dp)
+                .setSubText(playSong.getAlbum())
+                .setContentTitle(playSong.getTitle())
+                .setContentText(playSong.getArtist())
+                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
+                        .setShowActionsInCompactView(0,1,2)
+                        .setMediaSession(mediaSession.getSessionToken()))
+                .setContentIntent(notification)
+                .addAction(prevAction)
+                .addAction(player.isPlaying()?pauseAction:playAction)
+                .addAction(nextAction)
+                .setOngoing(player.isPlaying())
+                .setPriority(player.isPlaying() ?
+                        NotificationCompat.PRIORITY_MAX : NotificationCompat.PRIORITY_LOW);
+
+        if (player.isPlaying()){
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+                mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                mNotifyMgr.createNotificationChannel(mChannel);
+            }
+            startForeground(2,builder.build());
+        }else{
+            stopForeground(false);
+            mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+                mChannel.setLightColor(0);
+                mChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PRIVATE);
+                mNotifyMgr.createNotificationChannel(mChannel);
+            }
+            mNotifyMgr.notify(2, builder.build());
+        }
+    }
+
     public void showNotification(Boolean isUpdate) {
         final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
         final RemoteViews viewsBig = new RemoteViews(getPackageName(), R.layout.notification_big);
@@ -222,7 +316,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         nextIntent.setAction(Constants.NEXT_ACTION);
         PendingIntent next = PendingIntent.getService(getApplicationContext(), 1, nextIntent, 0);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+        String CHANNEL_ID = "CHANNEL_01";
+        CharSequence name = "NAME";
+        int importance = NotificationManager.IMPORTANCE_LOW;
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
                 .setCustomContentView(views)
                 .setCustomBigContentView(viewsBig)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -327,11 +425,23 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         viewsBig.setOnClickPendingIntent(R.id.status_bar_next, next);
 
         if (player.isPlaying()){
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+                mNotifyMgr =
+                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                mNotifyMgr.createNotificationChannel(mChannel);
+            }
             startForeground(1,builder.build());
         }else{
             stopForeground(false);
             mNotifyMgr =
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+                mChannel.setLightColor(0);
+                mChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PRIVATE);
+                mNotifyMgr.createNotificationChannel(mChannel);
+            }
             mNotifyMgr.notify(1, builder.build());
         }
     }
@@ -365,7 +475,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             }
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
-            showNotification(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                showNotification24();
+            }else{
+                showNotification(true);
+            }
             Log.i(TAG, "Clicked Previous");
             super.onSkipToPrevious();
         }
@@ -379,7 +493,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }catch (IllegalArgumentException e){
                 e.printStackTrace();
             }
-            showNotification(false);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                showNotification24();
+            }else{
+                showNotification(false);
+            }
             Log.i(TAG, "Clicked pause Current position is" + pausePosition);
             mediaSession.setPlaybackState(
                     stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
@@ -402,7 +520,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             registerReceiver(
                     becomingNoisyReceiver,
                     new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-            showNotification(false);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                showNotification24();
+            }else{
+                showNotification(false);
+            }
             Log.i(TAG, "Clicked play");
             mediaSession.setPlaybackState(
                     stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
@@ -424,7 +546,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 songStream(songPosition - 1);
             }
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
-            showNotification(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                showNotification24();
+            }else{
+                showNotification(true);
+            }
             Log.i(TAG, "Clicked Next");
             super.onSkipToNext();
         }

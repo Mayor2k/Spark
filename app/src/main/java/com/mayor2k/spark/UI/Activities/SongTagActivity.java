@@ -1,5 +1,7 @@
 package com.mayor2k.spark.UI.Activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -84,6 +86,7 @@ public class SongTagActivity extends AppCompatActivity {
         tag.setField(FieldKey.ALBUM,albumTitle.getText().toString());
         tag.setField(FieldKey.ARTIST,artistTitle.getText().toString());
         f.commit();
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(mp3)));
         //getApplicationContext().getContentResolver().notifyChange(Uri.parse("content://media"), null);
         finish();
     }

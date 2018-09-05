@@ -96,7 +96,11 @@ public class MainActivity extends AppCompatActivity{
         if (item.getItemId()==R.id.searchToolBar){
             Intent intent = new Intent(MainActivity.this, SearchActivity.class);
             startActivity(intent);
-        }else{
+        }else if(item.getItemId()==R.id.navigation_setting){
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        }
+        else{
             Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
             startActivity(intent);
         }

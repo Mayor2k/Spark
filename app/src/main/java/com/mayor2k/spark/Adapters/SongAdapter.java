@@ -66,8 +66,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         else
             spanCount = sPref.getInt("SongSpanCount", -1);
 
-
-        if (checkLayout())
+        if (spanCount!=1)
             setupCursorAdapter(null, 0, R.layout.grid_item, false);
         else
             setupCursorAdapter(null, 0, R.layout.linear_item, false);
@@ -85,7 +84,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
             songArtist = v.findViewById(R.id.itemBottomTextView);
             //getting view for bind tag
             songArea = v.findViewById(R.id.itemArea);
-            if (checkLayout())
+            if (spanCount!=1)
                 colorArea = v.findViewById(R.id.gridColorArea);
             else
                 songMenu = v.findViewById(R.id.linearMenu);
@@ -120,7 +119,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
-        if (checkLayout())
+        if (spanCount!=1)
             view = LayoutInflater.from(mContext)
                     .inflate(R.layout.grid_item, parent, false);
         else
@@ -128,7 +127,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
                     .inflate(R.layout.linear_item, parent, false);
         view.setOnClickListener(mOnClickListener);
 
-        if (!checkLayout()){
+        if (spanCount==1){
             View menu = view.findViewById(R.id.linearMenu);
             menu.setOnClickListener(menuOnClickListener);
         }
@@ -146,7 +145,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         holder.songTitle.setText(song.getTitle());
         holder.songArtist.setText(song.getArtist());
 
-        if(checkLayout()) {
+        if(spanCount!=1) {
             float itemSize = getScreenWidth(context)/spanCount;
             int padding = (int) ((int)itemSize*0.03f);
             float factor = context.getResources().getDisplayMetrics().density;
@@ -235,10 +234,5 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     @Override
     public int getItemViewType(int position) {
         return position;
-    }
-
-    private boolean checkLayout(){
-        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
-        return sPref.getInt("SongSpanCount", -1) != 1;
     }
 }

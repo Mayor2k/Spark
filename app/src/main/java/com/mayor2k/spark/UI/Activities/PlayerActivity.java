@@ -69,7 +69,7 @@ public class PlayerActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar()!=null){
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(false);

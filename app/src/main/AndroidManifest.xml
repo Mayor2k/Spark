@@ -50,6 +50,9 @@
         <activity android:name=".UI.Activities.SearchActivity">
             android:theme="@style/MyMaterialTheme" />
         </activity>
+        <activity
+            android:name=".UI.Activities.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

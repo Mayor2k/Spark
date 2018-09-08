@@ -6,8 +6,14 @@
 
         <SwitchPreference
             android:defaultValue="false"
-            android:key="notifications_new_message"
+            android:key="notifications_style"
             android:title="@string/pref_title_use_default_notification_style" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="notifications_color"
+            android:title="@string/pref_title_colored_notification"
+            android:summary="@string/pref_description_colored_notification"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

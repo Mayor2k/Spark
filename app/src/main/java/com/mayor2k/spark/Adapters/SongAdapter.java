@@ -51,16 +51,14 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     static BottomSheetDialogFragment bottomSheetDialogFragment =
             new BottomSheetDialog();
     private Context context;
-    private FragmentActivity fragmentActivity;
     private int spanCount;
 
     public SongAdapter(ArrayList<Song> theSongs,Context theContext,FragmentActivity theFragmentActivity){
         super(theContext);
         context = theContext;
         songs=theSongs;
-        fragmentActivity=theFragmentActivity;
 
-        SharedPreferences sPref = fragmentActivity.getPreferences(MODE_PRIVATE);
+        SharedPreferences sPref = theFragmentActivity.getPreferences(MODE_PRIVATE);
         if (!sPref.contains("SongSpanCount"))
             spanCount = 1;
         else

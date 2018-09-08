@@ -12,8 +12,10 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -22,6 +24,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -48,7 +51,6 @@ import com.mayor2k.spark.UI.Activities.PlayerActivity;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.ExecutionException;
 
 import static com.mayor2k.spark.UI.Activities.AlbumActivity.albumSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
@@ -68,6 +70,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static boolean isAudiofocusLoss;
     int audioFocusResult;
     public static NotificationManager mNotifyMgr;
+    private SharedPreferences sPref = ;
     //public NotificationManager mNotifyMgr24;
     public MediaSessionCompat mediaSession;
     public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
@@ -105,7 +108,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         } else if (intent.getAction().equals(Constants.STARTFOREGROUND_ACTION)) {
             playArray=songList;
             songStream(songPosition);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
                 showNotification(true);
@@ -113,7 +116,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }else if (intent.getAction().equals(Constants.START_ALBUM_ACTION)) {
             playArray=albumSongs;
             songStream(songPosition);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
                 showNotification(true);
@@ -121,7 +124,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }else if (intent.getAction().equals(Constants.START_SEARCH_ACTION)){
             playArray=searchList;
             songStream(songPosition);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
                 showNotification(true);
@@ -244,6 +247,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                         .setMediaSession(mediaSession.getSessionToken()))
                 .setContentIntent(notification)
                 .addAction(prevAction)
+                .setColor(Color.parseColor("#beceda"))
                 .addAction(player.isPlaying()?pauseAction:playAction)
                 .addAction(nextAction)
                 .setOngoing(player.isPlaying())
@@ -475,7 +479,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             }
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
                 showNotification(true);
@@ -493,7 +497,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }catch (IllegalArgumentException e){
                 e.printStackTrace();
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
                 showNotification(false);
@@ -520,7 +524,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             registerReceiver(
                     becomingNoisyReceiver,
                     new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
                 showNotification(false);
@@ -546,7 +550,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 songStream(songPosition - 1);
             }
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
                 showNotification(true);

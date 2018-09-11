@@ -1,11 +1,14 @@
 package com.mayor2k.spark.UI.Activities;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 
 import com.mayor2k.spark.R;
-
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
@@ -27,6 +30,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ){
+                PreferenceCategory preferenceCategory = (PreferenceCategory)findPreference("pref_key_storage_settings");
+                SwitchPreference switchPreference = (SwitchPreference)findPreference("notifications_style");
+                preferenceCategory.removePreference(switchPreference);
+            }
         }
     }
 }

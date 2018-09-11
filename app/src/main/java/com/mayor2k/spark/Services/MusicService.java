@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,6 +35,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.graphics.Palette;
+import android.support.v7.graphics.Target;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -51,6 +53,7 @@ import com.mayor2k.spark.UI.Activities.PlayerActivity;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
 
 import static com.mayor2k.spark.UI.Activities.AlbumActivity.albumSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
@@ -70,7 +73,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static boolean isAudiofocusLoss;
     int audioFocusResult;
     public static NotificationManager mNotifyMgr;
-    private SharedPreferences sPref = ;
+    private SharedPreferences sPref;
     //public NotificationManager mNotifyMgr24;
     public MediaSessionCompat mediaSession;
     public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
@@ -91,6 +94,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mediaSession.setCallback(mediaSessionCallback);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mediaSession.setActive(true);
+        sPref =  PreferenceManager.getDefaultSharedPreferences(this);
         super.onCreate();
     }
 
@@ -108,26 +112,26 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         } else if (intent.getAction().equals(Constants.STARTFOREGROUND_ACTION)) {
             playArray=songList;
             songStream(songPosition);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
-                showNotification(true);
+                showNotification();
             }
         }else if (intent.getAction().equals(Constants.START_ALBUM_ACTION)) {
             playArray=albumSongs;
             songStream(songPosition);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
-                showNotification(true);
+                showNotification();
             }
         }else if (intent.getAction().equals(Constants.START_SEARCH_ACTION)){
             playArray=searchList;
             songStream(songPosition);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
-                showNotification(true);
+                showNotification();
             }
         }
         return START_NOT_STICKY;
@@ -163,7 +167,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         player.setOnCompletionListener(mp -> mediaSessionCallback.onSkipToNext());
 
         MediaMetadataCompat.Builder metadata = metadataBuilder
-                .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getCoverBitmap(playSong,getApplicationContext()));
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getCoverBitmap(playSong,getApplicationContext()))
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, playSong.getArtist())
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, playSong.getAlbum())
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playSong.getTitle());
         mediaSession.setMetadata(metadata.build());
 
         startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
@@ -231,9 +238,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         String CHANNEL_ID = "CHANNEL_02";
         CharSequence name = "NAME_1";
         int importance = NotificationManager.IMPORTANCE_LOW;
-        Bitmap bitmap = getCoverBitmap(playSong,getApplicationContext());
-        if (bitmap==null)
+        Bitmap bitmap;
+        int color = 0;
+        bitmap = getCoverBitmap(playSong,getBaseContext());
+        if (bitmap!=null && sPref.getBoolean("notifications_color",true)){
+            Palette p = Palette.from(bitmap).generate();
+            color = p.getMutedColor(p.getMutedColor(p.getVibrantColor(p.getDominantColor(0))));
+        }else if (bitmap==null){
             bitmap = BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.album);
+        }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -246,8 +259,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                         .setShowActionsInCompactView(0,1,2)
                         .setMediaSession(mediaSession.getSessionToken()))
                 .setContentIntent(notification)
+                .setColorized(bitmap!=null && sPref.getBoolean("notifications_color",true))
+                .setColor(color)
                 .addAction(prevAction)
-                .setColor(Color.parseColor("#beceda"))
                 .addAction(player.isPlaying()?pauseAction:playAction)
                 .addAction(nextAction)
                 .setOngoing(player.isPlaying())
@@ -274,27 +288,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
-    public void showNotification(Boolean isUpdate) {
+    public void showNotification() {
         final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
         final RemoteViews viewsBig = new RemoteViews(getPackageName(), R.layout.notification_big);
 
         views.setTextViewText(R.id.status_bar_track_name, playSong.getTitle());
         views.setTextViewText(R.id.status_bar_artist_name, playSong.getArtist());
 
-        views.setImageViewResource(R.id.status_bar_prev, isCover()?
-                R.drawable.ic_previous_24dp:R.drawable.ic_previous_24dp_black);
-        viewsBig.setImageViewResource(R.id.status_bar_prev, isCover()?
-                R.drawable.ic_previous_24dp:R.drawable.ic_previous_24dp_black);
-
         viewsBig.setTextViewText(R.id.status_bar_track_name, playSong.getTitle());
         viewsBig.setTextViewText(R.id.status_bar_album_name, playSong.getAlbum());
         viewsBig.setTextViewText(R.id.status_bar_artist_name, playSong.getArtist());
-
-        views.setImageViewResource(R.id.status_bar_next, isCover()?
-                R.drawable.ic_next_24dp:R.drawable.ic_next_24dp_black);
-        viewsBig.setImageViewResource(R.id.status_bar_next, isCover()?
-                R.drawable.ic_next_24dp:R.drawable.ic_next_24dp_black);
-
 
         Intent notificationIntent = new Intent(getApplicationContext(), PlayerActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -346,81 +349,51 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 viewsBig,
                 builder.build(), 1);
 
-        if (isUpdate){
-            Glide.with(getApplicationContext())
-                    .asBitmap()
-                    .load(playSong.getUri())
-                    .apply(new RequestOptions()
-                            .override(NotificationTarget.SIZE_ORIGINAL)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    )
-                    .into(new SimpleTarget<Bitmap>(com.bumptech.glide.request.target.Target.SIZE_ORIGINAL, com.bumptech.glide.request.target.Target.SIZE_ORIGINAL) {
-                        @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+        Glide.with(getApplicationContext())
+                .asBitmap()
+                .load(playSong.getUri())
+                .apply(new RequestOptions()
+                        .override(NotificationTarget.SIZE_ORIGINAL)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                )
+                .into(new SimpleTarget<Bitmap>(com.bumptech.glide.request.target.Target.SIZE_ORIGINAL, com.bumptech.glide.request.target.Target.SIZE_ORIGINAL) {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        if (sPref.getBoolean("notifications_color",true)){
                             Palette p = Palette.from(resource).generate();
                             int color = p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)));
                             views.setInt(R.id.root,"setBackgroundColor", color);
                             viewsBig.setInt(R.id.root,"setBackgroundColor",color);
-
-                            viewsBig.setTextColor(R.id.status_bar_track_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.white));
-                            viewsBig.setTextColor(R.id.status_bar_album_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.white));
-                            viewsBig.setTextColor(R.id.status_bar_artist_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.white));
-
-                            views.setTextColor(R.id.status_bar_track_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.white));
-                            views.setTextColor(R.id.status_bar_artist_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.white));
-
-                            viewsTarget.onResourceReady(resource,null);
-                            viewsBigTarget.onResourceReady(resource,null);
+                            setNotificationColor(views,viewsBig,true);
                         }
-
-                        @Override
-                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                            super.onLoadFailed(errorDrawable);
+                        else {
                             views.setInt(R.id.root,"setBackgroundColor",
                                     ContextCompat.getColor(getApplicationContext(), R.color.transparent));
                             viewsBig.setInt(R.id.root,"setBackgroundColor",
                                     ContextCompat.getColor(getApplicationContext(), R.color.transparent));
-
-                            viewsBig.setTextColor(R.id.status_bar_track_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.black));
-                            viewsBig.setTextColor(R.id.status_bar_album_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.black));
-                            viewsBig.setTextColor(R.id.status_bar_artist_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.black));
-
-                            views.setTextColor(R.id.status_bar_track_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.black));
-                            views.setTextColor(R.id.status_bar_artist_name,
-                                    ContextCompat.getColor(getApplicationContext(), R.color.black));
-
-                            viewsTarget.onResourceReady(BitmapFactory.decodeResource
-                                    (getApplicationContext().getResources(),
-                                    R.drawable.cover),null);
-                            viewsBigTarget.onResourceReady(BitmapFactory.decodeResource
-                                    (getApplicationContext().getResources(), R.drawable.cover),null);
+                            setNotificationColor(views,viewsBig,false);
                         }
-                    });
-        }
+                        viewsTarget.onResourceReady(resource,null);
+                        viewsBigTarget.onResourceReady(resource,null);
+                    }
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        super.onLoadFailed(errorDrawable);
+                        views.setInt(R.id.root,"setBackgroundColor",
+                                ContextCompat.getColor(getApplicationContext(), R.color.transparent));
+                        viewsBig.setInt(R.id.root,"setBackgroundColor",
+                                ContextCompat.getColor(getApplicationContext(), R.color.transparent));
+                        setNotificationColor(views,viewsBig,false);
+                        viewsTarget.onResourceReady(BitmapFactory.decodeResource
+                                (getApplicationContext().getResources(),
+                                        R.drawable.cover),null);
+                        viewsBigTarget.onResourceReady(BitmapFactory.decodeResource
+                                (getApplicationContext().getResources(), R.drawable.cover),null);
+                    }});
 
         views.setOnClickPendingIntent(R.id.status_bar_prev, prev);
         viewsBig.setOnClickPendingIntent(R.id.status_bar_prev, prev);
-
-        if (isCover()){
-            views.setImageViewResource(R.id.status_bar_play,
-                    player.isPlaying() ? R.drawable.ic_pause_24dp : R.drawable.ic_play_24dp);
-            viewsBig.setImageViewResource(R.id.status_bar_play,
-                    player.isPlaying() ? R.drawable.ic_pause_24dp : R.drawable.ic_play_24dp);
-        }else {
-            views.setImageViewResource(R.id.status_bar_play,
-                    player.isPlaying() ? R.drawable.ic_pause_24dp_black : R.drawable.ic_play_24dp_black);
-            viewsBig.setImageViewResource(R.id.status_bar_play,
-                    player.isPlaying() ? R.drawable.ic_pause_24dp_black : R.drawable.ic_play_24dp_black);
-        }
 
         views.setOnClickPendingIntent(R.id.status_bar_play, player.isPlaying() ? pause : play);
         viewsBig.setOnClickPendingIntent(R.id.status_bar_play, player.isPlaying() ? pause : play);
@@ -447,6 +420,52 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 mNotifyMgr.createNotificationChannel(mChannel);
             }
             mNotifyMgr.notify(1, builder.build());
+        }
+    }
+
+    void setNotificationColor(RemoteViews views, RemoteViews viewsBig, Boolean isWhite){
+        if (isWhite){
+            views.setImageViewResource(R.id.status_bar_prev, R.drawable.ic_previous_24dp);
+            viewsBig.setImageViewResource(R.id.status_bar_prev, R.drawable.ic_previous_24dp);
+            views.setImageViewResource(R.id.status_bar_next, R.drawable.ic_next_24dp);
+            viewsBig.setImageViewResource(R.id.status_bar_next, R.drawable.ic_next_24dp);
+            views.setImageViewResource(R.id.status_bar_play,
+                    player.isPlaying() ? R.drawable.ic_pause_24dp : R.drawable.ic_play_24dp);
+            viewsBig.setImageViewResource(R.id.status_bar_play,
+                    player.isPlaying() ? R.drawable.ic_pause_24dp : R.drawable.ic_play_24dp);
+
+            viewsBig.setTextColor(R.id.status_bar_track_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.white));
+            viewsBig.setTextColor(R.id.status_bar_album_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.white));
+            viewsBig.setTextColor(R.id.status_bar_artist_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.white));
+
+            views.setTextColor(R.id.status_bar_track_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.white));
+            views.setTextColor(R.id.status_bar_artist_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.white));
+        }else{
+            views.setImageViewResource(R.id.status_bar_prev, R.drawable.ic_previous_24dp_black);
+            viewsBig.setImageViewResource(R.id.status_bar_prev, R.drawable.ic_previous_24dp_black);
+            views.setImageViewResource(R.id.status_bar_next, R.drawable.ic_next_24dp_black);
+            viewsBig.setImageViewResource(R.id.status_bar_next, R.drawable.ic_next_24dp_black);
+            views.setImageViewResource(R.id.status_bar_play,
+                    player.isPlaying() ? R.drawable.ic_pause_24dp_black : R.drawable.ic_play_24dp_black);
+            viewsBig.setImageViewResource(R.id.status_bar_play,
+                    player.isPlaying() ? R.drawable.ic_pause_24dp_black : R.drawable.ic_play_24dp_black);
+
+            viewsBig.setTextColor(R.id.status_bar_track_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.black));
+            viewsBig.setTextColor(R.id.status_bar_album_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.black));
+            viewsBig.setTextColor(R.id.status_bar_artist_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.black));
+
+            views.setTextColor(R.id.status_bar_track_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.black));
+            views.setTextColor(R.id.status_bar_artist_name,
+                    ContextCompat.getColor(getApplicationContext(), R.color.black));
         }
     }
 
@@ -479,10 +498,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             }
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
-                showNotification(true);
+                showNotification();
             }
             Log.i(TAG, "Clicked Previous");
             super.onSkipToPrevious();
@@ -497,10 +516,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }catch (IllegalArgumentException e){
                 e.printStackTrace();
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
-                showNotification(false);
+                showNotification();
             }
             Log.i(TAG, "Clicked pause Current position is" + pausePosition);
             mediaSession.setPlaybackState(
@@ -524,10 +543,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             registerReceiver(
                     becomingNoisyReceiver,
                     new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
-                showNotification(false);
+                showNotification();
             }
             Log.i(TAG, "Clicked play");
             mediaSession.setPlaybackState(
@@ -550,10 +569,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 songStream(songPosition - 1);
             }
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !sPref.getBoolean("notifications_style",true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
-                showNotification(true);
+                showNotification();
             }
             Log.i(TAG, "Clicked Next");
             super.onSkipToNext();

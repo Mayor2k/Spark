@@ -24,7 +24,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,9 +38,8 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.elmargomez.typer.Font;
 import com.elmargomez.typer.Typer;
-import com.github.florent37.glidepalette.GlidePalette;
 import com.jaeger.library.StatusBarUtil;
-import com.mayor2k.spark.Adapters.CustomAdapter;
+import com.mayor2k.spark.Adapters.AlbumActivityAdapter;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Song;
@@ -109,7 +107,7 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
         ImageView albumCover = findViewById(R.id.albumCover);
         RecyclerView trackList = findViewById(R.id.trackList);
         albumSongs = new ArrayList<>();
-        CustomAdapter customAdapter = new CustomAdapter(albumSongs);
+        AlbumActivityAdapter customAdapter = new AlbumActivityAdapter(albumSongs);
 
         Glide.with(this)
                 .asBitmap()

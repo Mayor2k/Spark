@@ -4,10 +4,7 @@
     android:id="@+id/itemArea"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingBottom="5dp"
-    android:paddingLeft="15dp"
-    android:paddingTop="5dp">
+    android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/itemImageView"

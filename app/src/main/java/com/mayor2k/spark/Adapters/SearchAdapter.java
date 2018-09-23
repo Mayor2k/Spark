@@ -31,6 +31,7 @@ import com.mayor2k.spark.UI.Activities.AlbumActivity;
 
 import java.util.ArrayList;
 
+import static com.mayor2k.spark.Adapters.SongAdapter.isCircle;
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.UI.Activities.SearchActivity.searchList;
@@ -116,6 +117,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             holder.headerText.setText("Artist");
 
         else{
+            holder.itemArea.setPadding(15,position==0?10:0,15,10);
+
             holder.itemArea.setTag(position);
             holder.itemMenu.setTag(position);
             if (objects.get(position) instanceof Song){
@@ -126,8 +129,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 Glide.with(holder.itemImage.getContext())
                         .asBitmap()
                         .load(song.getUri())
-                        .apply(new RequestOptions()
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .apply(isCircle?new RequestOptions()
+                                .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
+                                new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
                         )
                         .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
                             @Override
@@ -150,8 +154,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 Glide.with(holder.itemImage.getContext())
                         .asBitmap()
                         .load(album.getUri())
-                        .apply(new RequestOptions()
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .apply(isCircle?new RequestOptions()
+                                .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
+                                new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
                         )
                         .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
                             @Override
@@ -174,8 +179,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 Glide.with(holder.itemImage.getContext())
                         .asBitmap()
                         .load(artist.getUrl())
-                        .apply(new RequestOptions()
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .apply(isCircle?new RequestOptions()
+                                .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
+                                new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
                         )
                         .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
                             @Override

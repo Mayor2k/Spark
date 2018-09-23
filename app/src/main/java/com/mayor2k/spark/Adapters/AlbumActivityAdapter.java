@@ -23,10 +23,10 @@ import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 import static com.mayor2k.spark.Adapters.SongAdapter.parentTag;
 
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+public class AlbumActivityAdapter extends RecyclerView.Adapter<AlbumActivityAdapter.ViewHolder> {
     private ArrayList<Song> songs;
 
-    public CustomAdapter(ArrayList<Song> theSongs){
+    public AlbumActivityAdapter(ArrayList<Song> theSongs){
         songs=theSongs;
     }
 

@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -40,6 +41,7 @@ import com.mayor2k.spark.R;
 import com.mayor2k.spark.Services.MusicService;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.UI.Activities.MainActivity.getScreenWidth;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
@@ -52,8 +54,9 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
             new BottomSheetDialog();
     private Context context;
     private int spanCount;
+    public static boolean isCircle;
 
-    public SongAdapter(ArrayList<Song> theSongs,Context theContext,FragmentActivity theFragmentActivity){
+    public SongAdapter(ArrayList<Song> theSongs,Context theContext, FragmentActivity theFragmentActivity){
         super(theContext);
         context = theContext;
         songs=theSongs;
@@ -62,7 +65,10 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         if (!sPref.contains("SongSpanCount"))
             spanCount = 1;
         else
-            spanCount = sPref.getInt("SongSpanCount", -1);
+            spanCount = sPref.getInt("SongSpanCount", 0);
+
+        isCircle = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("circle_style",true);
+        Log.i("tagging","xds "+spanCount);
 
         if (spanCount!=1)
             setupCursorAdapter(null, 0, R.layout.grid_item, false);
@@ -134,7 +140,6 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         return new ViewHolder(view);
     }
 
-    @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Song song = songs.get(position);
@@ -155,16 +160,13 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
             holder.songArea.requestLayout();
 
             //set left padding only for first layout on row
-            //set bottom padding only for last row
-            holder.songArea.setPadding(position%spanCount==0?padding:0,padding,
-                    padding,position==getItemCount()-1?padding:0);
-
+            //set top padding only for first row
+            holder.songArea.setPadding(position%spanCount==0?padding:0,position<=spanCount-1?padding:0,
+                    padding,padding);
             Glide.with(context)
                     .asBitmap()
                     .load(song.getUri())
-                    .apply(new RequestOptions()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    )
+                    .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
                     .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL,Target.SIZE_ORIGINAL) {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
@@ -187,11 +189,14 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
                     });
         }
         else{
+            holder.songArea.setPadding(15,position==0?10:0,15,10);
+
             Glide.with(holder.coverView.getContext())
                     .asBitmap()
                     .load(song.getUri())
-                    .apply(new RequestOptions()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .apply(isCircle?new RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
+                            new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
                     )
                     .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
                         @Override

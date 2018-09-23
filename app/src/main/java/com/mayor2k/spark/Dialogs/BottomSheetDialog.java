@@ -36,6 +36,7 @@ import com.mayor2k.spark.UI.Activities.SongTagActivity;
 
 import java.io.File;
 
+import static com.mayor2k.spark.Adapters.SongAdapter.isCircle;
 import static com.mayor2k.spark.Services.MusicService.isQueue;
 import static com.mayor2k.spark.Services.MusicService.queuePosition;
 import static com.mayor2k.spark.Adapters.SongAdapter.parentTag;
@@ -97,8 +98,9 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
             Glide.with(getContext())
                     .asBitmap()
                     .load(song.getUri())
-                    .apply(new RequestOptions()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .apply(isCircle?new RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
+                            new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
                     )
                     .into(new SimpleTarget<Bitmap>() {
                         @Override

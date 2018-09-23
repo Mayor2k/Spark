@@ -35,6 +35,7 @@ import com.mayor2k.spark.R;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.mayor2k.spark.Adapters.SongAdapter.isCircle;
 import static com.mayor2k.spark.UI.Activities.MainActivity.getScreenWidth;
 
 
@@ -130,9 +131,9 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
             holder.artistArea.requestLayout();
 
             //set left padding only for first layout on row
-            //set bottom padding only for last row
-            holder.artistArea.setPadding(position%spanCount==0?padding:0,padding,
-                    padding,position==getItemCount()-1?padding:0);
+            //set top padding only for first row
+            holder.artistArea.setPadding(position%spanCount==0?padding:0,position<=spanCount-1?padding:0,
+                    padding,padding);
 
             Glide.with(context)
                     .asBitmap()
@@ -160,14 +161,27 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
                     });
     }
         else
-            Glide.with(context)
-                    .load(artist.getUrl())
-                    .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
-                            .error(R.drawable.cover)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    )
-                    .into(holder.artistCover);
+            holder.artistArea.setPadding(15,position==0?10:0,15,10);
+
+        Glide.with(context)
+                .asBitmap()
+                .load(artist.getUrl())
+                .apply(isCircle?new RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
+                        new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+                )
+                .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        holder.artistCover.setImageBitmap(resource);
+                    }
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        super.onLoadFailed(errorDrawable);
+                        holder.artistCover.setImageResource(R.drawable.album);
+                    }
+                });
 
         mCursorAdapter.getCursor().moveToPosition(position);
         setViewHolder(holder);

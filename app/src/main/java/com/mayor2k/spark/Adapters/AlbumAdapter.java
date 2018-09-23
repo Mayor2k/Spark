@@ -38,6 +38,7 @@ import com.mayor2k.spark.UI.Fragments.AlbumFragment;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.mayor2k.spark.Adapters.SongAdapter.isCircle;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.UI.Activities.MainActivity.getScreenWidth;
 
@@ -127,9 +128,9 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
             holder.album.requestLayout();
 
             //set left padding only for first layout on row
-            //set bottom padding only for last row
-            holder.album.setPadding(position%spanCount==0?padding:0,padding,
-                    padding,position==getItemCount()-1?padding:0);
+            //set top padding only for first row
+            holder.album.setPadding(position%spanCount==0?padding:0,position<=spanCount-1?padding:0,
+                    padding,padding);
 
             Glide.with(context)
                     .asBitmap()
@@ -157,14 +158,27 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
                     });
         }
         else
-            Glide.with(context)
-                    .load(album.getUri())
-                    .apply(new RequestOptions()
-                            .override(Target.SIZE_ORIGINAL)
-                            .error(R.drawable.album)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    )
-                    .into(holder.imageView);
+            holder.album.setPadding(15,position==0?10:0,15,10);
+
+        Glide.with(context)
+                .asBitmap()
+                .load(album.getUri())
+                .apply(isCircle?new RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
+                        new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+                )
+                .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        holder.imageView.setImageBitmap(resource);
+                    }
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        super.onLoadFailed(errorDrawable);
+                        holder.imageView.setImageResource(R.drawable.album);
+                    }
+                });
 
         mCursorAdapter.getCursor().moveToPosition(position);
         setViewHolder(holder);

@@ -16,4 +16,15 @@
             android:summary="@string/pref_description_colored_notification"/>
 
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_header_design"
+        android:key="pref_key_design">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="circle_style"
+            android:title="@string/pref_title_use_circle_theme" />
+
+    </PreferenceCategory>
 </PreferenceScreen>

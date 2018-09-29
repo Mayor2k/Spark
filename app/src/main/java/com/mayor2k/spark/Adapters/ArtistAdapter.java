@@ -2,6 +2,7 @@ package com.mayor2k.spark.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -31,6 +32,8 @@ import com.bumptech.glide.request.transition.Transition;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.R;
+import com.mayor2k.spark.UI.Activities.AlbumActivity;
+import com.mayor2k.spark.UI.Activities.ArtistActivity;
 
 import java.util.ArrayList;
 
@@ -88,7 +91,9 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
+            Intent intent = new Intent(v.getContext(), ArtistActivity.class);
+            intent.putExtra("currentArtist",(Integer)v.getTag());
+            v.getContext().startActivity(intent);
         }
     };
 

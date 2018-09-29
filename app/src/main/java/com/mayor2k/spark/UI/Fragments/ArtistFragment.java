@@ -160,9 +160,9 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
                                 SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
                                 SharedPreferences.Editor ed = sPref.edit();
                                 try{
-                                    if (Objects.equals(response.body().getArtist().getImage().get(2).getText(), "https://lastfm-img2.akamaized.net/i/u/174s/04554b1baa8b4c65b29b23cfcd8cdf58.png"))
+                                    if (Objects.equals(response.body().getArtist().getImage().get(4).getText(), "https://lastfm-img2.akamaized.net/i/u/174s/04554b1baa8b4c65b29b23cfcd8cdf58.png"))
                                         ed.putString(artistTitle,null);
-                                    ed.putString(artistTitle, response.body().getArtist().getImage().get(2).getText());
+                                    ed.putString(artistTitle, response.body().getArtist().getImage().get(4).getText());
                                 }catch (NullPointerException e){
                                     Log.i(TAG, "onResponse is null");
                                 }

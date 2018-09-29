@@ -52,7 +52,9 @@
         </activity>
         <activity
             android:name=".UI.Activities.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
+        <activity android:name=".UI.Activities.ArtistActivity"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

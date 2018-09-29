@@ -1,13 +1,10 @@
 package com.mayor2k.spark.Services;
 
-import android.annotation.TargetApi;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -15,16 +12,13 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,7 +29,6 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.graphics.Palette;
-import android.support.v7.graphics.Target;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -50,12 +43,10 @@ import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.PlayerActivity;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.ExecutionException;
 
 import static com.mayor2k.spark.UI.Activities.AlbumActivity.albumSongs;
+import static com.mayor2k.spark.UI.Activities.ArtistActivity.artistSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
@@ -74,7 +65,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     int audioFocusResult;
     public static NotificationManager mNotifyMgr;
     private SharedPreferences sPref;
-    //public NotificationManager mNotifyMgr24;
     public MediaSessionCompat mediaSession;
     public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
     final PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
@@ -94,11 +84,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mediaSession.setCallback(mediaSessionCallback);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mediaSession.setActive(true);
-        sPref =  PreferenceManager.getDefaultSharedPreferences(this);
+        sPref = PreferenceManager.getDefaultSharedPreferences(this);
         super.onCreate();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(Constants.PREV_ACTION)) {
@@ -127,6 +116,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }
         }else if (intent.getAction().equals(Constants.START_SEARCH_ACTION)){
             playArray=searchList;
+            songStream(songPosition);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
+                showNotification24();
+            }else{
+                showNotification();
+            }
+        }else if (intent.getAction().equals(Constants.START_ARTIST_ACTION)){
+            playArray=artistSongs;
             songStream(songPosition);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
@@ -239,18 +236,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         CharSequence name = "NAME_1";
         int importance = NotificationManager.IMPORTANCE_LOW;
         Bitmap bitmap;
-        int color = 0;
         bitmap = getCoverBitmap(playSong,getBaseContext());
-        if (bitmap!=null && sPref.getBoolean("notifications_color",true)){
-            Palette p = Palette.from(bitmap).generate();
-            color = p.getMutedColor(p.getMutedColor(p.getVibrantColor(p.getDominantColor(0))));
-        }else if (bitmap==null){
+        if(bitmap==null)
             bitmap = BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.album);
-        }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
                 .setLargeIcon(bitmap)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_play_24dp)
                 .setSubText(playSong.getAlbum())
                 .setContentTitle(playSong.getTitle())
@@ -259,8 +251,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                         .setShowActionsInCompactView(0,1,2)
                         .setMediaSession(mediaSession.getSessionToken()))
                 .setContentIntent(notification)
-                .setColorized(bitmap!=null && sPref.getBoolean("notifications_color",true))
-                .setColor(color)
+                .setColorized(true)
+                .setShowWhen(false)
                 .addAction(prevAction)
                 .addAction(player.isPlaying()?pauseAction:playAction)
                 .addAction(nextAction)
@@ -287,6 +279,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mNotifyMgr.notify(2, builder.build());
         }
     }
+
 
     public void showNotification() {
         final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
@@ -594,18 +587,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     };
 
-    private Boolean isCover(){
-        Boolean check;
-        ContentResolver res = getApplicationContext().getContentResolver();
-        try {
-            InputStream in = res.openInputStream(playSong.getUri());
-            check = true;
-        } catch (FileNotFoundException e) {
-            check = false;
-        }
-        return check;
-    }
-
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener =
             focusChange -> {
                 switch (focusChange) {
@@ -662,5 +643,4 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }
         }
     };
-
 }

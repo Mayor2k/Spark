@@ -28,6 +28,7 @@ import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.AlbumActivity;
+import com.mayor2k.spark.UI.Activities.ArtistActivity;
 
 import java.util.ArrayList;
 
@@ -82,7 +83,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 Intent intent = new Intent(v.getContext(), AlbumActivity.class);
                 v.getContext().startActivity(intent);
             }else if(object instanceof Artist){
-                Toast.makeText(v.getContext(),"Not ready right now!",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(v.getContext(), ArtistActivity.class);
+                intent.putExtra("currentArtist",(Integer)v.getTag());
+                v.getContext().startActivity(intent);
             }
         }
     };

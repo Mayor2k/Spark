@@ -189,7 +189,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
                     });
         }
         else{
-            holder.songArea.setPadding(15,position==0?10:0,15,10);
+            holder.songArea.setPadding(15,position==0?10:0,0,10);
 
             Glide.with(holder.coverView.getContext())
                     .asBitmap()

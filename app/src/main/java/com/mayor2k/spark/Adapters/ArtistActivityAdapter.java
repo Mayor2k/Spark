@@ -57,13 +57,13 @@ public class ArtistActivityAdapter extends RecyclerView.Adapter<ArtistActivityAd
             songDuration = v.findViewById(R.id.itemBottomTextView);
 
             songArea = v.findViewById(R.id.itemArea);
-            songMenu = v.findViewById(R.id.songMenu);
+            songMenu = v.findViewById(R.id.linearMenu);
         }
     }
 
     private final View.OnClickListener mOnClickListener = v -> {
         songPosition=(Integer)v.getTag();
-        serviceIntent.setAction(Constants.START_ALBUM_ACTION);
+        serviceIntent.setAction(Constants.START_ARTIST_ACTION);
         v.getContext().startService(serviceIntent);
     };
 
@@ -83,7 +83,7 @@ public class ArtistActivityAdapter extends RecyclerView.Adapter<ArtistActivityAd
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.linear_item, parent, false);
         view.setOnClickListener(mOnClickListener);
-        View menu = view.findViewById(R.id.songMenu);
+        View menu = view.findViewById(R.id.linearMenu);
         menu.setOnClickListener(menuOnClickListener);
         return new ArtistActivityAdapter.ViewHolder(view);
     }
@@ -95,6 +95,8 @@ public class ArtistActivityAdapter extends RecyclerView.Adapter<ArtistActivityAd
 
         holder.songArea.setTag(position);
         holder.songMenu.setTag(position);
+
+        holder.songArea.setPadding(15,position==0?10:0,0,10);
 
         Glide.with(holder.songCover.getContext())
                 .asBitmap()

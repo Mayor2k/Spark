@@ -137,17 +137,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             ArrayList<Object> artists = new ArrayList<>();
 
             searchList.clear();
-
-            /*int[] list = new int[3];
-            for (int i = 0; searchList.size()>i; i++) {
-                if (searchList.get(i) instanceof Song)
-                    list[0] += 1;
-                else if (searchList.get(i) instanceof Album)
-                    list[1]+=1;
-                else if (searchList.get(i) instanceof Artist)
-                    list[2]+=1;
-            }*/
-
+            
             for (int i=0;songList.size()>i;i++){
                 Song song = songList.get(i);
                 if (containsIgnoreCase(song.getTitle(),query))

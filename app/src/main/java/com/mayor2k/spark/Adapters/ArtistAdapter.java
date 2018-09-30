@@ -88,13 +88,10 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
         }
     }
 
-    private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(v.getContext(), ArtistActivity.class);
-            intent.putExtra("currentArtist",(Integer)v.getTag());
-            v.getContext().startActivity(intent);
-        }
+    private final View.OnClickListener mOnClickListener = v -> {
+        Intent intent = new Intent(v.getContext(), ArtistActivity.class);
+        intent.putExtra("currentArtist",(Integer)v.getTag());
+        v.getContext().startActivity(intent);
     };
 
 
@@ -164,33 +161,33 @@ public class ArtistAdapter  extends RecyclerViewCursorAdapter<ArtistAdapter.View
                             holder.artistInfo.setTextColor(ContextCompat.getColor(context, R.color.black_p50));
                         }
                     });
-    }
-        else
-            holder.artistArea.setPadding(15,position==0?10:0,15,10);
+    }else {
+            holder.artistArea.setPadding(15, position == 0 ? 10 : 0, 0, 10);
 
-        Glide.with(context)
-                .asBitmap()
-                .load(artist.getUrl())
-                .apply(isCircle?new RequestOptions()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
-                        new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-                )
-                .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        holder.artistCover.setImageBitmap(resource);
-                    }
+            Glide.with(context)
+                    .asBitmap()
+                    .load(artist.getUrl())
+                    .apply(isCircle ? new RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop() :
+                            new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+                    )
+                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            holder.artistCover.setImageBitmap(resource);
+                        }
 
-                    @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        super.onLoadFailed(errorDrawable);
-                        holder.artistCover.setImageResource(R.drawable.album);
-                    }
-                });
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            holder.artistCover.setImageResource(R.drawable.album);
+                        }
+                    });
 
-        mCursorAdapter.getCursor().moveToPosition(position);
-        setViewHolder(holder);
-        mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
+            mCursorAdapter.getCursor().moveToPosition(position);
+            setViewHolder(holder);
+            mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
+        }
     }
 
 

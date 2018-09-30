@@ -38,6 +38,7 @@ import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.UI.Activities.SearchActivity.searchList;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
 import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
+import static com.mayor2k.spark.UI.Fragments.ArtistFragment.artistList;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder>{
     private ArrayList<Object> objects;
@@ -84,7 +85,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 v.getContext().startActivity(intent);
             }else if(object instanceof Artist){
                 Intent intent = new Intent(v.getContext(), ArtistActivity.class);
-                intent.putExtra("currentArtist",(Integer)v.getTag());
+                intent.putExtra("currentArtist",artistList.indexOf(object));
                 v.getContext().startActivity(intent);
             }
         }
@@ -120,7 +121,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             holder.headerText.setText("Artist");
 
         else{
-            holder.itemArea.setPadding(15,position==0?10:0,15,10);
+            holder.itemArea.setPadding(15,position==0?10:0,0,10);
 
             holder.itemArea.setTag(position);
             holder.itemMenu.setTag(position);

@@ -157,28 +157,28 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
                         }
                     });
         }
-        else
-            holder.album.setPadding(15,position==0?10:0,15,10);
+        else{
+            holder.album.setPadding(15,position==0?10:0,0,10);
+            Glide.with(context)
+                    .asBitmap()
+                    .load(album.getUri())
+                    .apply(isCircle?new RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
+                            new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+                    )
+                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            holder.imageView.setImageBitmap(resource);
+                        }
 
-        Glide.with(context)
-                .asBitmap()
-                .load(album.getUri())
-                .apply(isCircle?new RequestOptions()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
-                        new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-                )
-                .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        holder.imageView.setImageBitmap(resource);
-                    }
-
-                    @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        super.onLoadFailed(errorDrawable);
-                        holder.imageView.setImageResource(R.drawable.album);
-                    }
-                });
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            holder.imageView.setImageResource(R.drawable.album);
+                        }
+                    });
+        }
 
         mCursorAdapter.getCursor().moveToPosition(position);
         setViewHolder(holder);

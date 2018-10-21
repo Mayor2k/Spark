@@ -18,16 +18,24 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -47,19 +55,23 @@ import static com.mayor2k.spark.Services.MusicService.pausePosition;
 import static com.mayor2k.spark.Services.MusicService.playSong;
 import static com.mayor2k.spark.Services.MusicService.player;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
-
 public class PlayerActivity extends AppCompatActivity {
     public ImageView trackCover;
     public SeekBar seekBar;
     public ImageButton prev,next,shuffle;
     private FloatingActionButton play;
     public TextView title,artist,timeStart,timeEnd;
+    private ProgressBar progressBar;
+    private GestureDetectorCompat
+            gestureDetector;
+    private FrameLayout frameLayout;
 
     public MusicService.MusicServiceBinder musicServiceBinder;
     public MediaControllerCompat mediaController;
     public Handler handler = new Handler();
     public Runnable runnable;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,8 +98,14 @@ public class PlayerActivity extends AppCompatActivity {
 
         timeStart = findViewById(R.id.seekBarTimeStart);
         timeEnd = findViewById(R.id.seekBarTimeEnd);
+        frameLayout = findViewById(R.id.defaultState);
+        progressBar = findViewById(R.id.progress);
 
         trackCover = findViewById(R.id.trackCover);
+        gestureDetector = new GestureDetectorCompat(this, new GestureListener());
+        trackCover.setOnClickListener(v -> {});
+        trackCover.setOnTouchListener(touchListener);
+
         title = findViewById(R.id.playerTitle);
         artist = findViewById(R.id.playerArtist);
         seekBar = findViewById(R.id.seekBar);
@@ -181,6 +199,8 @@ public class PlayerActivity extends AppCompatActivity {
     public void progressListener(){
         seekBar.setProgress(player.getCurrentPosition());
         seekBar.setMax(player.getDuration());
+        progressBar.setProgress(player.getCurrentPosition());
+        progressBar.setMax(player.getDuration());
 
         timeStart.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(player.getCurrentPosition()),
                 TimeUnit.MILLISECONDS.toSeconds(player.getCurrentPosition()%60000)));
@@ -208,14 +228,16 @@ public class PlayerActivity extends AppCompatActivity {
                             play.setBackgroundTintList(ColorStateList.valueOf(color));
                             seekBar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
                             seekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+                            progressBar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
                         }
 
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
                             super.onLoadFailed(errorDrawable);
-                            trackCover.setImageResource(R.drawable.cover);
+                            trackCover.setImageResource(R.drawable.album);
                             seekBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.silver), PorterDuff.Mode.SRC_IN);
                             seekBar.getThumb().setColorFilter(getResources().getColor(R.color.silver), PorterDuff.Mode.SRC_IN);
+                            progressBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.silver), PorterDuff.Mode.SRC_IN);
                             play.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.silver)));
                         }
                     });
@@ -223,7 +245,6 @@ public class PlayerActivity extends AppCompatActivity {
             artist.setText(playSong.getArtist());
         }catch (IllegalArgumentException e){
             e.printStackTrace();
-
         }
     }
 
@@ -237,5 +258,66 @@ public class PlayerActivity extends AppCompatActivity {
     protected void onDestroy() {
         handler.removeCallbacks(runnable);
         super.onDestroy();
+    }
+
+    View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return gestureDetector.onTouchEvent(event);
+
+        }
+    };
+
+    private void hideSystemUI() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+    private void showSystemUI() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return gestureDetector.onTouchEvent(event);
+    }
+
+    class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            if (frameLayout.getVisibility()==View.VISIBLE){
+                frameLayout.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
+                hideSystemUI();
+            }
+            else{
+                frameLayout.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+                showSystemUI();
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            if (player.isPlaying()) {
+                mediaController.getTransportControls().pause();
+                frameLayout.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+                showSystemUI();
+            }
+            else
+                mediaController.getTransportControls().play();
+            return true;
+        }
     }
 }

@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -158,7 +161,7 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
                     });
         }
         else{
-            holder.album.setPadding(15,position==0?10:0,0,10);
+            holder.album.setPadding(10,position==0?10:0,10,10);
             Glide.with(context)
                     .asBitmap()
                     .load(album.getUri())
@@ -175,7 +178,11 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
                             super.onLoadFailed(errorDrawable);
-                            holder.imageView.setImageResource(R.drawable.album);
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(),
+                                            BitmapFactory.decodeResource(context.getResources(), R.drawable.album));
+                            circularBitmapDrawable.setCircular(true);
+                            holder.imageView.setImageDrawable(circularBitmapDrawable);
                         }
                     });
         }

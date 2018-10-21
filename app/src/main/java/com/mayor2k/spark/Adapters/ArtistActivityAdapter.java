@@ -38,11 +38,9 @@ import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
 public class ArtistActivityAdapter extends RecyclerView.Adapter<ArtistActivityAdapter.ViewHolder>{
     private ArrayList<Song> songs;
-    private ArrayList<Album> albums;
 
-    public ArtistActivityAdapter(ArrayList<Song> theSongs, ArrayList<Album> theAlbums){
+    public ArtistActivityAdapter(ArrayList<Song> theSongs){
         songs = theSongs;
-        albums = theAlbums;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -79,7 +77,7 @@ public class ArtistActivityAdapter extends RecyclerView.Adapter<ArtistActivityAd
 
     @NonNull
     @Override
-    public ArtistActivityAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ArtistActivityAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.linear_item, parent, false);
         view.setOnClickListener(mOnClickListener);
@@ -96,7 +94,7 @@ public class ArtistActivityAdapter extends RecyclerView.Adapter<ArtistActivityAd
         holder.songArea.setTag(position);
         holder.songMenu.setTag(position);
 
-        holder.songArea.setPadding(15,position==0?10:0,0,10);
+        holder.songArea.setPadding(10,position==0?10:0,0,10);
 
         Glide.with(holder.songCover.getContext())
                 .asBitmap()

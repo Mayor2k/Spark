@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -15,6 +16,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -189,7 +192,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
                     });
         }
         else{
-            holder.songArea.setPadding(15,position==0?10:0,0,10);
+            holder.songArea.setPadding(10,position==0?10:0,0,10);
 
             Glide.with(holder.coverView.getContext())
                     .asBitmap()
@@ -207,7 +210,11 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
                             super.onLoadFailed(errorDrawable);
-                            holder.coverView.setImageResource(R.drawable.album);
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(context.getResources(),
+                                            BitmapFactory.decodeResource(context.getResources(), R.drawable.album));
+                            circularBitmapDrawable.setCircular(true);
+                            holder.coverView.setImageDrawable(circularBitmapDrawable);
                         }
                     });
         }

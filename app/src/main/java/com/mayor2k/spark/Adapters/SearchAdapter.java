@@ -3,9 +3,12 @@ package com.mayor2k.spark.Adapters;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -121,7 +124,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             holder.headerText.setText("Artist");
 
         else{
-            holder.itemArea.setPadding(15,position==0?10:0,0,10);
+            holder.itemArea.setPadding(10,position==0?10:0,0,10);
 
             holder.itemArea.setTag(position);
             holder.itemMenu.setTag(position);
@@ -146,7 +149,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                             @Override
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
                                 super.onLoadFailed(errorDrawable);
-                                holder.itemImage.setImageResource(R.drawable.album);
+                                RoundedBitmapDrawable circularBitmapDrawable =
+                                        RoundedBitmapDrawableFactory.create(holder.itemImage.getContext().getResources(),
+                                                BitmapFactory.decodeResource(holder.itemImage.getContext().getResources(), R.drawable.album));
+                                circularBitmapDrawable.setCircular(true);
+                                holder.itemImage.setImageDrawable(circularBitmapDrawable);
                             }
                         });
 

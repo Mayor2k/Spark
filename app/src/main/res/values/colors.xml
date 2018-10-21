@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#212121</color>
+    <color name="colorAccent">#212121</color>
     <color name="selected_tabtext">#bb000000</color>
     <color name="unselected_tabtext">#77000000</color>
     <color name="shuffle_grey">#ffdedede</color>
@@ -12,9 +11,9 @@
     <color name="black">#000000</color>
     <color name="white">#ffffffff</color>
     <color name="silver">#DDDDDD</color>
-
     <color name="colorNotification">#ffffffff</color>
     <color name="item_area">#E5E5E5</color>
     <color name="transparent_black">#80000000</color>
+    <color name="material_black">#212121</color>
 
 </resources>

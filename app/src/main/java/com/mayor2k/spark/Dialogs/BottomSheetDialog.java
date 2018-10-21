@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
@@ -32,7 +33,6 @@ import com.bumptech.glide.request.transition.Transition;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.MainActivity;
-import com.mayor2k.spark.UI.Activities.SongTagActivity;
 
 import java.io.File;
 
@@ -42,8 +42,6 @@ import static com.mayor2k.spark.Services.MusicService.queuePosition;
 import static com.mayor2k.spark.Adapters.SongAdapter.parentTag;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
-import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
-import static com.mayor2k.spark.Utils.CoverUtil.getPaletteBitmap;
 import static com.mayor2k.spark.Utils.CoverUtil.isCover;
 
 public class BottomSheetDialog extends BottomSheetDialogFragment{
@@ -134,8 +132,10 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), SongTagActivity.class);
-                startActivity(intent);
+                TagEditorDialog tagEditorDialog = new TagEditorDialog();
+                tagEditorDialog.show(((FragmentActivity)v.getContext()).getSupportFragmentManager(),
+                        tagEditorDialog.getTag());
+                dismiss();
             }
         });
 

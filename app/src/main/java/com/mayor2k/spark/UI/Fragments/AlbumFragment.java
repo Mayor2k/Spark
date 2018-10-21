@@ -29,7 +29,20 @@ import com.mayor2k.spark.Adapters.AlbumAdapter;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.R;
 
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.TagField;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.musicUri;
@@ -107,6 +120,7 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
             else
                 albumView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
             albumView.setAdapter(albumAdapter);
+
         }catch (IllegalArgumentException e){
             Toast.makeText(getActivity(),"Nothing found",Toast.LENGTH_LONG).show();
         }
@@ -118,6 +132,7 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
             MediaStore.Audio.Albums.ALBUM,
             MediaStore.Audio.Albums.ARTIST,
             MediaStore.Audio.Albums.ALBUM_ID,
+            MediaStore.Audio.Media.YEAR
     };
 
     @NonNull
@@ -136,18 +151,19 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
             int titleColumn = data.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
             int artistColumn = data.getColumnIndex(MediaStore.Audio.Albums.ARTIST);
             int cover = data.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID);
+            int year = data.getColumnIndex(MediaStore.Audio.Media.YEAR);
             for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
                 long albumId = data.getLong(idColumn);
                 long songCover = data.getLong(cover);
+                int albumYear = data.getInt(year);
                 Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                 Uri uri = ContentUris.withAppendedId(sArtworkUri, songCover);
-
                 String artistTitle = data.getString(artistColumn);
                 String albumTitle = data.getString(titleColumn);
 
                 if (!checking.contains(albumTitle)) {
                     checking.add(albumTitle);
-                    albumList.add(new Album(albumId ,albumTitle,artistTitle, uri));
+                    albumList.add(new Album(albumId ,albumTitle,artistTitle, uri, albumYear));
                 }
             }
             albumAdapter.notifyDataSetChanged();

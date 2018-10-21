@@ -7,12 +7,14 @@ public class Album {
     private String title;
     private String artist;
     private Uri uri;
+    private int year;
 
-    public Album(long idAlbum, String titleAlbum, String artistAlbum, Uri albumUri) {
+    public Album(long idAlbum, String titleAlbum, String artistAlbum, Uri albumUri, int albumYear) {
         Id = idAlbum;
         title = titleAlbum;
         artist = artistAlbum;
         uri = albumUri;
+        year = albumYear;
     }
 
     public long getId() {return Id;}
@@ -33,5 +35,13 @@ public class Album {
 
     public void setUri(Uri uri) {
         this.uri = uri;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 }

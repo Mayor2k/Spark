@@ -5,8 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".UI.Activities.SongTagActivity"
-    tools:showIn="@layout/activity_song_tag"
     android:orientation="vertical">
 
 
@@ -48,5 +46,28 @@
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:text="SongArtist" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:background="@color/transparent"
+            android:id="@+id/cancel_action"
+            android:text="Cancle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:background="@color/transparent"
+            android:id="@+id/save_action"
+            android:text="Save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:ignore="ButtonStyle" />
+    </LinearLayout>
 
 </LinearLayout>

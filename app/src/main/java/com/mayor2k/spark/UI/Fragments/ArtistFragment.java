@@ -119,6 +119,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
                 artistView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
 
             artistView.setAdapter(artistAdapter);
+
         }catch (IllegalArgumentException e){
             Toast.makeText(getActivity(),"Nothing found",Toast.LENGTH_LONG).show();
         }

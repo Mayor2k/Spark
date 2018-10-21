@@ -1,12 +1,15 @@
 package com.mayor2k.spark.UI.Activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -17,6 +20,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +37,8 @@ import com.bumptech.glide.request.transition.Transition;
 import com.elmargomez.typer.Font;
 import com.elmargomez.typer.Typer;
 import com.jaeger.library.StatusBarUtil;
+
+import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import com.mayor2k.spark.Adapters.ArtistActivityAdapter;
 import com.mayor2k.spark.Interfaces.Constants;
@@ -41,6 +47,7 @@ import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
@@ -50,9 +57,12 @@ import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
 import static com.mayor2k.spark.UI.Fragments.ArtistFragment.artistList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
-public class ArtistActivity extends AppCompatActivity{
+public class ArtistActivity extends AppCompatActivity {
     static public ArrayList<Song> artistSongs;
     static public ArrayList<Album> artistAlbums;
+    public static LinearLayout horizontalScrollView;
+
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +70,7 @@ public class ArtistActivity extends AppCompatActivity{
         StatusBarUtil.setTransparent(this);
 
         // status bar height
-        int statusBarHeight=0;
+        int statusBarHeight = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
             statusBarHeight = getResources().getDimensionPixelSize(resourceId);
@@ -69,16 +79,16 @@ public class ArtistActivity extends AppCompatActivity{
         // action bar height
         int actionBarHeight;
         final TypedArray styledAttributes = this.getTheme().obtainStyledAttributes(
-                new int[] { android.R.attr.actionBarSize }
+                new int[]{android.R.attr.actionBarSize}
         );
         actionBarHeight = (int) styledAttributes.getDimension(0, 0);
         styledAttributes.recycle();
 
         View gradient = findViewById(R.id.gradientView);
         gradient.setLayoutParams(new CollapsingToolbarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                actionBarHeight+statusBarHeight));
+                actionBarHeight + statusBarHeight));
 
-        Artist currentArtist = artistList.get(getIntent().getIntExtra("currentArtist",-1));
+        Artist currentArtist = artistList.get(getIntent().getIntExtra("currentArtist", -1));
 
         final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.artistCollapsing);
 
@@ -89,14 +99,14 @@ public class ArtistActivity extends AppCompatActivity{
 
         actionButton.setOnClickListener(v -> {
             songPosition = 0;
-            serviceIntent.setAction(Constants.START_ALBUM_ACTION);
+            serviceIntent.setAction(Constants.START_ARTIST_ACTION);
             v.getContext().startService(serviceIntent);
         });
 
         collapsingToolbarLayout.setExpandedTitleTypeface(font);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar()!=null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_24dp_white);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -106,12 +116,12 @@ public class ArtistActivity extends AppCompatActivity{
         artistSongs = new ArrayList<>();
         artistAlbums = new ArrayList<>();
         ArrayList<Song> songs = new ArrayList<>();
-        for (int i=0;albumList.size()>i;i++){
+        for (int i = 0; albumList.size() > i; i++) {
             Album album = albumList.get(i);
-            if(Objects.equals(album.getArtist(), currentArtist.getTitle())){
-                for (int count=0;songList.size()>count;count++){
+            if (Objects.equals(album.getArtist(), currentArtist.getTitle())) {
+                for (int count = 0; songList.size() > count; count++) {
                     Song song = songList.get(count);
-                    if (Objects.equals(song.getAlbum(),album.getTitle()))
+                    if (Objects.equals(song.getAlbum(), album.getTitle()))
                         songs.add(song);
                 }
                 Collections.sort(songs, (item, t1) -> item.getTrack() - t1.getTrack());
@@ -120,7 +130,7 @@ public class ArtistActivity extends AppCompatActivity{
                 artistAlbums.add(album);
             }
         }
-        ArtistActivityAdapter customAdapter = new ArtistActivityAdapter(artistSongs,artistAlbums);
+        ArtistActivityAdapter customAdapter = new ArtistActivityAdapter(artistSongs);
 
         Glide.with(this)
                 .asBitmap()
@@ -150,32 +160,41 @@ public class ArtistActivity extends AppCompatActivity{
 
                     }
                 });
+        trackList.setNestedScrollingEnabled(false);
         trackList.setLayoutManager(new LinearLayoutManager(this));
         trackList.setAdapter(customAdapter);
 
-        LinearLayout horizontalScrollView = findViewById(R.id.scrollAlbum);
-        LayoutInflater layoutInflater = LayoutInflater.from(this);
-        for (int i=0;artistAlbums.size()>i;i++){
-            @SuppressLint("ViewHolder") LinearLayout albumLayout = (LinearLayout)layoutInflater.inflate
+        horizontalScrollView = findViewById(R.id.scrollAlbum);
+        for (int i = 0; artistAlbums.size() > i; i++) {
+            LayoutInflater layoutInflater = LayoutInflater.from(this);
+            @SuppressLint("ViewHolder") LinearLayout albumLayout = (LinearLayout) layoutInflater.inflate
                     (R.layout.grid_item, horizontalScrollView, false);
-            albumLayout.setPadding(i==0?10:0,10,10,10);
+            albumLayout.setPadding(i == 0 ? 10 : 0, 10, 10, 0);
             Album album = artistAlbums.get(i);
+
+            final View.OnClickListener onClickListener = v -> {
+                currentAlbum = albumList.indexOf(album);
+                Intent intent = new Intent(v.getContext(), AlbumActivity.class);
+                v.getContext().startActivity(intent);
+            };
+
+            albumLayout.setOnClickListener(onClickListener);
 
             TextView albumTitle = albumLayout.findViewById(R.id.itemTopTextView);
             TextView albumArtist = albumLayout.findViewById(R.id.itemBottomTextView);
-            ImageView albumImage  = albumLayout.findViewById(R.id.itemImageView);
+            ImageView albumImage = albumLayout.findViewById(R.id.itemImageView);
             LinearLayout colorArea = albumLayout.findViewById(R.id.gridColorArea);
             LinearLayout albumArea = albumLayout.findViewById(R.id.itemArea);
 
             float factor = this.getResources().getDisplayMetrics().density;
-            albumImage.getLayoutParams().width = (int)(100*factor);
-            albumImage.getLayoutParams().height = (int)(100*factor);
+            albumImage.getLayoutParams().width = (int) (100 * factor);
+            albumImage.getLayoutParams().height = (int) (100 * factor);
             albumImage.requestLayout();
-            albumArea.getLayoutParams().width = (int)(100*factor);
+            albumArea.getLayoutParams().width = (int) (100 * factor);
             albumArea.requestLayout();
 
-            albumTitle.setText(album.getTitle());
-            albumArtist.setText(album.getArtist());
+            //albumTitle.setText(album.getTitle());
+            //albumArtist.setText(String.valueOf(album.getYear()));
 
             Glide.with(this)
                     .asBitmap()
@@ -183,7 +202,7 @@ public class ArtistActivity extends AppCompatActivity{
                     .apply(new RequestOptions()
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                     )
-                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL,Target.SIZE_ORIGINAL) {
+                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             albumImage.setImageBitmap(resource);
@@ -197,7 +216,7 @@ public class ArtistActivity extends AppCompatActivity{
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
                             super.onLoadFailed(errorDrawable);
                             albumImage.setImageResource(R.drawable.album);
-                            colorArea.setBackgroundColor(getResources().getColor(R.color.white));
+                            colorArea.setBackgroundColor(getResources().getColor(R.color.item_area));
                             albumTitle.setTextColor(getResources().getColor(R.color.black));
                             albumArtist.setTextColor(getResources().getColor(R.color.black));
                         }
@@ -206,4 +225,10 @@ public class ArtistActivity extends AppCompatActivity{
         }
     }
 
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 }

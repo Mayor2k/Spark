@@ -61,7 +61,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static boolean isShuffle = false;
     public static boolean isQueue;
     public static int queuePosition;
-    public static boolean isAudiofocusLoss;
     int audioFocusResult;
     public static NotificationManager mNotifyMgr;
     private SharedPreferences sPref;
@@ -509,6 +508,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }catch (IllegalArgumentException e){
                 e.printStackTrace();
             }
+
+            audioManager.abandonAudioFocus(audioFocusChangeListener);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
             }else{
@@ -525,13 +526,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         public void onPlay() {
             player.seekTo(pausePosition);
             player.start();
-            int audioFocusResult = audioManager.requestAudioFocus(
-                    audioFocusChangeListener,
-                    AudioManager.STREAM_MUSIC,
-                    AudioManager.AUDIOFOCUS_GAIN);
-            if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
-                return;
-
             startAudioFocus(AudioManager.AUDIOFOCUS_GAIN);
             registerReceiver(
                     becomingNoisyReceiver,
@@ -592,26 +586,19 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_GAIN:
                         Log.i("TAGGING","AUDIOFOCUS_GAIN");
-                        if (!isAudiofocusLoss && !player.isPlaying())
-                            mediaSessionCallback.onPlay();
+                        mediaSessionCallback.onPlay();
                         break;
                     case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
                         Log.i("TAGGING","AUDIOFOCUS_GAIN_TRANSIENT");
-                        if (player.isPlaying()){
-                            pausePosition=player.getCurrentPosition();
-                            mediaSessionCallback.onPlay();
-                        }
+                        pausePosition=player.getCurrentPosition();
+                        mediaSessionCallback.onPlay();
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                         Log.i("TAGGING","AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
-                        /*if (player.isPlaying()){
-                            pausePosition=player.getCurrentPosition();
-                            mediaSessionCallback.onPlay();
-                        }*/
+                        mediaSessionCallback.onPlay();
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS:
                         Log.i("TAGGING","AUDIOFOCUS_LOSS");
-                        isAudiofocusLoss = true;
                         mediaSessionCallback.onPause();
                         break;
                     default:
@@ -621,7 +608,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             };
 
     void startAudioFocus(int audioFocus){
-        audioFocusResult = audioManager.requestAudioFocus(
+        int audioFocusResult = audioManager.requestAudioFocus(
                 audioFocusChangeListener,
                 AudioManager.STREAM_MUSIC,
                 audioFocus);

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="MyMaterialTheme" parent="MyMaterialTheme.Base">
     </style>
@@ -6,6 +6,8 @@
     <style name="MyMaterialTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/black</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -20,7 +22,8 @@
     <style name="MyMaterialTheme.Player" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="actionMenuTextColor">@color/black</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 
     <style name="MyMaterialTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -34,9 +37,12 @@
         <item name="android:textColorPrimary">@android:color/white</item>
     </style>
 
-    <style name="ToolbarStyle" parent="@style/ThemeOverlay.AppCompat.ActionBar">
-        <item name="colorControlNormal">@color/white</item>
+    <style name="ToolbarStyle" parent="@style/ThemeOverlay.AppCompat.Light">
+        <item name="colorControlNormal">@color/black</item>
         <item name="android:textColor">@color/black</item>
+        <item name="android:textColorPrimary">@color/material_black</item>
+        <item name="android:textColorSecondary">@color/material_black</item>
+        <item name="actionMenuTextColor">@color/material_black</item>
     </style>
 
 </resources>

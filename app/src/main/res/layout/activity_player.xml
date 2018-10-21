@@ -6,7 +6,8 @@
     android:id="@+id/swipeBackLayout"
     android:layout_width="match_parent"
     tools:context="com.mayor2k.spark.UI.Activities.PlayerActivity"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    style="@style/MyMaterialTheme.Player">
 
     <FrameLayout
         android:id="@+id/player"
@@ -21,178 +22,195 @@
             android:src="@drawable/cover"
             tools:ignore="ContentDescription" />
 
-        <View
-            android:id="@+id/halfBlackBackground"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/transparent_black" />
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="112dp"
-            android:fitsSystemWindows="true"
-            app:theme="@style/ToolbarStyle" />
-
-        <LinearLayout
-            android:layout_gravity="bottom"
-            android:layout_width="match_parent"
+        <FrameLayout
+            android:id="@+id/defaultState"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:visibility="visible">
 
-            <SeekBar
-                android:id="@+id/seekBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="15dp"
-                android:max="100"
-                android:progress="00" />
-
-            <RelativeLayout
-                android:id="@+id/seekBar_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/seekBarTimeStart"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignStart="@+id/seekBarTimeEnd"
-                    android:layout_marginStart="15dp"
-                    android:gravity="start"
-                    android:text="0.00"
-                    android:textColor="@color/white"
-                    tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:id="@+id/seekBarTimeEnd"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="15dp"
-                    android:gravity="end"
-                    android:text="3.48"
-                    android:textColor="@color/white"
-                    tools:ignore="HardcodedText" />
-
-            </RelativeLayout>
-
-            <LinearLayout
+            <View
+                android:id="@+id/halfBlackBackground"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="vertical"
-                tools:ignore="NestedWeights">
-                <TextView
-                    android:id="@+id/playerTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_marginStart="15dp"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:text="Talking to Myself"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="24sp"
-                    tools:ignore="HardcodedText" />
+                android:background="@color/transparent_black" />
 
-                <TextView
-                    android:id="@+id/playerArtist"
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="112dp"
+                android:fitsSystemWindows="true" />
+
+            <LinearLayout
+                android:layout_gravity="bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <SeekBar
+                    android:id="@+id/seekBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginBottom="5dp"
                     android:layout_marginEnd="15dp"
                     android:layout_marginStart="15dp"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:text="Linkin Park"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    tools:ignore="HardcodedText" />
+                    android:layout_marginTop="15dp"
+                    android:max="100"
+                    android:progress="00" />
+
+                <RelativeLayout
+                    android:id="@+id/seekBar_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/seekBarTimeStart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignStart="@+id/seekBarTimeEnd"
+                        android:layout_marginStart="15dp"
+                        android:gravity="start"
+                        android:text="0.00"
+                        android:textColor="@color/white"
+                        tools:ignore="HardcodedText" />
+
+                    <TextView
+                        android:id="@+id/seekBarTimeEnd"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:gravity="end"
+                        android:text="3.48"
+                        android:textColor="@color/white"
+                        tools:ignore="HardcodedText" />
+
+                </RelativeLayout>
 
                 <LinearLayout
-                    android:id="@+id/media_actions"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingBottom="15sp">
-
-                    <ImageButton
-                        android:id="@+id/playerRepeat"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:layout_gravity="center_vertical"
-                        android:scaleType="fitCenter"
-                        android:tint="@color/black_p50"
-                        app:srcCompat="@drawable/ic_repeat_24dp"
-                        tools:ignore="ContentDescription"  />
-
-                    <ImageButton
-                        android:id="@+id/playerPrev"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:layout_gravity="center_vertical"
-                        android:scaleType="fitCenter"
-                        android:tint="@color/white"
-                        app:srcCompat="@drawable/ic_previous_24dp"
-                        tools:ignore="ContentDescription" />
-
-                    <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/playerPlay"
-                        android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    tools:ignore="NestedWeights">
+                    <TextView
+                        android:id="@+id/playerTitle"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:fabCustomSize="64dp"
-                        android:layout_weight="0"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:ellipsize="end"
                         android:gravity="center"
-                        android:scaleType="fitCenter"
-                        android:tint="@color/white"
-                        app:srcCompat="@drawable/ic_pause_24dp"
-                        tools:ignore="ContentDescription" />
+                        android:maxLines="1"
+                        android:text="Talking to Myself"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        tools:ignore="HardcodedText" />
 
-                    <ImageButton
-                        android:id="@+id/playerNext"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
+                    <TextView
+                        android:id="@+id/playerArtist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:ellipsize="end"
                         android:gravity="center"
-                        android:layout_gravity="center_vertical"
-                        android:padding="8dp"
-                        android:scaleType="fitCenter"
-                        android:tint="@color/white"
-                        app:srcCompat="@drawable/ic_next_24dp"
-                        tools:ignore="ContentDescription" />
+                        android:text="Linkin Park"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        tools:ignore="HardcodedText" />
 
-                    <ImageButton
-                        android:id="@+id/playerShuffle"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:layout_gravity="center_vertical"
-                        android:scaleType="fitCenter"
-                        android:tint="@color/black_p50"
-                        app:srcCompat="@drawable/ic_shuffle_24dp"
-                        tools:ignore="ContentDescription" />
+                    <LinearLayout
+                        android:id="@+id/media_actions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="15sp">
+
+                        <ImageButton
+                            android:id="@+id/playerRepeat"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_gravity="center_vertical"
+                            android:scaleType="fitCenter"
+                            android:tint="@color/black_p50"
+                            app:srcCompat="@drawable/ic_repeat_24dp"
+                            tools:ignore="ContentDescription"  />
+
+                        <ImageButton
+                            android:id="@+id/playerPrev"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_gravity="center_vertical"
+                            android:scaleType="fitCenter"
+                            android:tint="@color/white"
+                            app:srcCompat="@drawable/ic_previous_24dp"
+                            tools:ignore="ContentDescription" />
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/playerPlay"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:fabCustomSize="64dp"
+                            android:layout_weight="0"
+                            android:gravity="center"
+                            android:scaleType="fitCenter"
+                            android:tint="@color/white"
+                            app:srcCompat="@drawable/ic_pause_24dp"
+                            tools:ignore="ContentDescription" />
+
+                        <ImageButton
+                            android:id="@+id/playerNext"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_gravity="center_vertical"
+                            android:padding="8dp"
+                            android:scaleType="fitCenter"
+                            android:tint="@color/white"
+                            app:srcCompat="@drawable/ic_next_24dp"
+                            tools:ignore="ContentDescription" />
+
+                        <ImageButton
+                            android:id="@+id/playerShuffle"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_gravity="center_vertical"
+                            android:scaleType="fitCenter"
+                            android:tint="@color/black_p50"
+                            app:srcCompat="@drawable/ic_shuffle_24dp"
+                            tools:ignore="ContentDescription" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </FrameLayout>
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/custom_progressbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progress"
+            android:layout_gravity="bottom"
+            android:max="100"
+            android:progress="4"
+            android:visibility="invisible"/>
 
     </FrameLayout>
 

@@ -41,6 +41,7 @@ import com.jaeger.library.StatusBarUtil;
 import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import com.mayor2k.spark.Adapters.ArtistActivityAdapter;
+import com.mayor2k.spark.Adapters.HorizontalRecyclerViewAdapter;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Artist;
@@ -98,6 +99,7 @@ public class ArtistActivity extends AppCompatActivity {
         final FloatingActionButton actionButton = findViewById(R.id.action_button);
 
         actionButton.setOnClickListener(v -> {
+            Collections.shuffle(artistSongs);
             songPosition = 0;
             serviceIntent.setAction(Constants.START_ARTIST_ACTION);
             v.getContext().startService(serviceIntent);
@@ -113,6 +115,7 @@ public class ArtistActivity extends AppCompatActivity {
         }
         ImageView albumCover = findViewById(R.id.artistCover);
         RecyclerView trackList = findViewById(R.id.trackList);
+        RecyclerView scrollAlbum = findViewById(R.id.scrollAlbum);
         artistSongs = new ArrayList<>();
         artistAlbums = new ArrayList<>();
         ArrayList<Song> songs = new ArrayList<>();
@@ -131,6 +134,7 @@ public class ArtistActivity extends AppCompatActivity {
             }
         }
         ArtistActivityAdapter customAdapter = new ArtistActivityAdapter(artistSongs);
+        HorizontalRecyclerViewAdapter horizontalRecyclerViewAdapter = new HorizontalRecyclerViewAdapter(this, artistAlbums);
 
         Glide.with(this)
                 .asBitmap()
@@ -163,68 +167,25 @@ public class ArtistActivity extends AppCompatActivity {
         trackList.setNestedScrollingEnabled(false);
         trackList.setLayoutManager(new LinearLayoutManager(this));
         trackList.setAdapter(customAdapter);
+        /*trackList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int visibleItemCount = recyclerView.getChildCount();//смотрим сколько элементов на экране
+                int totalItemCount = recyclerView.getItemCount();//сколько всего элементов
+                int firstVisibleItems = recyclerView.findFirstVisibleItemPosition();
+            }
 
-        horizontalScrollView = findViewById(R.id.scrollAlbum);
-        for (int i = 0; artistAlbums.size() > i; i++) {
-            LayoutInflater layoutInflater = LayoutInflater.from(this);
-            @SuppressLint("ViewHolder") LinearLayout albumLayout = (LinearLayout) layoutInflater.inflate
-                    (R.layout.grid_item, horizontalScrollView, false);
-            albumLayout.setPadding(i == 0 ? 10 : 0, 10, 10, 0);
-            Album album = artistAlbums.get(i);
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });*/
 
-            final View.OnClickListener onClickListener = v -> {
-                currentAlbum = albumList.indexOf(album);
-                Intent intent = new Intent(v.getContext(), AlbumActivity.class);
-                v.getContext().startActivity(intent);
-            };
-
-            albumLayout.setOnClickListener(onClickListener);
-
-            TextView albumTitle = albumLayout.findViewById(R.id.itemTopTextView);
-            TextView albumArtist = albumLayout.findViewById(R.id.itemBottomTextView);
-            ImageView albumImage = albumLayout.findViewById(R.id.itemImageView);
-            LinearLayout colorArea = albumLayout.findViewById(R.id.gridColorArea);
-            LinearLayout albumArea = albumLayout.findViewById(R.id.itemArea);
-
-            float factor = this.getResources().getDisplayMetrics().density;
-            albumImage.getLayoutParams().width = (int) (100 * factor);
-            albumImage.getLayoutParams().height = (int) (100 * factor);
-            albumImage.requestLayout();
-            albumArea.getLayoutParams().width = (int) (100 * factor);
-            albumArea.requestLayout();
-
-            //albumTitle.setText(album.getTitle());
-            //albumArtist.setText(String.valueOf(album.getYear()));
-
-            Glide.with(this)
-                    .asBitmap()
-                    .load(album.getUri())
-                    .apply(new RequestOptions()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    )
-                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
-                        @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                            albumImage.setImageBitmap(resource);
-                            albumTitle.setTextColor(getResources().getColor(R.color.white));
-                            albumArtist.setTextColor(getResources().getColor(R.color.white));
-                            Palette.from(resource).generate(p ->
-                                    colorArea.setBackgroundColor(p.getMutedColor(p.getVibrantColor(p.getDominantColor(0)))));
-                        }
-
-                        @Override
-                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                            super.onLoadFailed(errorDrawable);
-                            albumImage.setImageResource(R.drawable.album);
-                            colorArea.setBackgroundColor(getResources().getColor(R.color.item_area));
-                            albumTitle.setTextColor(getResources().getColor(R.color.black));
-                            albumArtist.setTextColor(getResources().getColor(R.color.black));
-                        }
-                    });
-            horizontalScrollView.addView(albumLayout);
-        }
+        scrollAlbum.setNestedScrollingEnabled(false);
+        scrollAlbum.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        scrollAlbum.setAdapter(horizontalRecyclerViewAdapter);
     }
-
 
     @Override
     public boolean onSupportNavigateUp() {

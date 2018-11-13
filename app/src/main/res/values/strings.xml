@@ -92,5 +92,6 @@
     <string name="pref_title_use_circle_theme">Use circle theme</string>
     <string name="now_playing">Now Playing</string>
     <string name="play_next">Play Next:</string>
+    <string name="todo">TODO</string>
 
 </resources>

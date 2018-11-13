@@ -69,7 +69,6 @@ public class ArtistActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist);
         StatusBarUtil.setTransparent(this);
-
         // status bar height
         int statusBarHeight = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -164,9 +163,9 @@ public class ArtistActivity extends AppCompatActivity {
 
                     }
                 });
-        ViewStub stub = findViewById(R.id.viewStub);
+        /*ViewStub stub = findViewById(R.id.viewStub);
         stub.setLayoutResource(R.layout.bottom_player);
-        stub.inflate();
+        stub.inflate();*/
 
         trackList.setNestedScrollingEnabled(false);
         trackList.setLayoutManager(new LinearLayoutManager(this));

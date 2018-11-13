@@ -1,12 +1,20 @@
 package com.mayor2k.spark.UI.Activities;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,23 +31,74 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.mayor2k.spark.Adapters.QueueActivityAdapter;
 import com.mayor2k.spark.Helper.SimpleItemTouchHelperCallback;
+import com.mayor2k.spark.Interfaces.OnStartDragListener;
 import com.mayor2k.spark.R;
+import com.mayor2k.spark.Services.MusicService;
+
+import java.util.ArrayList;
 
 import static com.mayor2k.spark.Adapters.SongAdapter.isCircle;
 import static com.mayor2k.spark.Services.MusicService.playSong;
+import static com.mayor2k.spark.Services.MusicService.player;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
-public class QueueActivity extends AppCompatActivity {
+public class QueueActivity extends AppCompatActivity implements
+        OnStartDragListener {
+    private MusicService.MusicServiceBinder musicServiceBinder;
+    private MediaControllerCompat mediaController;
+    private TextView songTitle, songArtist;
+    private ImageView songImage;
+    private ItemTouchHelper itemTouchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_queue);
-        TextView songTitle = findViewById(R.id.songTitle);
+        songTitle = findViewById(R.id.songTitle);
+        songArtist = findViewById(R.id.songArtist);
+        songImage = findViewById(R.id.itemImageView);
+        setPlayingSong();
+        RecyclerView recyclerView = findViewById(R.id.trackList);
+        QueueActivityAdapter queueActivityAdapter =
+                new QueueActivityAdapter(new ArrayList<>(playArray.subList(playSong.getPosition(),playArray.size())),this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(queueActivityAdapter);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(queueActivityAdapter);
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        bindService(new Intent(this, MusicService.class), new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                musicServiceBinder = (MusicService.MusicServiceBinder) service;
+                try {
+                    mediaController = new MediaControllerCompat(
+                            QueueActivity.this, musicServiceBinder.getMediaSessionToken());
+                    mediaController.registerCallback(
+                            new MediaControllerCompat.Callback() {
+                                @Override
+                                public void onPlaybackStateChanged(PlaybackStateCompat state) {
+
+                                }
+                            }
+                    );
+                }
+                catch (RemoteException|IllegalArgumentException e) {
+                    mediaController = null;
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                musicServiceBinder = null;
+                mediaController = null;
+            }
+        }, BIND_AUTO_CREATE);
+    }
+
+    private void setPlayingSong(){
         songTitle.setText(playSong.getTitle());
-        TextView songArtist = findViewById(R.id.songArtist);
         songArtist.setText(playSong.getArtist());
-        ImageView songImage = findViewById(R.id.itemImageView);
         Glide.with(this)
                 .asBitmap()
                 .load(playSong.getUri())
@@ -63,13 +122,15 @@ public class QueueActivity extends AppCompatActivity {
                         songImage.setImageDrawable(circularBitmapDrawable);
                     }
                 });
-        RecyclerView recyclerView = findViewById(R.id.trackList);
-        QueueActivityAdapter queueActivityAdapter = new QueueActivityAdapter(playArray);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(queueActivityAdapter);
+    }
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(queueActivityAdapter);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
     }
 }

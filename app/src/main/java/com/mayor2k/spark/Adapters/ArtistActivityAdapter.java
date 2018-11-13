@@ -132,7 +132,7 @@ public class ArtistActivityAdapter extends RecyclerView.Adapter<ArtistActivityAd
     }
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
 }

@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Fragments.AlbumFragment;
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 
 public class MainActivity extends AppCompatActivity{
-
+    public static TextView songTitle;
     public static final String TAG = "TAGGING";
     public static ArrayList playArray;
     public TabLayout tabLayout;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity{
         tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         isStoragePermissionGranted();
+        songTitle = findViewById(R.id.bottom_player_song_title);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -105,6 +107,10 @@ public class MainActivity extends AppCompatActivity{
             Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
             startActivity(intent);
         }
+    }
+
+    public static void changePlayerTitle(String title){
+        songTitle.setText(title);
     }
 
     public static float getScreenWidth(Context context){

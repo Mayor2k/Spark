@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -61,7 +62,6 @@ import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 public class ArtistActivity extends AppCompatActivity {
     static public ArrayList<Song> artistSongs;
     static public ArrayList<Album> artistAlbums;
-    public static LinearLayout horizontalScrollView;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -164,23 +164,13 @@ public class ArtistActivity extends AppCompatActivity {
 
                     }
                 });
+        ViewStub stub = findViewById(R.id.viewStub);
+        stub.setLayoutResource(R.layout.bottom_player);
+        stub.inflate();
+
         trackList.setNestedScrollingEnabled(false);
         trackList.setLayoutManager(new LinearLayoutManager(this));
         trackList.setAdapter(customAdapter);
-        /*trackList.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int visibleItemCount = recyclerView.getChildCount();//смотрим сколько элементов на экране
-                int totalItemCount = recyclerView.getItemCount();//сколько всего элементов
-                int firstVisibleItems = recyclerView.findFirstVisibleItemPosition();
-            }
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-        });*/
 
         scrollAlbum.setNestedScrollingEnabled(false);
         scrollAlbum.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));

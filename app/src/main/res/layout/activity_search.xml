@@ -37,6 +37,7 @@
             android:text="@string/no_results"
             android:textColor="?android:textColorSecondary" />
 
+        <include layout="@layout/bottom_player"/>
     </FrameLayout>
 
 </LinearLayout>

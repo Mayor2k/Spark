@@ -1,4 +1,4 @@
-package com.mayor2k.spark.Utils;
+package com.mayor2k.spark.Helper;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;

@@ -55,13 +55,11 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     public static int parentTag;
     static BottomSheetDialogFragment bottomSheetDialogFragment =
             new BottomSheetDialog();
-    private Context context;
     private int spanCount;
     public static boolean isCircle;
 
-    public SongAdapter(ArrayList<Song> theSongs,Context theContext, FragmentActivity theFragmentActivity){
-        super(theContext);
-        context = theContext;
+    public SongAdapter(ArrayList<Song> theSongs, FragmentActivity theFragmentActivity){
+        super(theFragmentActivity);
         songs=theSongs;
 
         SharedPreferences sPref = theFragmentActivity.getPreferences(MODE_PRIVATE);
@@ -70,7 +68,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         else
             spanCount = sPref.getInt("SongSpanCount", 0);
 
-        isCircle = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("circle_style",true);
+        isCircle = PreferenceManager.getDefaultSharedPreferences(theFragmentActivity).getBoolean("circle_style",true);
         Log.i("tagging","xds "+spanCount);
 
         if (spanCount!=1)
@@ -146,6 +144,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Song song = songs.get(position);
+        Context context = holder.coverView.getContext();
 
         holder.songArea.setTag(position);
         holder.songTitle.setText(song.getTitle());
@@ -194,7 +193,7 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
         else{
             holder.songArea.setPadding(10,position==0?10:0,0,10);
 
-            Glide.with(holder.coverView.getContext())
+            Glide.with(context)
                     .asBitmap()
                     .load(song.getUri())
                     .apply(isCircle?new RequestOptions()

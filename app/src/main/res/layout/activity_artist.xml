@@ -90,4 +90,5 @@
         app:srcCompat="@drawable/ic_shuffle_24dp"
         app:layout_anchor="@id/main.appbar"
         app:layout_anchorGravity="bottom|right|end" />
+
 </android.support.design.widget.CoordinatorLayout>

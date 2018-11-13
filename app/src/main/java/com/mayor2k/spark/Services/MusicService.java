@@ -49,10 +49,11 @@ import static com.mayor2k.spark.UI.Activities.AlbumActivity.albumSongs;
 import static com.mayor2k.spark.UI.Activities.ArtistActivity.artistSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
+import static com.mayor2k.spark.UI.Activities.MainActivity.changePlayerTitle;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 import static com.mayor2k.spark.UI.Activities.SearchActivity.searchList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
-import static com.mayor2k.spark.Utils.CoverUtil.getCoverBitmap;
+import static com.mayor2k.spark.Helper.CoverUtil.getCoverBitmap;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener {
     public static MediaPlayer player = new MediaPlayer();
@@ -61,7 +62,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static boolean isShuffle = false;
     public static boolean isQueue;
     public static int queuePosition;
-    int audioFocusResult;
     public static NotificationManager mNotifyMgr;
     private SharedPreferences sPref;
     public MediaSessionCompat mediaSession;
@@ -496,6 +496,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 showNotification();
             }
             Log.i(TAG, "Clicked Previous");
+            changePlayerTitle(playSong.getTitle());
             super.onSkipToPrevious();
         }
 
@@ -562,6 +563,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 showNotification();
             }
             Log.i(TAG, "Clicked Next");
+            changePlayerTitle(playSong.getTitle());
             super.onSkipToNext();
         }
 

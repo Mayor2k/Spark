@@ -96,7 +96,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
         try {
-            songAdt = new SongAdapter(songList,getContext(),getActivity());
+            songAdt = new SongAdapter(songList,getActivity());
 
             int spanCount;
             SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
@@ -173,7 +173,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                         pathId, uri, songTrack, songDuration);
                 songList.add(song);
             }
-            songAdt.notifyDataSetChanged();
+            //songAdt.notifyDataSetChanged();
             songAdt.swapCursor(data);
         }
     }

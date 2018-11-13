@@ -22,6 +22,7 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,19 +43,26 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.jaeger.library.StatusBarUtil;
+import com.mayor2k.spark.Models.Album;
+import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.Services.MusicService;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 import static com.mayor2k.spark.Services.MusicService.isShuffle;
 import static com.mayor2k.spark.Services.MusicService.pausePosition;
 import static com.mayor2k.spark.Services.MusicService.playSong;
 import static com.mayor2k.spark.Services.MusicService.player;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
+import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
+import static com.mayor2k.spark.UI.Fragments.ArtistFragment.artistList;
+
 public class PlayerActivity extends AppCompatActivity {
     public ImageView trackCover;
     public SeekBar seekBar;
@@ -186,6 +194,40 @@ public class PlayerActivity extends AppCompatActivity {
                 progressListener();
             }
         });
+    }
+    public void menuItemListener(MenuItem item) {
+        switch (item.getItemId()){
+            case (R.id.findLyrics):
+                Toast.makeText(this,"lyrics",Toast.LENGTH_SHORT).show();
+                break;
+            case (R.id.addToPlaylist):
+                Toast.makeText(this,"playlist",Toast.LENGTH_SHORT).show();
+                break;
+            case (R.id.goToQueue):
+                startActivity(new Intent(PlayerActivity.this, QueueActivity.class));
+                break;
+            case (R.id.goToAlbum):
+                for (int i=0;albumList.size()>i;i++){
+                    Album album = albumList.get(i);
+                    if (Objects.equals(album.getTitle(), playSong.getAlbum())) {
+                        currentAlbum = albumList.indexOf(album);
+                        break;
+                    }
+                }
+                startActivity(new Intent(PlayerActivity.this, AlbumActivity.class));
+                break;
+            case (R.id.goToArtist):
+                Intent intent = new Intent(PlayerActivity.this, ArtistActivity.class);
+                for (int i=0;artistList.size()>i;i++){
+                    Artist artist = artistList.get(i);
+                    if (Objects.equals(artist.getTitle(), playSong.getArtist())) {
+                        intent.putExtra("currentArtist",artistList.indexOf(artist));
+                        break;
+                    }
+                }
+                startActivity(intent);
+                break;
+        }
     }
 
     @Override

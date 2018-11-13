@@ -1,4 +1,4 @@
-package com.mayor2k.spark.Utils;
+package com.mayor2k.spark.Helper;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -8,8 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
-import android.support.v7.graphics.Palette;
-import android.widget.LinearLayout;
 
 import com.mayor2k.spark.Models.Song;
 

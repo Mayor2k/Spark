@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -42,7 +41,7 @@ import static com.mayor2k.spark.Services.MusicService.queuePosition;
 import static com.mayor2k.spark.Adapters.SongAdapter.parentTag;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
-import static com.mayor2k.spark.Utils.CoverUtil.isCover;
+import static com.mayor2k.spark.Helper.CoverUtil.isCover;
 
 public class BottomSheetDialog extends BottomSheetDialogFragment{
     public ImageView cover;

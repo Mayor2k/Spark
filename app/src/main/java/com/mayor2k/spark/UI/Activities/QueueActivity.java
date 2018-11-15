@@ -57,12 +57,12 @@ public class QueueActivity extends AppCompatActivity implements
         songTitle = findViewById(R.id.songTitle);
         songArtist = findViewById(R.id.songArtist);
         songImage = findViewById(R.id.itemImageView);
-        setPlayingSong();
         RecyclerView recyclerView = findViewById(R.id.trackList);
-        QueueActivityAdapter queueActivityAdapter =
-                new QueueActivityAdapter(new ArrayList<>(playArray.subList(playSong.getPosition(),playArray.size())),this);
+        setPlayingSong();
+        QueueActivityAdapter queueActivityAdapter = new QueueActivityAdapter(playArray,this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(queueActivityAdapter);
+        recyclerView.scrollToPosition(playArray.indexOf(playSong));
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(queueActivityAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
@@ -78,7 +78,11 @@ public class QueueActivity extends AppCompatActivity implements
                             new MediaControllerCompat.Callback() {
                                 @Override
                                 public void onPlaybackStateChanged(PlaybackStateCompat state) {
-
+                                    setPlayingSong();
+                                    queueActivityAdapter.notifyDataSetChanged();
+                                    recyclerView.scrollToPosition(playArray.indexOf(playSong));
+                                    if (state == null)
+                                        return;
                                 }
                             }
                     );
@@ -93,35 +97,40 @@ public class QueueActivity extends AppCompatActivity implements
                 musicServiceBinder = null;
                 mediaController = null;
             }
+
         }, BIND_AUTO_CREATE);
     }
 
     private void setPlayingSong(){
-        songTitle.setText(playSong.getTitle());
-        songArtist.setText(playSong.getArtist());
-        Glide.with(this)
-                .asBitmap()
-                .load(playSong.getUri())
-                .apply(isCircle?new RequestOptions()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
-                        new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-                )
-                .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        songImage.setImageBitmap(resource);
-                    }
+        try{
+            songTitle.setText(playSong.getTitle());
+            songArtist.setText(playSong.getArtist());
+            Glide.with(this)
+                    .asBitmap()
+                    .load(playSong.getUri())
+                    .apply(isCircle?new RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop():
+                            new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+                    )
+                    .into(new SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            songImage.setImageBitmap(resource);
+                        }
 
-                    @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        super.onLoadFailed(errorDrawable);
-                        RoundedBitmapDrawable circularBitmapDrawable =
-                                RoundedBitmapDrawableFactory.create(getResources(),
-                                        BitmapFactory.decodeResource(getResources(), R.drawable.album));
-                        circularBitmapDrawable.setCircular(true);
-                        songImage.setImageDrawable(circularBitmapDrawable);
-                    }
-                });
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(getResources(),
+                                            BitmapFactory.decodeResource(getResources(), R.drawable.album));
+                            circularBitmapDrawable.setCircular(true);
+                            songImage.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
+        }catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

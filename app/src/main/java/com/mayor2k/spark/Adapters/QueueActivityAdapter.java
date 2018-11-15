@@ -1,20 +1,20 @@
 package com.mayor2k.spark.Adapters;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androidessence.recyclerviewcursoradapter.RecyclerViewCursorViewHolder;
-import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Interfaces.ItemTouchHelperAdapter;
 import com.mayor2k.spark.Interfaces.OnStartDragListener;
 import com.mayor2k.spark.Models.Song;
@@ -23,24 +23,27 @@ import com.mayor2k.spark.R;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
-import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
+import static com.mayor2k.spark.Services.MusicService.playSong;
+import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
 public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdapter.ViewHolder> implements ItemTouchHelperAdapter {
     private ArrayList playlist;
     private OnStartDragListener onStartDragListener;
-    public QueueActivityAdapter( ArrayList playlist,OnStartDragListener onStartDragListener) {
+    public QueueActivityAdapter(ArrayList playlist,OnStartDragListener onStartDragListener) {
         this.playlist = playlist;
         this.onStartDragListener = onStartDragListener;
     }
 
     public class ViewHolder extends RecyclerViewCursorViewHolder {
-        TextView songTitle,songArtist;
+        LinearLayout itemArea;
+        TextView songTitle,songArtist,itemNumber;
         ImageButton dragSong;
         ViewHolder(View view) {
             super(view);
+            itemArea = view.findViewById(R.id.itemArea);
             songTitle = view.findViewById(R.id.itemTopTextView);
             songArtist = view.findViewById(R.id.itemBottomTextView);
+            itemNumber = view.findViewById(R.id.itemNumber);
             dragSong = view.findViewById(R.id.dragSong);
         }
         @Override
@@ -55,21 +58,26 @@ public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdap
         return  new QueueActivityAdapter.ViewHolder(view);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull QueueActivityAdapter.ViewHolder holder, int position) {
         Song song = (Song) playlist.get(position);
-        holder.dragSong.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (MotionEventCompat.getActionMasked(event) ==
-                        MotionEvent.ACTION_DOWN) {
-                    onStartDragListener.onStartDrag(holder);
-                }
-                return false;
+        Context context = holder.songTitle.getContext();
+        holder.dragSong.setOnTouchListener((v, event) -> {
+            if (MotionEventCompat.getActionMasked(event) ==
+                    MotionEvent.ACTION_DOWN) {
+                onStartDragListener.onStartDrag(holder);
             }
+            return false;
         });
         holder.songTitle.setText(song.getTitle());
         holder.songArtist.setText(song.getArtist());
+        holder.itemNumber.setText(String.valueOf(position-playArray.indexOf(playSong)));
+        if (position<playArray.indexOf(playSong)){
+            holder.songTitle.setTextColor(context.getResources().getColor(R.color.black_p50));
+            holder.songArtist.setTextColor(context.getResources().getColor(R.color.black_p50));
+            holder.itemNumber.setTextColor(context.getResources().getColor(R.color.black_p50));
+        }
     }
 
     @Override
@@ -105,5 +113,9 @@ public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdap
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+    }
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 }

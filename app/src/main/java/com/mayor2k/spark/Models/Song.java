@@ -12,10 +12,9 @@ public class Song {
     private Uri uri;
     private int track;
     private int duration;
-    private int position;
 
     public Song(long songID, String songTitle, String songArtist, String songAlbum,
-                String songPath, Uri songUri, int songTrack, int songDuration, int position) {
+                String songPath, Uri songUri, int songTrack, int songDuration) {
         id=songID;
         uri=songUri;
         title=songTitle;
@@ -24,7 +23,6 @@ public class Song {
         path=songPath;
         track=songTrack;
         duration=songDuration;
-        this.position = position;
     }
 
     public long getId() {
@@ -83,13 +81,5 @@ public class Song {
 
     public void setTrack(int track) {
         this.track = track;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
     }
 }

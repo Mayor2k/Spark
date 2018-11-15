@@ -24,6 +24,7 @@
         android:layout_weight="2"
         android:ellipsize="end"
         android:gravity="start|center"
+        android:maxLines="1"
         android:text="Talking to Myself"
         android:textSize="20dp" />
 

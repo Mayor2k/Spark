@@ -6,6 +6,9 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.mayor2k.spark.Interfaces.ItemTouchHelperAdapter;
 
+import static com.mayor2k.spark.MusicService.playSong;
+import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
+
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     private final ItemTouchHelperAdapter mAdapter;
@@ -20,14 +23,14 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     }
 
     @Override
-    public boolean isItemViewSwipeEnabled() {
-        return true;
-    }
+    public boolean isItemViewSwipeEnabled() { return true; }
+
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        int swipeFlags = viewHolder.getAdapterPosition()==playArray.indexOf(playSong)?
+                0:ItemTouchHelper.START | ItemTouchHelper.END;
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 
@@ -42,5 +45,4 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
     }
-
 }

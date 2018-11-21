@@ -93,5 +93,6 @@
     <string name="now_playing">Now Playing</string>
     <string name="play_next">Play Next:</string>
     <string name="todo">TODO</string>
+    <string name="TAG_ITEM_POSITION">0</string>
 
 </resources>

@@ -30,7 +30,7 @@
         </activity>
 
         <service
-            android:name=".Services.MusicService"
+            android:name=".MusicService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />

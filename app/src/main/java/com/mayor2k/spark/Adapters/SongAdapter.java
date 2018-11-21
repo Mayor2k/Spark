@@ -2,7 +2,6 @@ package com.mayor2k.spark.Adapters;
 
 import java.util.ArrayList;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -41,10 +40,9 @@ import com.mayor2k.spark.Dialogs.BottomSheetDialog;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
-import com.mayor2k.spark.Services.MusicService;
+import com.mayor2k.spark.MusicService;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.UI.Activities.MainActivity.getScreenWidth;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 

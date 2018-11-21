@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -33,13 +32,10 @@ import com.mayor2k.spark.Adapters.QueueActivityAdapter;
 import com.mayor2k.spark.Helper.SimpleItemTouchHelperCallback;
 import com.mayor2k.spark.Interfaces.OnStartDragListener;
 import com.mayor2k.spark.R;
-import com.mayor2k.spark.Services.MusicService;
-
-import java.util.ArrayList;
+import com.mayor2k.spark.MusicService;
 
 import static com.mayor2k.spark.Adapters.SongAdapter.isCircle;
-import static com.mayor2k.spark.Services.MusicService.playSong;
-import static com.mayor2k.spark.Services.MusicService.player;
+import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
 public class QueueActivity extends AppCompatActivity implements

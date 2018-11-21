@@ -23,7 +23,7 @@ import com.mayor2k.spark.R;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.mayor2k.spark.Services.MusicService.playSong;
+import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
 public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdapter.ViewHolder> implements ItemTouchHelperAdapter {
@@ -62,7 +62,8 @@ public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdap
     @Override
     public void onBindViewHolder(@NonNull QueueActivityAdapter.ViewHolder holder, int position) {
         Song song = (Song) playlist.get(position);
-        Context context = holder.songTitle.getContext();
+        //Context context = holder.songTitle.getContext();
+        holder.itemView.setTag(R.string.TAG_ITEM_POSITION,holder.getLayoutPosition());
         holder.dragSong.setOnTouchListener((v, event) -> {
             if (MotionEventCompat.getActionMasked(event) ==
                     MotionEvent.ACTION_DOWN) {
@@ -73,11 +74,11 @@ public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdap
         holder.songTitle.setText(song.getTitle());
         holder.songArtist.setText(song.getArtist());
         holder.itemNumber.setText(String.valueOf(position-playArray.indexOf(playSong)));
-        if (position<playArray.indexOf(playSong)){
+        /*if (position<playArray.indexOf(playSong)){
             holder.songTitle.setTextColor(context.getResources().getColor(R.color.black_p50));
             holder.songArtist.setTextColor(context.getResources().getColor(R.color.black_p50));
             holder.itemNumber.setTextColor(context.getResources().getColor(R.color.black_p50));
-        }
+        }*/
     }
 
     @Override
@@ -92,12 +93,15 @@ public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdap
             }
         }
         notifyItemMoved(fromPosition, toPosition);
+        notifyItemChanged(fromPosition);
+        notifyItemChanged(toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
         playlist.remove(position);
         notifyItemRemoved(position);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -113,9 +117,5 @@ public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdap
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-    }
-    @Override
-    public int getItemViewType(int position) {
-        return position;
     }
 }

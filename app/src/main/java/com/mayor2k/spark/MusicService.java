@@ -1,4 +1,4 @@
-package com.mayor2k.spark.Services;
+package com.mayor2k.spark;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -40,7 +40,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
-import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.PlayerActivity;
 
 import java.io.IOException;

@@ -36,8 +36,8 @@ import com.mayor2k.spark.UI.Activities.MainActivity;
 import java.io.File;
 
 import static com.mayor2k.spark.Adapters.SongAdapter.isCircle;
-import static com.mayor2k.spark.Services.MusicService.isQueue;
-import static com.mayor2k.spark.Services.MusicService.queuePosition;
+import static com.mayor2k.spark.MusicService.isQueue;
+import static com.mayor2k.spark.MusicService.queuePosition;
 import static com.mayor2k.spark.Adapters.SongAdapter.parentTag;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
@@ -62,7 +62,6 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 dismiss();
             }
-            Log.i(MainActivity.TAG,"newState is "+newState);
         }
 
         @Override
@@ -155,7 +154,6 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
                                     Log.i("TAGGING", "Failed to delete file");
                                 }
                                 getContext().getContentResolver().notifyChange(Uri.parse("content://media"), null);
-                                Log.i(MainActivity.TAG,"CURSOR IS RESTART!"+songList.size());
                                 dismiss();
                             }
                         })

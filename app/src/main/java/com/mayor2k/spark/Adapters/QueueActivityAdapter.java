@@ -55,7 +55,7 @@ public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdap
     public QueueActivityAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.queue_item, parent, false);
-        return  new QueueActivityAdapter.ViewHolder(view);
+        return new QueueActivityAdapter.ViewHolder(view);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -92,21 +92,22 @@ public class QueueActivityAdapter extends RecyclerView.Adapter<QueueActivityAdap
                 Collections.swap(playlist, i, i - 1);
             }
         }
-        notifyItemMoved(fromPosition, toPosition);
-        notifyItemChanged(fromPosition);
-        notifyItemChanged(toPosition);
+        //notifyItemMoved(fromPosition, toPosition);
+        //notifyItemChanged(fromPosition);
+        //(toPosition);
+        notifyDataSetChanged();
     }
 
     @Override
     public void onItemDismiss(int position) {
         playlist.remove(position);
-        notifyItemRemoved(position);
+        //notifyItemRemoved(position);
         notifyDataSetChanged();
     }
 
     @Override
     public long getItemId(int arg0) {
-        return super.getItemId(arg0);
+        return playlist.get(arg0).hashCode();
     }
 
     @Override

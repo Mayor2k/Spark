@@ -5,12 +5,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,21 +18,24 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.View;
+import android.view.WindowManager;
 
+import com.jaeger.library.StatusBarUtil;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Fragments.AlbumFragment;
 import com.mayor2k.spark.UI.Fragments.ArtistFragment;
+import com.mayor2k.spark.UI.Fragments.PlayerFragment;
 import com.mayor2k.spark.UI.Fragments.SongFragment;
 import com.mayor2k.spark.Interfaces.Constants;
-import com.mayor2k.spark.UI.Fragments.ViewPagerAdapter;
+import com.mayor2k.spark.Adapters.ViewPagerAdapter;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 
 public class MainActivity extends AppCompatActivity{
-    public static TextView songTitle;
     public static final String TAG = "TAGGING";
     public static ArrayList playArray;
     public TabLayout tabLayout;
@@ -54,14 +56,41 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        StatusBarUtil.setLightMode(MainActivity.this);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         viewPager = findViewById(R.id.content);
         setupViewPager(viewPager);
         tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.player_container, new PlayerFragment())
+                .commit();
+        View bottomPlayerFragment = findViewById(R.id.bottomPlayerArea);
+        SlidingUpPanelLayout slidingUpPanelLayout = findViewById(R.id.container);
+        slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                bottomPlayerFragment.setAlpha(1-slideOffset);
+                if (slideOffset==1){
+                    StatusBarUtil.setDarkMode(MainActivity.this);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        getWindow().setStatusBarColor(ContextCompat.getColor(MainActivity.this,R.color.transparent));
+                }else{
+                    StatusBarUtil.setLightMode(MainActivity.this);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        getWindow().setStatusBarColor(ContextCompat.getColor(MainActivity.this,R.color.white));
+                }
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+            }
+        });
+
+
         isStoragePermissionGranted();
-        songTitle = findViewById(R.id.bottom_player_song_title);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -103,14 +132,6 @@ public class MainActivity extends AppCompatActivity{
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
         }
-        else{
-            Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
-            startActivity(intent);
-        }
-    }
-
-    public static void changePlayerTitle(String title){
-        songTitle.setText(title);
     }
 
     public static float getScreenWidth(Context context){

@@ -72,5 +72,4 @@
         app:srcCompat="@drawable/ic_play_24dp"
         app:layout_anchor="@id/main.appbar"
         app:layout_anchorGravity="bottom|right|end" />
-    <include layout="@layout/bottom_player"/>
 </android.support.design.widget.CoordinatorLayout>

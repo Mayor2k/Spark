@@ -1,6 +1,7 @@
 package com.mayor2k.spark.UI.Activities;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
@@ -56,7 +57,8 @@ public class QueueActivity extends AppCompatActivity implements
         RecyclerView recyclerView = findViewById(R.id.trackList);
         setPlayingSong();
         QueueActivityAdapter queueActivityAdapter = new QueueActivityAdapter(playArray,this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        queueActivityAdapter.setHasStableIds(true);
+        recyclerView.setLayoutManager(new CustomLinearLayoutManager(this));
         recyclerView.setAdapter(queueActivityAdapter);
         recyclerView.scrollToPosition(playArray.indexOf(playSong));
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(queueActivityAdapter);
@@ -137,5 +139,16 @@ public class QueueActivity extends AppCompatActivity implements
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         itemTouchHelper.startDrag(viewHolder);
+    }
+
+    private class CustomLinearLayoutManager extends LinearLayoutManager {
+        public CustomLinearLayoutManager(Context context) {
+            super(context);
+        }
+
+        @Override
+        public boolean supportsPredictiveItemAnimations() {
+            return true;
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.mayor2k.spark.UI.Fragments;
+package com.mayor2k.spark.Adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

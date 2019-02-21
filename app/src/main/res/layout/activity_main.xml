@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<com.sothree.slidinguppanel.SlidingUpPanelLayout
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/container"
+    android:gravity="bottom"
+    sothree:umanoPanelHeight="50dp"
+    sothree:umanoOverlay="true"
     tools:context="com.mayor2k.spark.UI.Activities.MainActivity">
 
     <LinearLayout
@@ -17,6 +21,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <include layout="@layout/status_bar"/>
+
             <android.support.design.widget.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -27,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:background="?attr/colorPrimary"
-                    app:popupTheme="@style/Theme.AppCompat.Light" />
+                    app:popupTheme="@style/Theme.AppCompat.Light"/>
 
                 <android.support.design.widget.TabLayout
                     android:id="@+id/tabs"
@@ -37,6 +43,7 @@
                     app:tabMode="fixed" />
 
             </android.support.design.widget.AppBarLayout>
+
         </LinearLayout>
 
         <android.support.v4.view.ViewPager
@@ -44,9 +51,29 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_marginBottom="50dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <include layout="@layout/bottom_player"/>
     </LinearLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+    <FrameLayout
+        android:id="@+id/sliding_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/player_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+
+        <fragment
+            android:id="@+id/bottomPlayerArea"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="top"
+            class="com.mayor2k.spark.UI.Fragments.BottomPlayerFragment" />
+    </FrameLayout>
+
+
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>

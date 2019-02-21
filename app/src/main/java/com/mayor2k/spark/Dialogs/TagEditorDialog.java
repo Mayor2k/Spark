@@ -70,6 +70,9 @@ public class TagEditorDialog extends DialogFragment{
         tag.setField(FieldKey.ALBUM,albumTitle.getText().toString());
         tag.setField(FieldKey.ARTIST,artistTitle.getText().toString());
         f.commit();
+        song.setTitle(songTitle.getText().toString());
+        song.setAlbum(albumTitle.getText().toString());
+        song.setArtist(artistTitle.getText().toString());
         getActivity().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(mp3)));
         dismiss();
     }

@@ -215,7 +215,6 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
                         }
                     });
         }
-
         mCursorAdapter.getCursor().moveToPosition(position);
         setViewHolder(holder);
         mCursorAdapter.bindView(

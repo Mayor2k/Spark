@@ -31,18 +31,13 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
-import com.github.florent37.glidepalette.GlidePalette;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Activities.AlbumActivity;
-import com.mayor2k.spark.UI.Activities.MainActivity;
-import com.mayor2k.spark.UI.Fragments.AlbumFragment;
-
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.mayor2k.spark.Adapters.SongAdapter.isCircle;
-import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.UI.Activities.MainActivity.getScreenWidth;
 
 public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHolder> {
@@ -97,7 +92,7 @@ public class AlbumAdapter extends RecyclerViewCursorAdapter<AlbumAdapter.ViewHol
         View view;
         if (checkLayout())
             view = LayoutInflater.from(mContext)
-                .inflate(R.layout.grid_item, parent, false);
+                    .inflate(R.layout.grid_item, parent, false);
         else
             view = LayoutInflater.from(mContext)
                     .inflate(R.layout.linear_item, parent, false);

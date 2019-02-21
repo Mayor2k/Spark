@@ -40,7 +40,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
-import com.mayor2k.spark.UI.Activities.PlayerActivity;
+import com.mayor2k.spark.UI.Fragments.PlayerFragment;
 
 import java.io.IOException;
 
@@ -48,7 +48,6 @@ import static com.mayor2k.spark.UI.Activities.AlbumActivity.albumSongs;
 import static com.mayor2k.spark.UI.Activities.ArtistActivity.artistSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
-import static com.mayor2k.spark.UI.Activities.MainActivity.changePlayerTitle;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 import static com.mayor2k.spark.UI.Activities.SearchActivity.searchList;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
@@ -199,7 +198,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void showNotification24(){
-        Intent notificationIntent = new Intent(getApplicationContext(), PlayerActivity.class);
+        Intent notificationIntent = new Intent(getApplicationContext(), PlayerFragment.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notificationIntent.setAction(Constants.MAIN_ACTION);
 
@@ -290,7 +289,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         viewsBig.setTextViewText(R.id.status_bar_album_name, playSong.getAlbum());
         viewsBig.setTextViewText(R.id.status_bar_artist_name, playSong.getArtist());
 
-        Intent notificationIntent = new Intent(getApplicationContext(), PlayerActivity.class);
+        Intent notificationIntent = new Intent(getApplicationContext(), PlayerFragment.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notificationIntent.setAction(Constants.MAIN_ACTION);
         PendingIntent notification = PendingIntent.getActivity(this, 0,
@@ -495,7 +494,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 showNotification();
             }
             Log.i(TAG, "Clicked Previous");
-            changePlayerTitle(playSong.getTitle());
             super.onSkipToPrevious();
         }
 
@@ -562,7 +560,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 showNotification();
             }
             Log.i(TAG, "Clicked Next");
-            changePlayerTitle(playSong.getTitle());
             super.onSkipToNext();
         }
 

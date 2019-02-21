@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/songArea"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -28,10 +29,10 @@
             android:id="@+id/songTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Talking to Myself"
             android:ellipsize="end"
-            android:textColor="@android:color/black"
             android:maxLines="1"
+            android:text="Talking to Myself"
+            android:textColor="@android:color/black"
             android:textSize="18dp" />
 
         <TextView
@@ -52,6 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right|center"
         android:background="@color/transparent"
-        app:srcCompat="@drawable/ic_dots_vertical_24dp" />
+        app:srcCompat="@drawable/ic_dots_vertical_24dp"
+        tools:ignore="RtlHardcoded" />
 
 </LinearLayout>

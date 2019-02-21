@@ -196,6 +196,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
                     artistList.add(new Artist(artistId, artistTitle, url, songInfo, albumInfo));
                 }
             }
+            artistAdapter.notifyDataSetChanged();
             artistAdapter.swapCursor(data);
         }
     }

@@ -1,33 +1,36 @@
-package com.mayor2k.spark.UI.Activities;
+package com.mayor2k.spark.UI.Fragments;
+
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -43,13 +46,17 @@ import com.bumptech.glide.request.transition.Transition;
 import com.jaeger.library.StatusBarUtil;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Artist;
-import com.mayor2k.spark.R;
 import com.mayor2k.spark.MusicService;
+import com.mayor2k.spark.R;
+import com.mayor2k.spark.UI.Activities.AlbumActivity;
+import com.mayor2k.spark.UI.Activities.ArtistActivity;
+import com.mayor2k.spark.UI.Activities.QueueActivity;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static android.content.Context.BIND_AUTO_CREATE;
 import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 import static com.mayor2k.spark.MusicService.isShuffle;
 import static com.mayor2k.spark.MusicService.pausePosition;
@@ -59,7 +66,7 @@ import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
 import static com.mayor2k.spark.UI.Fragments.ArtistFragment.artistList;
 
-public class PlayerActivity extends AppCompatActivity {
+public class PlayerFragment extends Fragment {
     public ImageView trackCover;
     public SeekBar seekBar;
     public ImageButton prev,next,shuffle;
@@ -74,57 +81,60 @@ public class PlayerActivity extends AppCompatActivity {
     public MediaControllerCompat mediaController;
     public Handler handler = new Handler();
     public Runnable runnable;
+    Toolbar fragmentToolbar;
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        StatusBarUtil.setTransparent(this);
-        setContentView(R.layout.activity_player);
-        //setDragEdge(SwipeBackLayout.DragEdge.TOP);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar()!=null){
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_player, container, false);
+        prev = view.findViewById(R.id.playerPrev);
+        play = view.findViewById(R.id.playerPlay);
+        next = view.findViewById(R.id.playerNext);
+        shuffle = view.findViewById(R.id.playerShuffle);
+        timeStart = view.findViewById(R.id.seekBarTimeStart);
+        timeEnd = view.findViewById(R.id.seekBarTimeEnd);
+        frameLayout = view.findViewById(R.id.defaultState);
+        progressBar = view.findViewById(R.id.progress);
+        trackCover = view.findViewById(R.id.trackCover);
+        title = view.findViewById(R.id.playerTitle);
+        artist = view.findViewById(R.id.playerArtist);
+        seekBar = view.findViewById(R.id.seekBar);
+        fragmentToolbar = view.findViewById(R.id.playerToolbar);
 
-        prev = findViewById(R.id.playerPrev);
-        play = findViewById(R.id.playerPlay);
-        next = findViewById(R.id.playerNext);
-        shuffle = findViewById(R.id.playerShuffle);
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        //setHasOptionsMenu(true);
+        /*((AppCompatActivity)getActivity()).setSupportActionBar(fragmentToolbar);
+        if (((AppCompatActivity)getActivity()).getSupportActionBar()!=null){
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }*/
+
         if(!isShuffle)
             shuffle.setColorFilter(getResources().getColor(R.color.black_p50));
         else
             shuffle.setColorFilter(getResources().getColor(R.color.white));
-
-        timeStart = findViewById(R.id.seekBarTimeStart);
-        timeEnd = findViewById(R.id.seekBarTimeEnd);
-        frameLayout = findViewById(R.id.defaultState);
-        progressBar = findViewById(R.id.progress);
-
-        trackCover = findViewById(R.id.trackCover);
-        gestureDetector = new GestureDetectorCompat(this, new GestureListener());
+        gestureDetector = new GestureDetectorCompat(getActivity(), new GestureListener());
         trackCover.setOnClickListener(v -> {});
         trackCover.setOnTouchListener(touchListener);
 
-        title = findViewById(R.id.playerTitle);
-        artist = findViewById(R.id.playerArtist);
-        seekBar = findViewById(R.id.seekBar);
         seekBar.setMax(player.getDuration());
         seekBar.setProgress(player.getCurrentPosition());
-        updateView();
         progressListener();
 
-        bindService(new Intent(this, MusicService.class), new ServiceConnection() {
+        getActivity().bindService(new Intent(getActivity(), MusicService.class), new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 musicServiceBinder = (MusicService.MusicServiceBinder) service;
                 try {
                     mediaController = new MediaControllerCompat(
-                            PlayerActivity.this, musicServiceBinder.getMediaSessionToken());
+                            getActivity(), musicServiceBinder.getMediaSessionToken());
                     mediaController.registerCallback(
                             new MediaControllerCompat.Callback() {
                                 @Override
@@ -194,13 +204,13 @@ public class PlayerActivity extends AppCompatActivity {
     public void menuItemListener(MenuItem item) {
         switch (item.getItemId()){
             case (R.id.findLyrics):
-                Toast.makeText(this,"lyrics",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"lyrics",Toast.LENGTH_SHORT).show();
                 break;
             case (R.id.addToPlaylist):
-                Toast.makeText(this,"playlist",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"playlist",Toast.LENGTH_SHORT).show();
                 break;
             case (R.id.goToQueue):
-                startActivity(new Intent(PlayerActivity.this, QueueActivity.class));
+                startActivity(new Intent(getActivity(), QueueActivity.class));
                 break;
             case (R.id.goToAlbum):
                 for (int i=0;albumList.size()>i;i++){
@@ -210,10 +220,10 @@ public class PlayerActivity extends AppCompatActivity {
                         break;
                     }
                 }
-                startActivity(new Intent(PlayerActivity.this, AlbumActivity.class));
+                startActivity(new Intent(getActivity(), AlbumActivity.class));
                 break;
             case (R.id.goToArtist):
-                Intent intent = new Intent(PlayerActivity.this, ArtistActivity.class);
+                Intent intent = new Intent(getActivity(), ArtistActivity.class);
                 for (int i=0;artistList.size()>i;i++){
                     Artist artist = artistList.get(i);
                     if (Objects.equals(artist.getTitle(), playSong.getArtist())) {
@@ -226,12 +236,11 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    /*@Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.player_navigation, menu);
-        return true;
-    }
+    }*/
 
     @SuppressLint("DefaultLocale")
     public void progressListener(){
@@ -288,17 +297,18 @@ public class PlayerActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        finish();
+        getActivity().finish();
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         handler.removeCallbacks(runnable);
         super.onDestroy();
     }
 
     View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @SuppressLint("ClickableViewAccessibility")
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             return gestureDetector.onTouchEvent(event);
@@ -307,7 +317,7 @@ public class PlayerActivity extends AppCompatActivity {
     };
 
     private void hideSystemUI() {
-        View decorView = getWindow().getDecorView();
+        View decorView = getActivity().getWindow().getDecorView();
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -317,17 +327,13 @@ public class PlayerActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
     private void showSystemUI() {
-        View decorView = getWindow().getDecorView();
+        View decorView = getActivity().getWindow().getDecorView();
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return gestureDetector.onTouchEvent(event);
-    }
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override

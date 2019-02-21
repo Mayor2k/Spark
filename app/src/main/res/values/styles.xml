@@ -4,6 +4,7 @@
     </style>
 
     <style name="MyMaterialTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowActionBarOverlay">true</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:textColorPrimary">@color/black</item>
@@ -20,8 +21,7 @@
     </style>
 
     <style name="MyMaterialTheme.Player" parent="AppTheme">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowActionBarOverlay">true</item>
         <item name="colorControlNormal">@color/white</item>
         <item name="android:textColorPrimary">@android:color/black</item>
     </style>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemArea"
     android:orientation="vertical"
     android:layout_width="170dp"
@@ -8,9 +9,12 @@
 
     <ImageView
         android:id="@+id/itemImageView"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
         android:layout_width="170dp"
         android:layout_height="170dp"
-        app:srcCompat="@drawable/album" />
+        app:srcCompat="@drawable/album"
+        tools:ignore="ContentDescription" />
 
     <LinearLayout
         android:id="@+id/gridColorArea"

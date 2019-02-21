@@ -154,6 +154,7 @@ public class BottomSheetDialog extends BottomSheetDialogFragment{
                                     Log.i("TAGGING", "Failed to delete file");
                                 }
                                 getContext().getContentResolver().notifyChange(Uri.parse("content://media"), null);
+                                songList.remove(song);
                                 dismiss();
                             }
                         })

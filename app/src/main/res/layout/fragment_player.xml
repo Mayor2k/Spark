@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.liuguangqiang.swipeback.SwipeBackLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeBackLayout"
     android:layout_width="match_parent"
-    tools:context="com.mayor2k.spark.UI.Activities.PlayerActivity"
+    tools:context="com.mayor2k.spark.UI.Fragments.PlayerFragment"
     android:layout_height="match_parent"
     style="@style/MyMaterialTheme.Player">
 
@@ -35,7 +35,7 @@
                 android:background="@color/transparent_black" />
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/playerToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="112dp"
                 android:fitsSystemWindows="true" />
@@ -214,4 +214,4 @@
 
     </FrameLayout>
 
-</com.liuguangqiang.swipeback.SwipeBackLayout>
+</android.support.constraint.ConstraintLayout>

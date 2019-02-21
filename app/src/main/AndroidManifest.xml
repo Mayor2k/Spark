@@ -38,9 +38,6 @@
         </service>
 
         <activity
-            android:name=".UI.Activities.PlayerActivity"
-            android:theme="@style/MyMaterialTheme.Player" />
-        <activity
             android:name=".UI.Activities.AlbumActivity"
             android:theme="@style/AppTheme" />
         <activity

@@ -67,7 +67,6 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
             spanCount = sPref.getInt("SongSpanCount", 0);
 
         isCircle = PreferenceManager.getDefaultSharedPreferences(theFragmentActivity).getBoolean("circle_style",true);
-        Log.i("tagging","xds "+spanCount);
 
         if (spanCount!=1)
             setupCursorAdapter(null, 0, R.layout.grid_item, false);

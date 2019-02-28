@@ -37,6 +37,7 @@
             android:textColor="@color/black"
             android:text="Linkin Park"
             android:ellipsize="end"
+            android:maxLines="1"
             android:textSize="14dp" />
 
     </LinearLayout>

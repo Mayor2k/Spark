@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaeger.library.StatusBarUtil;
 import com.mayor2k.spark.Adapters.SearchAdapter;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Artist;
@@ -47,6 +48,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusBarUtil.setLightMode(SearchActivity.this);
         setContentView(R.layout.activity_search);
         Toolbar toolbar = findViewById(R.id.searchActivityToolBar);
         RecyclerView searchRecyclerView = findViewById(R.id.searchableList);
@@ -73,7 +75,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         searchView.setIconifiedByDefault(false);
         searchView.setQueryHint("Search music");
         searchView.setMaxWidth(Integer.MAX_VALUE);
-
         searchView.post(() -> searchView.setOnQueryTextListener(SearchActivity.this));
         return true;
     }

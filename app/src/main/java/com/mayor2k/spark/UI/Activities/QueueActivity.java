@@ -29,6 +29,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
+import com.jaeger.library.StatusBarUtil;
 import com.mayor2k.spark.Adapters.QueueActivityAdapter;
 import com.mayor2k.spark.Helper.SimpleItemTouchHelperCallback;
 import com.mayor2k.spark.Interfaces.OnStartDragListener;
@@ -51,6 +52,7 @@ public class QueueActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_queue);
+        StatusBarUtil.setLightMode(QueueActivity.this);
         songTitle = findViewById(R.id.songTitle);
         songArtist = findViewById(R.id.songArtist);
         songImage = findViewById(R.id.itemImageView);

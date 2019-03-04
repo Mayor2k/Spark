@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/findLyrics"
-        android:onClick="menuItemListener"
-        android:title="View Lyrics" />
+        android:title="@string/find_lyrics" />
     <item
         android:id="@+id/addToPlaylist"
-        android:onClick="menuItemListener"
-        android:title="Add to Playlist" />
+        android:title="@string/add_to_playlist" />
     <item
         android:id="@+id/goToQueue"
-        android:onClick="menuItemListener"
-        android:title="Go to queue" />
+        android:title="@string/go_to_queue" />
     <item
         android:id="@+id/goToAlbum"
-        android:onClick="menuItemListener"
-        android:title="Go to Album" />
+        android:title="@string/go_to_album" />
     <item
         android:id="@+id/goToArtist"
-        android:onClick="menuItemListener"
-        android:title="Go to Artist" />
+        android:title="@string/go_to_artist" />
 </menu>

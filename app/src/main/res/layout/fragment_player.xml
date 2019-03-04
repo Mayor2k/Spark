@@ -38,6 +38,9 @@
                 android:id="@+id/playerToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="112dp"
+                style="@style/MyMaterialTheme.Player"
+                android:theme="@style/MyMaterialTheme.Player"
+                app:popupTheme="@style/MyMaterialTheme.Player"
                 android:fitsSystemWindows="true" />
 
             <LinearLayout

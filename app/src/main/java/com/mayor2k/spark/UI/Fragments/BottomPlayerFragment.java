@@ -25,6 +25,7 @@ import com.mayor2k.spark.R;
 import static android.content.Context.BIND_AUTO_CREATE;
 import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.MusicService.player;
+import static com.mayor2k.spark.UI.Activities.MainActivity.isPlayerOpen;
 
 public class BottomPlayerFragment extends Fragment {
     private TextView songTitle;
@@ -93,5 +94,10 @@ public class BottomPlayerFragment extends Fragment {
         playButton.setImageResource(!player.isPlaying()?R.drawable.ic_play_black_24dp:R.drawable.ic_pause_24dp_black);
         Runnable runnable = this::progressListener;
         handler.postDelayed(runnable,100);
+        if (isPlayerOpen)
+            playButton.setVisibility(View.GONE);
+        else
+            playButton.setVisibility(View.VISIBLE);
+
     }
 }

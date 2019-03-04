@@ -20,14 +20,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,34 +34,22 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
-import com.jaeger.library.StatusBarUtil;
-import com.mayor2k.spark.Models.Album;
-import com.mayor2k.spark.Models.Artist;
 import com.mayor2k.spark.MusicService;
 import com.mayor2k.spark.R;
-import com.mayor2k.spark.UI.Activities.AlbumActivity;
-import com.mayor2k.spark.UI.Activities.ArtistActivity;
-import com.mayor2k.spark.UI.Activities.QueueActivity;
-
 import java.util.Collections;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.BIND_AUTO_CREATE;
-import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 import static com.mayor2k.spark.MusicService.isShuffle;
 import static com.mayor2k.spark.MusicService.pausePosition;
 import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.MusicService.player;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
-import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
-import static com.mayor2k.spark.UI.Fragments.ArtistFragment.artistList;
 
 public class PlayerFragment extends Fragment {
     public ImageView trackCover;
@@ -81,12 +66,16 @@ public class PlayerFragment extends Fragment {
     public MediaControllerCompat mediaController;
     public Handler handler = new Handler();
     public Runnable runnable;
-    Toolbar fragmentToolbar;
+    public Toolbar fragmentToolbar;
+    @SuppressLint("StaticFieldLeak")
+    public static View staticPlayerView;
 
+    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_player, container, false);
+        staticPlayerView = view;
         prev = view.findViewById(R.id.playerPrev);
         play = view.findViewById(R.id.playerPlay);
         next = view.findViewById(R.id.playerNext);
@@ -100,22 +89,13 @@ public class PlayerFragment extends Fragment {
         artist = view.findViewById(R.id.playerArtist);
         seekBar = view.findViewById(R.id.seekBar);
         fragmentToolbar = view.findViewById(R.id.playerToolbar);
-
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //setHasOptionsMenu(true);
-        /*((AppCompatActivity)getActivity()).setSupportActionBar(fragmentToolbar);
-        if (((AppCompatActivity)getActivity()).getSupportActionBar()!=null){
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }*/
-
+        setHasOptionsMenu(false);
         if(!isShuffle)
             shuffle.setColorFilter(getResources().getColor(R.color.black_p50));
         else
@@ -140,13 +120,13 @@ public class PlayerFragment extends Fragment {
                                 @Override
                                 public void onPlaybackStateChanged(PlaybackStateCompat state) {
                                     updateView();
-                                    if (state == null)
+                                    /*if (state == null)
                                         return;
                                     boolean playing =
                                             state.getState() == PlaybackStateCompat.STATE_PLAYING;
-                                    play.setEnabled(player.isPlaying() == playing);
-                                    prev.setEnabled(player.isPlaying() == playing);
-                                    next.setEnabled(player.isPlaying() == playing);
+                                    //play.setEnabled(player.isPlaying() == playing);
+                                    //.setEnabled(player.isPlaying() == playing);
+                                    //next.setEnabled(player.isPlaying() == playing);*/
                                 }
                             }
                     );
@@ -191,7 +171,9 @@ public class PlayerFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                player.seekTo(pausePosition);
+            }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -201,46 +183,6 @@ public class PlayerFragment extends Fragment {
             }
         });
     }
-    public void menuItemListener(MenuItem item) {
-        switch (item.getItemId()){
-            case (R.id.findLyrics):
-                Toast.makeText(getActivity(),"lyrics",Toast.LENGTH_SHORT).show();
-                break;
-            case (R.id.addToPlaylist):
-                Toast.makeText(getActivity(),"playlist",Toast.LENGTH_SHORT).show();
-                break;
-            case (R.id.goToQueue):
-                startActivity(new Intent(getActivity(), QueueActivity.class));
-                break;
-            case (R.id.goToAlbum):
-                for (int i=0;albumList.size()>i;i++){
-                    Album album = albumList.get(i);
-                    if (Objects.equals(album.getTitle(), playSong.getAlbum())) {
-                        currentAlbum = albumList.indexOf(album);
-                        break;
-                    }
-                }
-                startActivity(new Intent(getActivity(), AlbumActivity.class));
-                break;
-            case (R.id.goToArtist):
-                Intent intent = new Intent(getActivity(), ArtistActivity.class);
-                for (int i=0;artistList.size()>i;i++){
-                    Artist artist = artistList.get(i);
-                    if (Objects.equals(artist.getTitle(), playSong.getArtist())) {
-                        intent.putExtra("currentArtist",artistList.indexOf(artist));
-                        break;
-                    }
-                }
-                startActivity(intent);
-                break;
-        }
-    }
-
-    /*@Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.player_navigation, menu);
-    }*/
 
     @SuppressLint("DefaultLocale")
     public void progressListener(){
@@ -293,12 +235,6 @@ public class PlayerFragment extends Fragment {
         }catch (IllegalArgumentException e){
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        getActivity().finish();
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

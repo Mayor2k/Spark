@@ -2,8 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/searchToolBar"
-        android:title="Search"
+        android:title="@string/search"
         app:showAsAction="always"
-        android:icon="@drawable/ic_search_24dp"
-        android:onClick="startAnotherActivity"/>
+        android:icon="@drawable/ic_search_24dp" />
 </menu>

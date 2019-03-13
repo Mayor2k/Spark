@@ -3,6 +3,7 @@ package com.mayor2k.spark.UI.Fragments;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -23,6 +24,8 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.MusicService;
 import com.mayor2k.spark.R;
@@ -31,10 +34,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import static android.content.Context.BIND_AUTO_CREATE;
+import static android.content.Context.MODE_PRIVATE;
 import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.MusicService.player;
 import static com.mayor2k.spark.UI.Activities.MainActivity.isPlayerOpen;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
+import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
 public class BottomPlayerFragment extends Fragment {
     private TextView songTitle;
@@ -66,8 +71,20 @@ public class BottomPlayerFragment extends Fragment {
             else
                 mediaController.getTransportControls().play();
         });
-        ServiceConnection serviceConnection = new ServiceConnection(){
+        SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
+        String jsonArray = sPref.getString("LastPlayArray", "");
+        Log.i("tagstate","jj"+jsonArray);
+        if (!jsonArray.equals("")) {
+            playArray = new Gson().fromJson(jsonArray,new TypeToken<ArrayList<Song>>(){}.getType());
+            playSong = playArray.get(sPref.getInt("LastSong",-1));
+            songTitle.setText(playSong.getTitle());
+        }else{
+            //playArray = songList;
+            //playSong = playArray.get(0);
+            songTitle.setText("dc");
+        }
 
+        ServiceConnection serviceConnection = new ServiceConnection(){
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 musicServiceBinder = (MusicService.MusicServiceBinder) service;
@@ -81,12 +98,6 @@ public class BottomPlayerFragment extends Fragment {
                                     if (state==null)
                                         return;
                                     songTitle.setText(playSong.getTitle());
-                                }
-
-                                @Override
-                                public void onSessionEvent(String event, Bundle extras) {
-                                    super.onSessionEvent(event, extras);
-                                    Log.i("tagstate",""+event);
                                 }
                             }
                     );

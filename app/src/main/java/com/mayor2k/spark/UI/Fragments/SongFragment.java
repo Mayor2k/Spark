@@ -174,7 +174,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
                     int songDuration = data.getInt(7);
                     Song song = new Song(songId, songTitle, songArtist, songAlbum,
-                            pathId, uri, songTrack, songDuration);
+                            pathId, uri.toString(), songTrack, songDuration);
                     songList.add(data.getPosition(),song);
                 }
             }

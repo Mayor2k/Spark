@@ -11,12 +11,12 @@ public class Song implements Parcelable {
     private String title;
     private String artist;
     private String path;
-    private Uri uri;
+    private String uri;
     private int track;
     private int duration;
 
     public Song(long id, String title, String artist, String songAlbum,
-                String path, Uri uri, int track, int duration) {
+                String path, String uri, int track, int duration) {
         this.id=id;
         this.uri=uri;
         this.title=title;
@@ -72,11 +72,11 @@ public class Song implements Parcelable {
         this.path = path;
     }
 
-    public Uri getUri() {
+    public String getUri() {
         return uri;
     }
 
-    public void setUri(Uri uri) {
+    public void setUri(String uri) {
         this.uri = uri;
     }
 

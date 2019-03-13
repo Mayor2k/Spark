@@ -196,7 +196,7 @@ public class AlbumActivity extends AppCompatActivity implements LoaderManager.Lo
 
             int songDuration = data.getInt(durationColumn);
             albumSongs.add(new Song(songId, songTitle, songArtist, songAlbum,
-                    pathId, uri, songTrack, songDuration));
+                    pathId, uri.toString(), songTrack, songDuration));
         }
     }
 

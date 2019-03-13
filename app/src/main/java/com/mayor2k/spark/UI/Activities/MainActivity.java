@@ -1,8 +1,10 @@
 package com.mayor2k.spark.UI.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.jaeger.library.StatusBarUtil;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Artist;
@@ -195,9 +198,13 @@ public class MainActivity extends AppCompatActivity{
         serviceIntent.setAction(Constants.STOPFOREGROUND_ACTION);
         stopService(serviceIntent);
         if (playSong!=null) {
-            outState.putInt("LastSong",playArray.indexOf(playSong));
-            outState.putInt("LastPosition",player.getCurrentPosition());
-            outState.putParcelableArrayList("LastPlayArray", playArray);
+            Log.i("tagstate",""+new Gson().toJson(playArray));
+            SharedPreferences sPref = getPreferences(MODE_PRIVATE);
+            @SuppressLint("CommitPrefEdits") SharedPreferences.Editor ed = sPref.edit();
+            ed.putInt("LastSong",playArray.indexOf(playSong));
+            ed.putInt("LastPosition",player.getCurrentPosition());
+            ed.putString("LastPlayArray", new Gson().toJson(playArray));
+            ed.apply();
         }
     }
 

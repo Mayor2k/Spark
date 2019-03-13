@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 
 import com.mayor2k.spark.Models.Song;
 
@@ -20,7 +21,7 @@ public class CoverUtil {
         ContentResolver res = context.getContentResolver();
         InputStream in;
         try {
-            in = res.openInputStream(song.getUri());
+            in = res.openInputStream(Uri.parse(song.getUri()));
             songImage = BitmapFactory.decodeStream(in);
         } catch (FileNotFoundException e) {
             songImage = null;
@@ -47,7 +48,7 @@ public class CoverUtil {
         Boolean check;
         ContentResolver res = context.getContentResolver();
         try {
-            InputStream in = res.openInputStream(song.getUri());
+            InputStream in = res.openInputStream(Uri.parse(song.getUri()));
             check = true;
         } catch (FileNotFoundException e) {
             check = false;

@@ -6,12 +6,16 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,19 +23,26 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.MusicService;
 import com.mayor2k.spark.R;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.MusicService.player;
 import static com.mayor2k.spark.UI.Activities.MainActivity.isPlayerOpen;
+import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
 public class BottomPlayerFragment extends Fragment {
     private TextView songTitle;
     private ImageButton playButton;
     private ProgressBar progressBar;
     private Handler handler = new Handler();
+    ServiceConnection serviceConnection;
+    Runnable runnable;
 
     private MusicService.MusicServiceBinder musicServiceBinder;
     private MediaControllerCompat mediaController;
@@ -48,7 +59,6 @@ public class BottomPlayerFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //songTitle.setText(playSong.getTitle());
         progressListener();
         playButton.setOnClickListener(v -> {
             if(player.isPlaying())
@@ -56,7 +66,8 @@ public class BottomPlayerFragment extends Fragment {
             else
                 mediaController.getTransportControls().play();
         });
-        getActivity().bindService(new Intent(getActivity(), MusicService.class), new ServiceConnection() {
+        ServiceConnection serviceConnection = new ServiceConnection(){
+
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 musicServiceBinder = (MusicService.MusicServiceBinder) service;
@@ -71,6 +82,12 @@ public class BottomPlayerFragment extends Fragment {
                                         return;
                                     songTitle.setText(playSong.getTitle());
                                 }
+
+                                @Override
+                                public void onSessionEvent(String event, Bundle extras) {
+                                    super.onSessionEvent(event, extras);
+                                    Log.i("tagstate",""+event);
+                                }
                             }
                     );
                 }
@@ -79,25 +96,26 @@ public class BottomPlayerFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 musicServiceBinder = null;
                 mediaController = null;
             }
-
-        }, BIND_AUTO_CREATE);
+        };
+        getActivity().bindService(new Intent(getActivity(), MusicService.class), serviceConnection,BIND_AUTO_CREATE);
     }
 
     public void progressListener(){
-        progressBar.setProgress(player.getCurrentPosition());
+        if (player.isPlaying())
+            progressBar.setProgress(player.getCurrentPosition());
         progressBar.setMax(player.getDuration());
         playButton.setImageResource(!player.isPlaying()?R.drawable.ic_play_black_24dp:R.drawable.ic_pause_24dp_black);
-        Runnable runnable = this::progressListener;
-        handler.postDelayed(runnable,100);
+        runnable = this::progressListener;
         if (isPlayerOpen)
             playButton.setVisibility(View.GONE);
         else
             playButton.setVisibility(View.VISIBLE);
-
+        handler.postDelayed(runnable,100);
     }
 }

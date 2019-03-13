@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.jaeger.library.StatusBarUtil;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Artist;
+import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Fragments.AlbumFragment;
 import com.mayor2k.spark.UI.Fragments.ArtistFragment;
@@ -39,13 +40,14 @@ import java.util.Objects;
 import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
 import static com.mayor2k.spark.MusicService.playSong;
+import static com.mayor2k.spark.MusicService.player;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
 import static com.mayor2k.spark.UI.Fragments.ArtistFragment.artistList;
 import static com.mayor2k.spark.UI.Fragments.PlayerFragment.staticPlayerView;
 
 public class MainActivity extends AppCompatActivity{
     public static final String TAG = "TAGGING";
-    public static ArrayList playArray;
+    public static ArrayList<Song> playArray;
     public TabLayout tabLayout;
     public ViewPager viewPager;
     public static boolean isPlayerOpen = false;
@@ -192,6 +194,11 @@ public class MainActivity extends AppCompatActivity{
         super.onDestroy();
         serviceIntent.setAction(Constants.STOPFOREGROUND_ACTION);
         stopService(serviceIntent);
+        if (playSong!=null) {
+            outState.putInt("LastSong",playArray.indexOf(playSong));
+            outState.putInt("LastPosition",player.getCurrentPosition());
+            outState.putParcelableArrayList("LastPlayArray", playArray);
+        }
     }
 
     public static float getScreenWidth(Context context){

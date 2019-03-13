@@ -79,7 +79,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             int position = (Integer)v.getTag();
             Object object = objects.get(position);
             if (object instanceof Song){
-                songPosition = position;
+                songPosition = position-1;
                 serviceIntent.setAction(Constants.START_SEARCH_ACTION);
                 v.getContext().startService(serviceIntent);
             }else if(object instanceof Album){

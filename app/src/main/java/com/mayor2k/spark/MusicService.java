@@ -49,7 +49,7 @@ import static com.mayor2k.spark.UI.Activities.ArtistActivity.artistSongs;
 import static com.mayor2k.spark.UI.Activities.MainActivity.TAG;
 import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
-import static com.mayor2k.spark.UI.Activities.SearchActivity.searchList;
+import static com.mayor2k.spark.UI.Activities.SearchActivity.searchSong;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 import static com.mayor2k.spark.Helper.CoverUtil.getCoverBitmap;
 
@@ -112,7 +112,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 showNotification();
             }
         }else if (intent.getAction().equals(Constants.START_SEARCH_ACTION)){
-            playArray=searchList;
+            playArray=searchSong;
             songStream(songPosition);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
                 showNotification24();
@@ -127,6 +127,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }else{
                 showNotification();
             }
+        }else if (intent.getAction().equals(Constants.STOPFOREGROUND_ACTION)){
+            mediaSessionCallback.onStop();
         }
         return START_NOT_STICKY;
     }
@@ -315,7 +317,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         String CHANNEL_ID = "CHANNEL_01";
         CharSequence name = "NAME";
-        int importance = NotificationManager.IMPORTANCE_LOW;
+        int importance = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            importance = NotificationManager.IMPORTANCE_LOW;
+        }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
                 .setCustomContentView(views)

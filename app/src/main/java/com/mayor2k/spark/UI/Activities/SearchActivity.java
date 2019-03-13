@@ -44,6 +44,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     public static ArrayList<Object> searchList;
     public SearchAdapter searchAdapter;
     private TextView noResults;
+    public static ArrayList<Song> searchSong = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +134,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 searchList.clear();
                 return searchList;
             }
-            ArrayList<Object> songs = new ArrayList<>();
             ArrayList<Object> albums = new ArrayList<>();
             ArrayList<Object> artists = new ArrayList<>();
 
@@ -142,11 +142,11 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             for (int i=0;songList.size()>i;i++){
                 Song song = songList.get(i);
                 if (containsIgnoreCase(song.getTitle(),query))
-                    songs.add(song);
+                    searchSong.add(song);
             }
-            if (songs.size()!=0){
-                songs.add(0,"SONG_HEADER");
-                searchList.addAll(songs);
+            if (searchSong.size()!=0){
+                searchList.add(0,"SONG_HEADER");
+                searchList.addAll(searchSong);
             }
 
             for (int i=0;albumList.size()>i;i++){

@@ -104,8 +104,6 @@ public class PlayerFragment extends Fragment {
         trackCover.setOnClickListener(v -> {});
         trackCover.setOnTouchListener(touchListener);
 
-        seekBar.setMax(player.getDuration());
-        seekBar.setProgress(player.getCurrentPosition());
         progressListener();
 
         getActivity().bindService(new Intent(getActivity(), MusicService.class), new ServiceConnection() {
@@ -186,9 +184,11 @@ public class PlayerFragment extends Fragment {
 
     @SuppressLint("DefaultLocale")
     public void progressListener(){
-        seekBar.setProgress(player.getCurrentPosition());
+        if (player.isPlaying()){
+            seekBar.setProgress(player.getCurrentPosition());
+            progressBar.setProgress(player.getCurrentPosition());
+        }
         seekBar.setMax(player.getDuration());
-        progressBar.setProgress(player.getCurrentPosition());
         progressBar.setMax(player.getDuration());
 
         timeStart.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(player.getCurrentPosition()),

@@ -1,8 +1,10 @@
 package com.mayor2k.spark.Models;
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Song {
+public class Song implements Parcelable {
 
     private long id;
     private String album;
@@ -13,16 +15,27 @@ public class Song {
     private int track;
     private int duration;
 
-    public Song(long songID, String songTitle, String songArtist, String songAlbum,
-                String songPath, Uri songUri, int songTrack, int songDuration) {
-        id=songID;
-        uri=songUri;
-        title=songTitle;
-        album=songAlbum;
-        artist=songArtist;
-        path=songPath;
-        track=songTrack;
-        duration=songDuration;
+    public Song(long id, String title, String artist, String songAlbum,
+                String path, Uri uri, int track, int duration) {
+        this.id=id;
+        this.uri=uri;
+        this.title=title;
+        this.album=songAlbum;
+        this.artist=artist;
+        this.path=path;
+        this.track=track;
+        this.duration=duration;
+    }
+
+    public Song(Parcel in) {
+        id = in.readLong();
+        album = in.readString();
+        title = in.readString();
+        artist = in.readString();
+        path = in.readString();
+        uri = in.readParcelable(Uri.class.getClassLoader());
+        track = in.readInt();
+        duration = in.readInt();
     }
 
     public long getId() {
@@ -82,4 +95,33 @@ public class Song {
     public void setTrack(int track) {
         this.track = track;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flag) {
+        dest.writeLong(id);
+        dest.writeString(album);
+        dest.writeString(title);
+        dest.writeString(artist);
+        dest.writeString(path);
+        dest.writeString(uri.toString());
+        dest.writeInt(track);
+        dest.writeInt(duration);
+    }
+
+    public static final Creator<Song> CREATOR = new Creator<Song>() {
+        @Override
+        public Song createFromParcel(Parcel in) {
+            return new Song(in);
+        }
+
+        @Override
+        public Song[] newArray(int size) {
+            return new Song[size];
+        }
+    };
 }

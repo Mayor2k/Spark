@@ -18,4 +18,5 @@
     <dimen name="notification_big_image_size">128dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="statusbar_view_height">25dp</dimen>
+    <dimen name="bottom_margin">50dp</dimen>
 </resources>

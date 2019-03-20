@@ -14,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -21,9 +22,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jaeger.library.StatusBarUtil;
 import com.mayor2k.spark.Models.Album;
 import com.mayor2k.spark.Models.Artist;
@@ -31,6 +37,7 @@ import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.UI.Fragments.AlbumFragment;
 import com.mayor2k.spark.UI.Fragments.ArtistFragment;
+import com.mayor2k.spark.UI.Fragments.BottomPlayerFragment;
 import com.mayor2k.spark.UI.Fragments.PlayerFragment;
 import com.mayor2k.spark.UI.Fragments.SongFragment;
 import com.mayor2k.spark.Interfaces.Constants;
@@ -42,6 +49,7 @@ import java.util.Objects;
 
 import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
+import static com.mayor2k.spark.MusicService.pausePosition;
 import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.MusicService.player;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
@@ -55,6 +63,15 @@ public class MainActivity extends AppCompatActivity{
     public ViewPager viewPager;
     public static boolean isPlayerOpen = false;
 
+    public FrameLayout slidingPanel;
+    FrameLayout bottomPlayerFragmentView;
+    FrameLayout playerFragmentView;
+    public static boolean isFirstClick;
+    public  ViewGroup.MarginLayoutParams lp;
+    public BottomPlayerFragment bottomPlayerFragment;
+    PlayerFragment playerFragment;
+    SlidingUpPanelLayout slidingUpPanelLayout;
+
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new SongFragment(), "Tracks");
@@ -64,26 +81,44 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+        return super.onCreateView(name, context, attrs);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         StatusBarUtil.setLightMode(MainActivity.this);
+        bottomPlayerFragment = new BottomPlayerFragment();
+        playerFragment = new PlayerFragment();
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         viewPager = findViewById(R.id.content);
         setupViewPager(viewPager);
+        lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
         tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        slidingPanel = findViewById(R.id.sliding_panel);
+        playerFragmentView = findViewById(R.id.player_container);
+        bottomPlayerFragmentView = findViewById(R.id.bottom_player_container);
+
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.player_container, new PlayerFragment())
+                .add(R.id.player_container, playerFragment)
                 .commit();
-        View bottomPlayerFragment = findViewById(R.id.bottomPlayerArea);
-        SlidingUpPanelLayout slidingUpPanelLayout = findViewById(R.id.container);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.bottom_player_container, bottomPlayerFragment)
+                .commit();
+
+        slidingUpPanelLayout = findViewById(R.id.container);
         slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
-                bottomPlayerFragment.setAlpha(1-slideOffset);
+                bottomPlayerFragmentView.setAlpha(1-slideOffset);
                 if (slideOffset==1){
                     StatusBarUtil.setDarkMode(MainActivity.this);
                     Toolbar toolbar1 = staticPlayerView.findViewById(R.id.playerToolbar);
@@ -110,6 +145,46 @@ public class MainActivity extends AppCompatActivity{
             }
         });
         isStoragePermissionGranted();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferences sPref = getPreferences(MODE_PRIVATE);
+        String jsonArray = sPref.getString("LastPlayArray", "");
+        isFirstClick = jsonArray.equals("");
+        if (!isFirstClick) {
+            playArray = new Gson().fromJson(jsonArray,new TypeToken<ArrayList<Song>>(){}.getType());
+            playSong = playArray.get(sPref.getInt("LastSong",-1));
+            View bottomPlayerView = bottomPlayerFragment.getBottomPlayerView();
+            TextView songTitle = bottomPlayerView.findViewById(R.id.bottom_player_song_title);
+            ProgressBar progressBar = bottomPlayerView.findViewById(R.id.progressBar);
+            songTitle.setText(playSong.getTitle());
+            pausePosition = sPref.getInt("LastPosition",-1);
+            progressBar.setMax(playSong.getDuration());
+            progressBar.setProgress(pausePosition);
+            /*slidingPanel.setVisibility(View.VISIBLE);
+            bottomPlayerFragmentView.setVisibility(View.VISIBLE);
+            playerFragmentView.setVisibility(View.VISIBLE);
+            slidingPanel.postInvalidate();
+            bottomPlayerFragmentView.postInvalidate();
+            playerFragmentView.postInvalidate();*/
+            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            int bottom = (int) (getResources().getDimension(R.dimen.bottom_margin)/getResources().getDisplayMetrics().density);
+            lp.setMargins(0, 0, 0, bottom);
+            viewPager.requestLayout();
+        }else{
+            /*slidingPanel.setVisibility(View.INVISIBLE);
+            bottomPlayerFragmentView.setVisibility(View.INVISIBLE);
+            playerFragmentView.setVisibility(View.INVISIBLE);
+            slidingPanel.postInvalidate();
+            bottomPlayerFragmentView.postInvalidate();
+            playerFragmentView.postInvalidate();*/
+            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+            lp.setMargins(0, 0, 0, 0);
+            viewPager.requestLayout();
+        }
+
     }
 
     @Override
@@ -198,7 +273,6 @@ public class MainActivity extends AppCompatActivity{
         serviceIntent.setAction(Constants.STOPFOREGROUND_ACTION);
         stopService(serviceIntent);
         if (playSong!=null) {
-            Log.i("tagstate",""+new Gson().toJson(playArray));
             SharedPreferences sPref = getPreferences(MODE_PRIVATE);
             @SuppressLint("CommitPrefEdits") SharedPreferences.Editor ed = sPref.edit();
             ed.putInt("LastSong",playArray.indexOf(playSong));
@@ -211,5 +285,22 @@ public class MainActivity extends AppCompatActivity{
     public static float getScreenWidth(Context context){
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return displayMetrics.widthPixels / displayMetrics.density;
+    }
+
+    public void addPlayerFragment(){
+        /*slidingPanel.setVisibility(View.VISIBLE);
+        bottomPlayerFragmentView.setVisibility(View.VISIBLE);
+        playerFragmentView.setVisibility(View.VISIBLE);
+        slidingPanel.postInvalidate();
+        bottomPlayerFragmentView.postInvalidate();
+        playerFragmentView.postInvalidate();*/
+        slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        int bottom = (int) (getResources().getDimension(R.dimen.bottom_margin)/getResources().getDisplayMetrics().density);
+        lp.setMargins(0, 0, 0, bottom);
+        viewPager.requestLayout();
+    }
+
+    public BottomPlayerFragment getBottomPlayerFragment(){
+        return bottomPlayerFragment;
     }
 }

@@ -119,12 +119,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }else{
                 showNotification();
             }
-        }else if (intent.getAction().equals(Constants.START_ARTIST_ACTION)){
-            playArray=artistSongs;
+        }else if (intent.getAction().equals(Constants.START_ARTIST_ACTION)) {
+            playArray = artistSongs;
             songStream(songPosition);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style",true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sPref.getBoolean("notifications_style", true)) {
                 showNotification24();
-            }else{
+            } else {
                 showNotification();
             }
         }else if (intent.getAction().equals(Constants.STOPFOREGROUND_ACTION)){
@@ -140,7 +140,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             e.printStackTrace();
         }
         songPosition = songPos;
-        playSong = (Song) playArray.get(songPosition);
+        playSong = playArray.get(songPosition);
         long currSong = playSong.getId();
         Log.i(TAG, "Artist " + playSong.getArtist() + " Song " + playSong.getTitle());
         Uri trackUri = ContentUris.withAppendedId

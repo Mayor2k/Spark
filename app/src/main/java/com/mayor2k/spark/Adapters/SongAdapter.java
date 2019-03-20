@@ -41,12 +41,14 @@ import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.R;
 import com.mayor2k.spark.MusicService;
+import com.mayor2k.spark.UI.Activities.MainActivity;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.mayor2k.spark.UI.Activities.MainActivity.getScreenWidth;
+import static com.mayor2k.spark.UI.Activities.MainActivity.isFirstClick;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 
-public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolder> {
+public abstract class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolder> {
     private ArrayList<Song> songs;
     public static int songPosition;
     public static Intent serviceIntent;
@@ -104,6 +106,9 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
             songPosition=(Integer)v.getTag();
             serviceIntent.setAction(Constants.STARTFOREGROUND_ACTION);
             v.getContext().startService(serviceIntent);
+            if (isFirstClick)
+                showPlayer();
+                isFirstClick = false;
         }
     };
 
@@ -240,4 +245,6 @@ public class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.ViewHolde
     public int getItemViewType(int position) {
         return position;
     }
+
+    public abstract void showPlayer();
 }

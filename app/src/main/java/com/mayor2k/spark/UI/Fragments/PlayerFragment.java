@@ -106,41 +106,7 @@ public class PlayerFragment extends Fragment {
 
         progressListener();
 
-        getActivity().bindService(new Intent(getActivity(), MusicService.class), new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                musicServiceBinder = (MusicService.MusicServiceBinder) service;
-                try {
-                    mediaController = new MediaControllerCompat(
-                            getActivity(), musicServiceBinder.getMediaSessionToken());
-                    mediaController.registerCallback(
-                            new MediaControllerCompat.Callback() {
-                                @Override
-                                public void onPlaybackStateChanged(PlaybackStateCompat state) {
-                                    updateView();
-                                    /*if (state == null)
-                                        return;
-                                    boolean playing =
-                                            state.getState() == PlaybackStateCompat.STATE_PLAYING;
-                                    //play.setEnabled(player.isPlaying() == playing);
-                                    //.setEnabled(player.isPlaying() == playing);
-                                    //next.setEnabled(player.isPlaying() == playing);*/
-                                }
-                            }
-                    );
-                }
-                catch (RemoteException e) {
-                    mediaController = null;
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                musicServiceBinder = null;
-                mediaController = null;
-            }
-        }, BIND_AUTO_CREATE);
+        getActivity().bindService(new Intent(getActivity(), MusicService.class), mConnection, BIND_AUTO_CREATE);
 
         prev.setOnClickListener(v -> mediaController.getTransportControls().skipToPrevious());
 
@@ -181,6 +147,43 @@ public class PlayerFragment extends Fragment {
             }
         });
     }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            musicServiceBinder = (MusicService.MusicServiceBinder) service;
+            try {
+                mediaController = new MediaControllerCompat(
+                        getActivity(), musicServiceBinder.getMediaSessionToken());
+                mediaController.registerCallback(
+                        new MediaControllerCompat.Callback() {
+                            @Override
+                            public void onPlaybackStateChanged(PlaybackStateCompat state) {
+                                updateView();
+                                    /*if (state == null)
+                                        return;
+                                    boolean playing =
+                                            state.getState() == PlaybackStateCompat.STATE_PLAYING;
+                                    //play.setEnabled(player.isPlaying() == playing);
+                                    //.setEnabled(player.isPlaying() == playing);
+                                    //next.setEnabled(player.isPlaying() == playing);*/
+                            }
+                        }
+                );
+            }
+            catch (RemoteException e) {
+                mediaController = null;
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicServiceBinder = null;
+            mediaController = null;
+        }
+    };
 
     @SuppressLint("DefaultLocale")
     public void progressListener(){
@@ -239,8 +242,9 @@ public class PlayerFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        handler.removeCallbacks(runnable);
         super.onDestroy();
+        handler.removeCallbacks(runnable);
+        getActivity().unbindService(mConnection);
     }
 
     View.OnTouchListener touchListener = new View.OnTouchListener() {

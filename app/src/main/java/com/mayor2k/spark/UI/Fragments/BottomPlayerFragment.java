@@ -26,6 +26,8 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mayor2k.spark.Interfaces.BottomPlayerInterface;
+import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.Models.Song;
 import com.mayor2k.spark.MusicService;
 import com.mayor2k.spark.R;
@@ -35,19 +37,23 @@ import java.util.ArrayList;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 import static android.content.Context.MODE_PRIVATE;
+import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
+import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
+import static com.mayor2k.spark.MusicService.pausePosition;
 import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.MusicService.player;
 import static com.mayor2k.spark.UI.Activities.MainActivity.isPlayerOpen;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
 import static com.mayor2k.spark.UI.Fragments.SongFragment.songList;
 
-public class BottomPlayerFragment extends Fragment {
+public class BottomPlayerFragment extends Fragment implements BottomPlayerInterface{
     private TextView songTitle;
     private ImageButton playButton;
     private ProgressBar progressBar;
     private Handler handler = new Handler();
-    ServiceConnection serviceConnection;
     Runnable runnable;
+    public static boolean isFirstClick = true;
+    View bottomPlayerView;
 
     private MusicService.MusicServiceBinder musicServiceBinder;
     private MediaControllerCompat mediaController;
@@ -55,6 +61,8 @@ public class BottomPlayerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bottom_player, container, false);
+        Log.i("tagstae","first");
+        setBottomPlayerView(view);
         songTitle = view.findViewById(R.id.bottom_player_song_title);
         playButton = view.findViewById(R.id.bottom_player_play);
         progressBar = view.findViewById(R.id.progressBar);
@@ -68,59 +76,57 @@ public class BottomPlayerFragment extends Fragment {
         playButton.setOnClickListener(v -> {
             if(player.isPlaying())
                 mediaController.getTransportControls().pause();
-            else
-                mediaController.getTransportControls().play();
+            else{
+                if (isFirstClick){
+                    songPosition = playArray.indexOf(playSong);
+                    serviceIntent.setAction(Constants.STARTFOREGROUND_ACTION);
+                    getActivity().startService(serviceIntent);
+                    mediaController.getTransportControls().play();
+                    isFirstClick = false;
+                }else
+                    mediaController.getTransportControls().play();
+            }
         });
-        SharedPreferences sPref = getActivity().getPreferences(MODE_PRIVATE);
-        String jsonArray = sPref.getString("LastPlayArray", "");
-        Log.i("tagstate","jj"+jsonArray);
-        if (!jsonArray.equals("")) {
-            playArray = new Gson().fromJson(jsonArray,new TypeToken<ArrayList<Song>>(){}.getType());
-            playSong = playArray.get(sPref.getInt("LastSong",-1));
-            songTitle.setText(playSong.getTitle());
-        }else{
-            //playArray = songList;
-            //playSong = playArray.get(0);
-            songTitle.setText("dc");
-        }
 
-        ServiceConnection serviceConnection = new ServiceConnection(){
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                musicServiceBinder = (MusicService.MusicServiceBinder) service;
-                try {
-                    mediaController = new MediaControllerCompat(
-                            getActivity(), musicServiceBinder.getMediaSessionToken());
-                    mediaController.registerCallback(
-                            new MediaControllerCompat.Callback() {
-                                @Override
-                                public void onPlaybackStateChanged(PlaybackStateCompat state) {
-                                    if (state==null)
-                                        return;
-                                    songTitle.setText(playSong.getTitle());
-                                }
-                            }
-                    );
-                }
-                catch (RemoteException |IllegalArgumentException e) {
-                    mediaController = null;
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                musicServiceBinder = null;
-                mediaController = null;
-            }
-        };
         getActivity().bindService(new Intent(getActivity(), MusicService.class), serviceConnection,BIND_AUTO_CREATE);
     }
 
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            musicServiceBinder = (MusicService.MusicServiceBinder) service;
+            try {
+                mediaController = new MediaControllerCompat(
+                        getActivity(), musicServiceBinder.getMediaSessionToken());
+                mediaController.registerCallback(
+                        new MediaControllerCompat.Callback() {
+                            @Override
+                            public void onPlaybackStateChanged(PlaybackStateCompat state) {
+                                if (state==null)
+                                    return;
+                                songTitle.setText(playSong.getTitle());
+                            }
+                        }
+                );
+            }
+            catch (RemoteException |IllegalArgumentException e) {
+                mediaController = null;
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicServiceBinder = null;
+            mediaController = null;
+        }
+    };
+
     public void progressListener(){
-        if (player.isPlaying())
+        if (player.isPlaying()){
             progressBar.setProgress(player.getCurrentPosition());
-        progressBar.setMax(player.getDuration());
+            progressBar.setMax(player.getDuration());
+        }
         playButton.setImageResource(!player.isPlaying()?R.drawable.ic_play_black_24dp:R.drawable.ic_pause_24dp_black);
         runnable = this::progressListener;
         if (isPlayerOpen)
@@ -128,5 +134,21 @@ public class BottomPlayerFragment extends Fragment {
         else
             playButton.setVisibility(View.VISIBLE);
         handler.postDelayed(runnable,100);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unbindService(serviceConnection);
+    }
+
+    @Override
+    public void setBottomPlayerView(View v) {
+        bottomPlayerView = v;
+    }
+
+    @Override
+    public View getBottomPlayerView() {
+        return bottomPlayerView;
     }
 }

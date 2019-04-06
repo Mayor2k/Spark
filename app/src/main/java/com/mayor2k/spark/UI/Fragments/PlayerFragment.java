@@ -1,6 +1,5 @@
 package com.mayor2k.spark.UI.Fragments;
 
-
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -34,22 +33,29 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
+import com.mayor2k.spark.Interfaces.Constants;
 import com.mayor2k.spark.MusicService;
 import com.mayor2k.spark.R;
+import com.mayor2k.spark.UI.Activities.MainActivity;
+
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.BIND_AUTO_CREATE;
+import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
+import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.MusicService.isShuffle;
 import static com.mayor2k.spark.MusicService.pausePosition;
 import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.MusicService.player;
 import static com.mayor2k.spark.UI.Activities.MainActivity.playArray;
+import static com.mayor2k.spark.UI.Fragments.BottomPlayerFragment.isFirstClick;
 
 public class PlayerFragment extends Fragment {
     public ImageView trackCover;
@@ -58,8 +64,7 @@ public class PlayerFragment extends Fragment {
     private FloatingActionButton play;
     public TextView title,artist,timeStart,timeEnd;
     private ProgressBar progressBar;
-    private GestureDetectorCompat
-            gestureDetector;
+    private GestureDetectorCompat gestureDetector;
     private FrameLayout frameLayout;
 
     public MusicService.MusicServiceBinder musicServiceBinder;
@@ -67,15 +72,12 @@ public class PlayerFragment extends Fragment {
     public Handler handler = new Handler();
     public Runnable runnable;
     public Toolbar fragmentToolbar;
-    @SuppressLint("StaticFieldLeak")
-    public static View staticPlayerView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_player, container, false);
-        staticPlayerView = view;
         prev = view.findViewById(R.id.playerPrev);
         play = view.findViewById(R.id.playerPlay);
         next = view.findViewById(R.id.playerNext);
@@ -92,6 +94,7 @@ public class PlayerFragment extends Fragment {
         return view;
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -103,22 +106,24 @@ public class PlayerFragment extends Fragment {
         gestureDetector = new GestureDetectorCompat(getActivity(), new GestureListener());
         trackCover.setOnClickListener(v -> {});
         trackCover.setOnTouchListener(touchListener);
-
-        progressListener();
-
         getActivity().bindService(new Intent(getActivity(), MusicService.class), mConnection, BIND_AUTO_CREATE);
 
-        prev.setOnClickListener(v -> mediaController.getTransportControls().skipToPrevious());
 
+        prev.setOnClickListener(v -> mediaController.getTransportControls().skipToPrevious());
         play.setOnClickListener(v -> {
             if(player.isPlaying())
                 mediaController.getTransportControls().pause();
             else
-                mediaController.getTransportControls().play();
+                if (isFirstClick){
+                    songPosition = playArray.indexOf(playSong);
+                    serviceIntent.setAction(Constants.STARTFOREGROUND_ACTION);
+                    getActivity().startService(serviceIntent);
+                    mediaController.getTransportControls().play();
+                    isFirstClick = false;
+                }else
+                    mediaController.getTransportControls().play();
         });
-
         next.setOnClickListener(v -> mediaController.getTransportControls().skipToNext());
-
         shuffle.setOnClickListener(v -> {
             if(!isShuffle){
                 isShuffle = true;
@@ -146,6 +151,7 @@ public class PlayerFragment extends Fragment {
                 progressListener();
             }
         });
+        //progressListener();
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -161,13 +167,6 @@ public class PlayerFragment extends Fragment {
                             @Override
                             public void onPlaybackStateChanged(PlaybackStateCompat state) {
                                 updateView();
-                                    /*if (state == null)
-                                        return;
-                                    boolean playing =
-                                            state.getState() == PlaybackStateCompat.STATE_PLAYING;
-                                    //play.setEnabled(player.isPlaying() == playing);
-                                    //.setEnabled(player.isPlaying() == playing);
-                                    //next.setEnabled(player.isPlaying() == playing);*/
                             }
                         }
                 );
@@ -187,26 +186,41 @@ public class PlayerFragment extends Fragment {
 
     @SuppressLint("DefaultLocale")
     public void progressListener(){
-        if (player.isPlaying()){
-            seekBar.setProgress(player.getCurrentPosition());
-            progressBar.setProgress(player.getCurrentPosition());
+        try{
+            if (player.isPlaying()){
+                seekBar.setProgress(player.getCurrentPosition());
+                progressBar.setProgress(player.getCurrentPosition());
+                seekBar.setMax(player.getDuration());
+                progressBar.setMax(player.getDuration());
+
+                timeStart.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(player.getCurrentPosition()),
+                        TimeUnit.MILLISECONDS.toSeconds(player.getCurrentPosition()%60000)));
+
+                timeEnd.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(player.getDuration()),
+                        TimeUnit.MILLISECONDS.toSeconds(player.getDuration()%60000)));
+            }else {
+                seekBar.setProgress(pausePosition);
+                progressBar.setProgress(pausePosition);
+                seekBar.setMax(playSong.getDuration());
+                progressBar.setMax(playSong.getDuration());
+
+                timeStart.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(pausePosition),
+                        TimeUnit.MILLISECONDS.toSeconds(pausePosition%60000)));
+
+                timeEnd.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(playSong.getDuration()),
+                        TimeUnit.MILLISECONDS.toSeconds(playSong.getDuration()%60000)));
+            }
+            play.setImageResource(!player.isPlaying()?R.drawable.ic_play_24dp:R.drawable.ic_pause_24dp);
+        }catch (IllegalStateException e){
+            e.printStackTrace();
+            handler.removeCallbacks(runnable);
         }
-        seekBar.setMax(player.getDuration());
-        progressBar.setMax(player.getDuration());
-
-        timeStart.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(player.getCurrentPosition()),
-                TimeUnit.MILLISECONDS.toSeconds(player.getCurrentPosition()%60000)));
-
-        timeEnd.setText(String.format("%d.%02d", TimeUnit.MILLISECONDS.toMinutes(player.getDuration()),
-                TimeUnit.MILLISECONDS.toSeconds(player.getDuration()%60000)));
-
-        play.setImageResource(!player.isPlaying()?R.drawable.ic_play_24dp:R.drawable.ic_pause_24dp);
 
         runnable = this::progressListener;
         handler.postDelayed(runnable,100);
     }
 
-    private void updateView(){
+    public void updateView(){
         try{
             Glide.with(trackCover.getContext())
                     .asBitmap()
@@ -300,7 +314,14 @@ public class PlayerFragment extends Fragment {
                 showSystemUI();
             }
             else
-                mediaController.getTransportControls().play();
+                if (isFirstClick){
+                    songPosition = playArray.indexOf(playSong);
+                    serviceIntent.setAction(Constants.STARTFOREGROUND_ACTION);
+                    getActivity().startService(serviceIntent);
+                    mediaController.getTransportControls().play();
+                    isFirstClick = false;
+                }else
+                    mediaController.getTransportControls().play();
             return true;
         }
     }

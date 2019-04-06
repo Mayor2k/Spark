@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.mayor2k.spark.MusicService.playSong;
+import static com.mayor2k.spark.MusicService.player;
 
 public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private RecyclerView songView;
@@ -106,13 +108,11 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                 public void showPlayer() {
                     ((MainActivity) getActivity()).addPlayerFragment();
                     BottomPlayerFragment bottomPlayerFragment = ((MainActivity)getActivity()).getBottomPlayerFragment();
-                    View bottomPlayerFragmentView = bottomPlayerFragment.getBottomPlayerView();
-                    TextView songTitle = bottomPlayerFragmentView.findViewById(R.id.bottom_player_song_title);
+                    TextView songTitle = bottomPlayerFragment.getView().findViewById(R.id.bottom_player_song_title);
                     playSong = songList.get(songPosition);
                     songTitle.setText(playSong.getTitle());
-                    /*progressBar.setMax(playSong.getDuration());
-                    progressBar.setProgress(pausePosition);*/
-
+                    bottomPlayerFragment.progressListener();
+                    ((MainActivity) getActivity()).getPlayerFragment().progressListener();
                 }
             };
             songAdt.setHasStableIds(true);

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -49,12 +50,12 @@ import java.util.Objects;
 
 import static com.mayor2k.spark.Adapters.AlbumAdapter.currentAlbum;
 import static com.mayor2k.spark.Adapters.SongAdapter.serviceIntent;
+import static com.mayor2k.spark.Adapters.SongAdapter.songPosition;
 import static com.mayor2k.spark.MusicService.pausePosition;
 import static com.mayor2k.spark.MusicService.playSong;
 import static com.mayor2k.spark.MusicService.player;
 import static com.mayor2k.spark.UI.Fragments.AlbumFragment.albumList;
 import static com.mayor2k.spark.UI.Fragments.ArtistFragment.artistList;
-import static com.mayor2k.spark.UI.Fragments.PlayerFragment.staticPlayerView;
 
 public class MainActivity extends AppCompatActivity{
     public static final String TAG = "TAGGING";
@@ -63,14 +64,13 @@ public class MainActivity extends AppCompatActivity{
     public ViewPager viewPager;
     public static boolean isPlayerOpen = false;
 
-    public FrameLayout slidingPanel;
     FrameLayout bottomPlayerFragmentView;
-    FrameLayout playerFragmentView;
     public static boolean isFirstClick;
     public  ViewGroup.MarginLayoutParams lp;
     public BottomPlayerFragment bottomPlayerFragment;
     PlayerFragment playerFragment;
     SlidingUpPanelLayout slidingUpPanelLayout;
+    Toolbar toolbar;
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -93,15 +93,13 @@ public class MainActivity extends AppCompatActivity{
         bottomPlayerFragment = new BottomPlayerFragment();
         playerFragment = new PlayerFragment();
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         viewPager = findViewById(R.id.content);
         setupViewPager(viewPager);
         lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
         tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        slidingPanel = findViewById(R.id.sliding_panel);
-        playerFragmentView = findViewById(R.id.player_container);
         bottomPlayerFragmentView = findViewById(R.id.bottom_player_container);
 
         getSupportFragmentManager()
@@ -115,13 +113,20 @@ public class MainActivity extends AppCompatActivity{
                 .commit();
 
         slidingUpPanelLayout = findViewById(R.id.container);
+        isStoragePermissionGranted();
+    }
+
+    @SuppressLint("DefaultLocale")
+    @Override
+    protected void onStart() {
+        super.onStart();
         slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
                 bottomPlayerFragmentView.setAlpha(1-slideOffset);
                 if (slideOffset==1){
                     StatusBarUtil.setDarkMode(MainActivity.this);
-                    Toolbar toolbar1 = staticPlayerView.findViewById(R.id.playerToolbar);
+                    Toolbar toolbar1 = playerFragment.getView().findViewById(R.id.playerToolbar);
                     isPlayerOpen = true;
                     setSupportActionBar(toolbar1);
                     toolbar1.setTitle(" ");
@@ -144,47 +149,44 @@ public class MainActivity extends AppCompatActivity{
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
             }
         });
-        isStoragePermissionGranted();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         SharedPreferences sPref = getPreferences(MODE_PRIVATE);
         String jsonArray = sPref.getString("LastPlayArray", "");
         isFirstClick = jsonArray.equals("");
         if (!isFirstClick) {
             playArray = new Gson().fromJson(jsonArray,new TypeToken<ArrayList<Song>>(){}.getType());
-            playSong = playArray.get(sPref.getInt("LastSong",-1));
-            View bottomPlayerView = bottomPlayerFragment.getBottomPlayerView();
-            TextView songTitle = bottomPlayerView.findViewById(R.id.bottom_player_song_title);
-            ProgressBar progressBar = bottomPlayerView.findViewById(R.id.progressBar);
+            songPosition = sPref.getInt("LastSong",-1);
+            if (playSong==null){
+                pausePosition = sPref.getInt("LastPosition",-1);
+                playSong = playArray.get(songPosition);
+            }
+            //bottom player fragment
+            TextView songTitle = bottomPlayerFragment.getView().findViewById(R.id.bottom_player_song_title);
             songTitle.setText(playSong.getTitle());
-            pausePosition = sPref.getInt("LastPosition",-1);
-            progressBar.setMax(playSong.getDuration());
-            progressBar.setProgress(pausePosition);
-            /*slidingPanel.setVisibility(View.VISIBLE);
-            bottomPlayerFragmentView.setVisibility(View.VISIBLE);
-            playerFragmentView.setVisibility(View.VISIBLE);
-            slidingPanel.postInvalidate();
-            bottomPlayerFragmentView.postInvalidate();
-            playerFragmentView.postInvalidate();*/
+            bottomPlayerFragment.progressListener();
+            //player fragment
+            playerFragment.updateView();
+            playerFragment.progressListener();
+
             slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             int bottom = (int) (getResources().getDimension(R.dimen.bottom_margin)/getResources().getDisplayMetrics().density);
             lp.setMargins(0, 0, 0, bottom);
             viewPager.requestLayout();
         }else{
-            /*slidingPanel.setVisibility(View.INVISIBLE);
-            bottomPlayerFragmentView.setVisibility(View.INVISIBLE);
-            playerFragmentView.setVisibility(View.INVISIBLE);
-            slidingPanel.postInvalidate();
-            bottomPlayerFragmentView.postInvalidate();
-            playerFragmentView.postInvalidate();*/
             slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
             lp.setMargins(0, 0, 0, 0);
             viewPager.requestLayout();
         }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (playSong!=null) {
+            SharedPreferences sPref = getPreferences(MODE_PRIVATE);
+            SharedPreferences.Editor ed = sPref.edit();
+            ed.putInt("LastPosition",player.getCurrentPosition());
+            ed.apply();
+        }
     }
 
     @Override
@@ -288,12 +290,6 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void addPlayerFragment(){
-        /*slidingPanel.setVisibility(View.VISIBLE);
-        bottomPlayerFragmentView.setVisibility(View.VISIBLE);
-        playerFragmentView.setVisibility(View.VISIBLE);
-        slidingPanel.postInvalidate();
-        bottomPlayerFragmentView.postInvalidate();
-        playerFragmentView.postInvalidate();*/
         slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         int bottom = (int) (getResources().getDimension(R.dimen.bottom_margin)/getResources().getDisplayMetrics().density);
         lp.setMargins(0, 0, 0, bottom);
@@ -303,4 +299,6 @@ public class MainActivity extends AppCompatActivity{
     public BottomPlayerFragment getBottomPlayerFragment(){
         return bottomPlayerFragment;
     }
+
+    public PlayerFragment getPlayerFragment(){return playerFragment;}
 }

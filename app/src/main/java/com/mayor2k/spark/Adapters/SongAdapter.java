@@ -107,6 +107,7 @@ public abstract class SongAdapter extends RecyclerViewCursorAdapter<SongAdapter.
             serviceIntent.setAction(Constants.STARTFOREGROUND_ACTION);
             v.getContext().startService(serviceIntent);
             if (isFirstClick)
+                Log.i("tagsts","kajjka");
                 showPlayer();
                 isFirstClick = false;
         }
